@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[node name="Blueprint" type="MarginContainer"]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Description" type="Label" parent="."]
+layout_mode = 2
+text = "BLUEPRINT / Concept review
+
+Planned: image-generated tower-defense concepts based on Human/ArtReference.jpg.
+Store review images in devtools/blueprint/images/.
+
+This workspace is a placeholder. Concept generation is not implemented."
+vertical_alignment = 0
+autowrap_mode = 2

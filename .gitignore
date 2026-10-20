@@ -1,0 +1,11 @@
+# Godot generated cache and local editor state.
+.godot/
+
+# Export output and local credentials.
+builds/
+export_credentials.cfg
+
+# OS/editor temporary files.
+.DS_Store
+Thumbs.db
+*.tmp
