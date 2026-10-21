@@ -36,7 +36,7 @@ text = "Star World / Developer Hub"
 layout_mode = 2
 text = "Independent modules > Review > Integration"
 
-[node name="Workspaces" type="TabContainer" parent="Margin/Layout"]
+[node name="Workspaces" type="VBoxContainer" parent="Margin/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3

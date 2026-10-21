@@ -1,19 +1,12 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[node name="Logic Test" type="MarginContainer"]
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
+[ext_resource type="Script" path="res://devtools/logic_test/logic_workspace.gd" id="1"]
 
-[node name="Description" type="Label" parent="."]
-layout_mode = 2
-text = "LOGIC TEST / Combat sandbox
-
-Planned: deployment, routes, waves, targeting, damage and victory conditions.
-Use simple shapes and placeholder UI to inspect combat state.
-Reusable rules belong in features/battle/; sandbox fixtures belong here.
-
-This workspace is a placeholder. Combat simulation is not implemented."
-vertical_alignment = 0
-autowrap_mode = 2
+[node name="LogicTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")

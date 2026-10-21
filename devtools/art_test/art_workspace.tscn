@@ -1,37 +1,11 @@
-[gd_scene format=3]
-
-[node name="Art Test" type="MarginContainer"]
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 24
-
-[node name="Categories" type="TabContainer" parent="."]
-layout_mode = 2
-
-[node name="Character" type="Label" parent="Categories"]
-layout_mode = 2
-text = "Character preview placeholder.
-
-Independent character presentation scenes belong in features/actor_view/.
-Original atlases remain in Human/StarterContent/character/."
-vertical_alignment = 0
-autowrap_mode = 2
-
-[node name="Effect" type="Label" parent="Categories"]
-layout_mode = 2
-text = "Effect preview placeholder.
-
-Independent effect scenes belong in features/effects/.
-Original atlases remain in Human/StarterContent/effects/."
-vertical_alignment = 0
-autowrap_mode = 2
-
-[node name="Battle Scene" type="Label" parent="Categories"]
-layout_mode = 2
-text = "Battle presentation preview placeholder.
-
-Maps belong in features/battlefield_view/; presentation-only UI belongs in features/battle_hud/.
-Use mock display data here; no live combat rules."
-vertical_alignment = 0
-autowrap_mode = 2
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://devtools/art_test/art_workspace.gd" id="1"]
+[node name="ArtWorkspace" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+page = 0

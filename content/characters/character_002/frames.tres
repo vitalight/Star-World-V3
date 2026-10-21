@@ -1,0 +1,29 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://content/characters/character_002/atlas.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="Pose0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 313.5, 313.5)
+
+[sub_resource type="AtlasTexture" id="Pose1"]
+atlas = ExtResource("1")
+region = Rect2(313.5, 0, 313.5, 313.5)
+
+[sub_resource type="AtlasTexture" id="Pose2"]
+atlas = ExtResource("1")
+region = Rect2(627, 0, 313.5, 313.5)
+
+[sub_resource type="AtlasTexture" id="Pose3"]
+atlas = ExtResource("1")
+region = Rect2(940.5, 0, 313.5, 313.5)
+
+[resource]
+animations = [
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose0")}], "loop": true, "name": &"front_idle", "speed": 1.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose1")}], "loop": true, "name": &"back_idle", "speed": 1.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose2")}], "loop": true, "name": &"front_attack", "speed": 1.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose3")}], "loop": true, "name": &"back_attack", "speed": 1.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose0")}, {"duration": 1.0, "texture": SubResource("Pose2")}], "loop": true, "name": &"front_preview", "speed": 2.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Pose1")}, {"duration": 1.0, "texture": SubResource("Pose3")}], "loop": true, "name": &"back_preview", "speed": 2.0}
+]

@@ -1,6 +1,9 @@
 # Godot generated cache and local editor state.
 .godot/
 
+# Task-generated temporary data.
+/temp/
+
 # Export output and local credentials.
 builds/
 export_credentials.cfg
