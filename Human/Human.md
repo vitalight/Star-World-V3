@@ -18,8 +18,15 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
 
 - 开发者关卡，包含四个子界面：
     - Blueprint：imagegen生成的游戏概念图（参考图，塔防界面）
-    - Art Test：只看资产（1）Character（2）Effect（3）战斗Scene（包括UI，但无实机逻辑）
+    - Art Test：只看资产（1）Character（2）Effect（3）Battle（包括UI，但无实机逻辑）
     - Logic Test：只看逻辑（1）极简战斗场景（全用极简占位素材）
     - Game Test：资产+逻辑集成（1）实机战斗场景
 
 初阶段首要目的，是开发一个高效率、低耦合的开发者工具。
+
+## Todo
+
+- [ ] Logic Test：验收
+- [ ] Game Test：集成最终关卡 Art + Logic。支持tilemap编辑地图
+- [ ] Story Test：初版
+- [ ] Game Test：集成剧情
