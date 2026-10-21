@@ -12,7 +12,7 @@
 开发者首页提供四个独立入口，每个页面均可返回首页，切换时销毁旧工作区。
 
 - Blueprint：切换 A（日照砂岩台地）与 B（夜间水渠桥梁）概念图，等待用户二选一；原图与提示词位于 `devtools/blueprint/`。
-- Art Test：Character、Effect、Battle Scene 三个独立展示页，支持姿态检查、播放/暂停、特效重播及静态战场 UI。素材缺少连续动画帧，循环演示已明确标注。详见 [Art Test 操作说明](devtools/art_test/README.md)。
+- Art Test：Character / Effect / Animation / Battle 四个 tab，默认 Character；全量浏览 16 个角色四姿态与 32 张静态特效，动态演示集中在 Animation，Battle 保留战场组合。所有工作区顶部路径统一，点击 Developer Hub 返回首页。素材缺少连续动画帧，循环演示已明确标注。详见 [Art Test 操作说明](devtools/art_test/README.md)。
 - Logic Test：点击 1–4 号方格部署，再点 Start wave；四格全部部署可胜利，空场可验证失败，Reset 重新开始。详见 [Logic Test 操作说明](devtools/logic_test/README.md)。
 - Game Test：可进入和返回的“待集成”页面，后续经过模块评审后组装。
 

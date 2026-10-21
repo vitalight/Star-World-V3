@@ -1,16 +1,27 @@
 extends Control
+const UI = preload("res://devtools/ui/workspace_style.gd")
+const ACCENT = Color("b0a4cf")
+
 func _ready() -> void:
-	var box = VBoxContainer.new()
-	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	box.offset_left = 32
-	box.offset_top = 32
-	box.offset_right = -32
-	add_child(box)
-	var back = Button.new()
-	back.text = "< Developer Hub"
-	back.pressed.connect(func(): get_tree().change_scene_to_file("res://devtools/hub/developer_hub.tscn"))
-	box.add_child(back)
-	var label = Label.new()
-	label.text = "GAME TEST / 待集成\n\nAfter module review, assemble battle rules and art here."
-	label.add_theme_font_size_override("font_size", 28)
-	box.add_child(label)
+	var layout := UI.shell(self, "Game Test", ACCENT)
+	var body := UI.scroll_body(layout)
+	UI.heading(body, "集成预览", "连接经过评审的模块，在这里验证完整游戏流程。", ACCENT)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UI.box(UI.SURFACE, UI.LINE, 32, 12))
+	body.add_child(panel)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 22)
+	panel.add_child(column)
+	UI.text(column, "04  /  INTEGRATION", 14, ACCENT)
+	UI.text(column, "等待模块接入", 30, UI.INK)
+	UI.text(column, "当前保留为集成入口。完成模块评审后，将战斗规则与美术表现组装到此工作区。", 18)
+	column.add_child(UI.divider())
+	for entry in [["战斗规则", "部署、寻敌、攻击与胜负"], ["美术表现", "角色、特效、战场与界面"]]:
+		var section := VBoxContainer.new()
+		section.add_theme_constant_override("separation", 6)
+		column.add_child(section)
+		UI.text(section, entry[0], 18, UI.INK)
+		UI.text(section, entry[1], 16)
+	column.add_child(UI.divider())
+	UI.text(column, "当前状态   ·   待评审与集成", 15, ACCENT)
+	UI.text(body, "独立验证  →  模块评审  →  游戏集成", 14)

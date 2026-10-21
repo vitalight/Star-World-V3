@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3]
-[ext_resource type="Script" path="res://features/battlefield_view/battlefield_view.gd" id="1"]
+[ext_resource type="Script" path="res://content/scenes/scene_001/field.gd" id="1"]
 [ext_resource type="Texture2D" path="res://content/terrains/terrain_001/atlas.png" id="2"]
-[node name="Wasteland" type="Node2D"]
+[node name="Wasteland" type="Node3D"]
 script = ExtResource("1")
 atlas = ExtResource("2")

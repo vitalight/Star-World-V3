@@ -1,5 +1,6 @@
 extends Control
-
+const UI = preload("res://devtools/ui/workspace_style.gd")
+const ACCENT = Color("90b5e4")
 const Battle = preload("res://features/battle/battle.gd")
 const TestConfig = preload("res://devtools/logic_test/test_config.gd")
 const Canvas = preload("res://devtools/logic_test/battle_canvas.gd")
@@ -11,49 +12,37 @@ var hint: Label
 
 func _ready() -> void:
 	battle = Battle.new(TestConfig.create())
-	var margin = MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, 22)
-	add_child(margin)
-	var column = VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
-	margin.add_child(column)
-	var header = HBoxContainer.new()
-	column.add_child(header)
-	var title = Label.new()
-	title.text = "LOGIC TEST / Geometry battle sandbox"
-	title.add_theme_font_size_override("font_size", 24)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(title)
-	var back = Button.new()
-	back.text = "Back to hub"
-	back.pressed.connect(func(): get_tree().change_scene_to_file("res://devtools/hub/developer_hub.tscn"))
-	header.add_child(back)
-	var actions = HBoxContainer.new()
-	column.add_child(actions)
+	var layout := UI.shell(self, "Logic Test", ACCENT)
+	var column := UI.scroll_body(layout)
+	UI.heading(column, "规则验证", "在几何沙盒中检查部署、自动攻击与战斗胜负。", ACCENT)
+	var toolbar := PanelContainer.new()
+	column.add_child(toolbar)
+	var toolbar_column := VBoxContainer.new()
+	toolbar.add_child(toolbar_column)
+	var actions := HFlowContainer.new()
+	toolbar_column.add_child(actions)
 	start_button = Button.new()
-	start_button.text = "Start wave"
+	start_button.text = "开始波次"
+	start_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	start_button.pressed.connect(func(): battle.start(); _refresh())
 	actions.add_child(start_button)
-	var reset_button = Button.new()
-	reset_button.text = "Reset"
+	var reset_button := Button.new()
+	reset_button.text = "重置战场"
+	reset_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	reset_button.pressed.connect(_reset)
 	actions.add_child(reset_button)
-	status = Label.new()
-	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	actions.add_child(status)
-	hint = Label.new()
-	hint.text = "Click numbered squares to deploy. Deploy all four to win; leave empty to test defeat."
-	column.add_child(hint)
+	status = UI.text(toolbar_column, "", 16, ACCENT)
+	hint = UI.text(column, "点击编号方格部署；四个位置全部部署可获胜，空场可检查失败流程。", 16)
+	var field := PanelContainer.new()
+	field.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(field)
 	canvas = Canvas.new()
 	canvas.config = TestConfig.create()
 	canvas.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	canvas.slot_clicked.connect(_deploy)
-	column.add_child(canvas)
-	var legend = Label.new()
-	legend.text = "Cyan squares: allies  |  Coral circles: enemies  |  Rings: attack range  |  Green bars: HP\nOne fixed wave: 8 enemies, base life 3. Placement is allowed before and during battle."
-	column.add_child(legend)
+	field.add_child(canvas)
+	canvas.custom_minimum_size.y = 350
+	UI.text(column, "青色方块 · 我方    /    珊瑚色圆点 · 敌方    /    圆环 · 攻击范围    /    绿条 · 生命\n固定单波：8 名敌人，基地生命 3；波次开始前与进行中均可部署。", 14)
 	_refresh()
 
 func _process(delta: float) -> void:
@@ -71,20 +60,21 @@ func _process(delta: float) -> void:
 
 func _deploy(index: int) -> void:
 	if battle.deploy(index):
-		hint.text = "Deployed slot %d. Automatic attacks target the enemy closest to the base." % (index + 1)
+		hint.text = "已部署位置 %d；自动攻击优先锁定最接近基地的敌人。" % (index + 1)
 	else:
-		hint.text = "Cannot deploy: slot occupied or battle finished. Reset to try again."
+		hint.text = "无法部署：位置已占用或战斗已结束。可重置战场后重试。"
 	_refresh()
 
 func _reset() -> void:
 	battle.reset()
 	canvas.flashes.clear()
-	hint.text = "Reset complete. Click slots to deploy, then start the wave."
+	hint.text = "已重置战场。点击编号方格部署，再开始波次。"
 	_refresh()
 
 func _refresh() -> void:
 	var state = battle.snapshot()
 	canvas.state = state
 	start_button.disabled = state.phase != "ready"
-	status.text = "  %s  |  Life %d  |  Remaining %d  |  Killed %d  |  Escaped %d" % [state.phase.to_upper(), state.life, state.remaining, state.killed, state.escaped]
+	var phases := {"ready": "准备中", "running": "战斗中", "victory": "胜利", "defeat": "失败"}
+	status.text = "%s   ·   基地生命 %d   /   剩余 %d   /   击败 %d   /   漏怪 %d" % [phases.get(state.phase, state.phase), state.life, state.remaining, state.killed, state.escaped]
 	canvas.queue_redraw()
