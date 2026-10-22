@@ -22,10 +22,12 @@ func _ready() -> void:
 	debug_window.hide()
 	var toggle := Button.new()
 	toggle.text = "F3"
-	toggle.position = Vector2(18, 66)
 	toggle.custom_minimum_size = Vector2(42, 26)
 	toggle.pressed.connect(_toggle_debug)
 	overlay.add_child(toggle)
+	toggle.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	toggle.offset_left = 18; toggle.offset_right = 60
+	toggle.offset_top = -44; toggle.offset_bottom = -18
 
 func _toggle_debug() -> void:
 	debug_window.visible = not debug_window.visible

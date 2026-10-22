@@ -136,3 +136,35 @@
 同时修正敌人出生首帧：新立片先放到逻辑位置，再按距离对应的路线段初始化朝向；后续根据实际位移更新，避免从默认世界原点推断首帧方向。无路线的 Art 模拟快照沿用传入 facing。
 
 复现脚本初始 16 项中 13 项失败；修复后永久回归 facing_test 52 项通过，覆盖五名干员四向待机／攻击、三类敌人左右路线的出生首帧与后续移动。真实渲染已核对 facing_0.png（朝右）与 facing_2.png（朝左），部署交互 54 项、显示一致性 84 项、战斗集成 107 项及 Art Battle 专项通过。日志 temp/facing.log、temp/deployment_view.log、temp/presentation_parity.log、temp/game_integration.log、temp/art_shared.log；截图 temp/verification/facing_*.png。
+
+### 选中在场干员显示范围
+
+点击已部署干员时，按战斗快照中的位置、朝向与范围配置显示橙色覆盖层；取消选择、撤退或离场时清除。部署成功后不自动选中，继续保持部署完成即清除预览。覆盖层缓存纳入选中单位信息，切换干员时正确刷新。
+
+真实图形验证：deployment_view_test 58 项、operator_actions_test 26 项均通过；截图 `temp/verification/game_selected_range.png`，日志 `temp/verification/selected_range.log`、`selected_range_actions.log`。
+
+### 选中干员的就近操作与信息展示
+
+撤退改为干员附近左上角的图标按钮，技能改为右下角的技能图标按钮。游戏层投影干员位置并调用 HUD 的 set_operator_anchor，HUD 负责窗口内布局及避免与左侧详情重叠；窗口变化后重新定位。按钮继续只发正常撤退／技能意图，快照控制技能就绪、持续中与无主动技能的禁用状态，离场、取消选择及终局时隐藏。
+
+左侧展示所选干员立绘、生命与技力、技能图标及功能说明；描述从实际技能倍率、持续时间与回复方式生成，不另存规则。复用原有立绘与技能纹理。
+
+真实渲染检查 1280×800、960×600、1600×900；operator_actions_test 48 项、battle_visual_test 459 项、deployment_view_test 58 项通过，Art Battle smoke 通过。验证包含图标相对位置与边界、切换干员、技能释放及禁用、撤退返费与冷却、取消选择隐藏、地图边缘避让、调试窗输入隔离。截图 temp/verification/operator_actions_*.png，日志 temp/verification/nearby_*.log。
+
+### 顶部 HUD 比例与调试入口位置
+
+移除部署卡片的 tooltip_text，悬浮不再弹出名称／部署地形字样。顶部菜单、倍速、暂停按钮与图标放大 1.5 倍，中央进度图标和数字字号放大 1.2 倍并扩展容器。开发者 F3 按钮改为左下角锚定，提示／开始区域右移留出空间。
+
+真实图形回归 battle_visual_test 459 项通过，覆盖 1280×800、960×600、1600×900、菜单、暂停倍速、F3 调试窗输入隔离及导航。已核对 temp/verification/game_960x600.png；对应三种尺寸截图 game_*.png，日志 temp/verification/top_hud_scaling.log。
+
+### 角色表现下移与方形操作按钮
+
+共享 actor_view 根据相机投影，将角色视觉锚点沿原高度平面移动至屏幕向下 20px 处，逻辑位置保留。干员、敌人、飞行单位及待部署预览统一生效；拾取、附近操作按钮、状态条、阴影与攻击／受击特效同步使用视觉位置。撤退与技能图标的全部按钮状态改为正方形，技能就绪边框也不再倾斜。
+
+真实渲染验证：三种窗口尺寸的五名干员与三类敌人均下移 20px，拾取同步；facing_test 115 项、actor_occlusion_test 21 项、operator_actions_test 48 项、deployment_view_test 58 项、combat_effects_test 215 项、presentation_parity_test 84 项、battle_visual_test 459 项全部通过。截图 temp/verification/actor_lowered_*.png，日志 temp/verification/actor_lower_*.log。
+
+### 干员脚下罗盘方向标识
+
+共享 actor_view 新增纯 shader 绘制的半透明圆面／圆环及三角方向箭头，无新增图片。水平 PlaneMesh 跟随视觉脚点，方向读取同一快照 facing，覆盖四向待机与攻击，待部署时同步鼠标选向。使用较低绘制优先级的地面覆盖层，避免在高台边缘被截掉，角色和脚下状态条保持可读；敌人不显示此标识，撤退／离场立即移除，重开随角色清理。删除游戏层旧的待部署点状箭头。
+
+真实渲染验证 facing_test 185 项、deployment_view_test 62 项、operator_actions_test 49 项、presentation_parity_test 84 项、actor_occlusion_test 21 项全部通过。包含五类干员四向姿态、三种窗口尺寸下的脚点对齐、待部署朝向、敌人排除和撤退清理。四向对照图 temp/verification/compass_four_directions.png，原图 facing_0.png 至 facing_3.png；日志 temp/verification/compass_*.log。

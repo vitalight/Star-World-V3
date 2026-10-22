@@ -25,7 +25,7 @@ func click_button(button: Button) -> void:
 	await click(button.get_global_rect().get_center())
 func select_actor(id: int) -> void:
 	var actor = game.presentation.actors[id]
-	await click(game.camera.unproject_position(actor.position + game.camera.global_basis.y * actor.display_height() * 0.5))
+	await click(game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height() * 0.5))
 func run() -> void:
 	root.size = Vector2i(1280,800)
 	game = load("res://game/battle/battle_scene.tscn").instantiate()
@@ -40,9 +40,18 @@ func run() -> void:
 	check(game.selected_unit == deployed.id and game.hud.info_panel.visible, "Clicking deployed operator opens details")
 	check(game.hud.skill_button.icon != null and not game.hud.skill_button.disabled and game.hud.skill_status.text.contains("就绪"), "Ready skill icon can be activated")
 	check(game.hud.retreat_button.tooltip_text.contains("一半") and game.hud.retreat_button.tooltip_text.contains("冷却"), "Details explain refund and redeployment delay")
-	for dimensions in [Vector2i(1280,800), Vector2i(960,600)]:
+	check(game.hud.operator_portrait.texture == game.appearances.guard.portrait and game.hud.skill_portrait.texture == game.hud.skill_button.icon, "Left panel displays selected portrait and skill icon")
+	check(game.hud.skill_description.text.contains("200%") and game.hud.skill_description.text.contains("5.0") and game.hud.skill_description.text.contains("自动回复"), "Skill description reflects real multiplier, duration and recovery")
+	for dimensions in [Vector2i(1280,800), Vector2i(960,600), Vector2i(1600,900)]:
 		root.size = dimensions; await settle(); game.fit_camera()
 		check(root.get_visible_rect().encloses(game.hud.info_panel.get_global_rect()), "Operator actions fit " + str(dimensions))
+		var center: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height() * 0.5)
+		check(game.hud.retreat_button.get_global_rect().get_center().x < center.x and game.hud.retreat_button.get_global_rect().get_center().y < center.y, "Retreat icon is above-left of operator " + str(dimensions))
+		check(game.hud.skill_button.get_global_rect().get_center().x > center.x and game.hud.skill_button.get_global_rect().get_center().y > center.y, "Skill icon is below-right of operator " + str(dimensions))
+		for button in [game.hud.retreat_button, game.hud.skill_button]:
+			check(root.get_visible_rect().encloses(button.get_global_rect()) and not game.hud.info_panel.get_global_rect().intersects(button.get_global_rect()), "Floating icon stays in view and outside details")
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("res://temp/verification/operator_actions_%dx%d.png" % [dimensions.x,dimensions.y])
 	root.size = Vector2i(1280,800); await settle(); game.fit_camera()
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png("res://temp/verification/operator_skill_ready.png")
@@ -60,10 +69,12 @@ func run() -> void:
 	check(game.battle.find_unit(deployed.id).skill_left == active.skill_left, "Repeated disabled click does not restart skill")
 	var before: float = game.last_state.cost
 	await click_button(game.hud.retreat_button)
+	check(not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Retreat hides floating actions")
 	check(game.battle.find_unit(deployed.id).is_empty() and not game.hud.info_panel.visible, "Retreat removes operator and closes its details")
 	check(is_equal_approx(game.last_state.cost, minf(game.configuration.cost_cap, before + floorf(active.cost * 0.5))), "Retreat refunds half the deployment cost, respecting cap")
 	check(game.hud.cards.guard.button.visible and game.hud.cards.guard.button.disabled and game.hud.cards.guard.cooldown.visible, "Retreated card returns with disabled cooldown overlay")
 	check(not actor.skill_hint.visible, "Departing operator has no readiness marker")
+	check(not actor.compass.visible, "Retreat immediately removes operator compass")
 	var cost: float = game.last_state.cost
 	check(game.command("deploy",["guard",Vector2i(3,1),2]).reason == "redeploy_cooldown" and game.last_state.cost == cost, "Immediate redeployment is rejected without spending")
 	game.battle.advance(active.redeploy_time - 0.1); game.refresh(active.redeploy_time - 0.1)
@@ -89,6 +100,17 @@ func run() -> void:
 	check(actor.skill_hint.visible and not game.hud.skill_button.disabled, "Auto recovery crossing threshold lights operator and enables icon")
 	await click_button(game.hud.skill_button)
 	check(game.battle.find_unit(deployed.id).skill_left > 0 and not actor.skill_hint.visible, "Auto-recovered skill can be activated through icon")
+	game.cancel_selection()
+	check(not game.hud.info_panel.visible and not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Cancelling selection hides both details and floating actions")
+	game.command("deploy",["tank",Vector2i(9,4),2])
+	var tank_id: int = game.last_state.units.back().id
+	await select_actor(tank_id)
+	check(game.hud.operator_portrait.texture == game.appearances.tank.portrait and game.hud.skill_description.text == "无主动技能" and game.hud.skill_button.disabled, "Switching operator updates portrait and disables absent skill")
+	for cell in [Vector2i(0,1), Vector2i(9,4)]:
+		game.reset(); game.command("deploy",["guard",cell,0]); game.select_cell(cell)
+		await settle()
+		for button in [game.hud.retreat_button,game.hud.skill_button]:
+			check(root.get_visible_rect().encloses(button.get_global_rect()) and not game.hud.info_panel.get_global_rect().intersects(button.get_global_rect()), "Map-edge actions avoid screen edge and details")
 	game.free(); await process_frame
 	print("OPERATOR ACTIONS: %d checks, %d failures" % [checks,failures])
 	quit(1 if failures else 0)

@@ -87,6 +87,7 @@ func run() -> void:
 		var offset: Vector2 = [Vector2(90,0),Vector2(0,80),Vector2(-90,0),Vector2(0,-80)][direction]
 		await motion(point + offset,offset)
 		check(game.facing == direction and game.candidate == Vector2i(3,1), "Mouse aiming rotates without moving pending tile: " + str(direction))
+		check(game.deployment_preview.compass.visible and game.deployment_preview.compass.basis.x.dot([Vector3.RIGHT,Vector3.BACK,Vector3.LEFT,Vector3.FORWARD][direction]) > 0.999, "Pending compass tracks mouse-selected facing")
 		check(game.deployment_preview.sprite.flip_h == (direction == 0) and game.deployment_preview.sprite.texture == game.appearances.guard.poses[1 if direction == 3 else 0], "Pending pose follows selected facing")
 	await motion(point + Vector2(-90,0),Vector2(-90,0))
 	await shot("game_pending_deployment")
@@ -99,6 +100,14 @@ func run() -> void:
 		quit(1); return
 	check(overlay_cells("attack_range").is_empty() and overlay_cells("deployable").is_empty(), "Successful deployment immediately clears orange and green overlays")
 	var actor = game.presentation.actors[1]
+	var actor_point: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * 0.5)
+	await mouse(actor_point,true); await mouse(actor_point,false); await settle()
+	check(game.selected_unit == 1 and not overlay_cells("attack_range").is_empty(), "Clicking deployed operator displays orange attack range")
+	check(overlay_cells("attack_range").all(func(cell): return preload("res://features/battle/combat.gd").range_cells(game.last_state.units[0]).has(cell)), "Selected range follows the operator position and facing")
+	check(overlay_cells("deployable").is_empty(), "Inspecting operator does not show deployment highlights")
+	await shot("game_selected_range")
+	await key(KEY_ESCAPE)
+	check(overlay_cells("attack_range").is_empty(), "Cancelling selection clears inspected range")
 	check(actor.sprite.scale == Vector3.ONE and actor.sprite.billboard == BaseMaterial3D.BILLBOARD_ENABLED,"Full billboard without compensating stretch")
 	var feet: Vector2 = game.camera.unproject_position(actor.position)
 	var bars: Vector2 = game.camera.unproject_position(actor.health_bar.global_position)

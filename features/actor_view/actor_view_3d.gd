@@ -4,6 +4,9 @@ extends Node3D
 @export var height: float = 1.2
 @export var foot_offset := Vector2(0, 12)
 @export var tint := Color.WHITE
+const SCREEN_OFFSET := Vector2(0, 20)
+var compass: MeshInstance3D
+var shadow: MeshInstance3D
 var sprite: Sprite3D
 var appearance: Resource
 var flash_left := 0.0
@@ -37,7 +40,7 @@ func _ready() -> void:
 		sprite.pixel_size = height / texture.get_height()
 		sprite.offset = Vector2(-foot_offset.x, texture.get_height() / 2.0 - foot_offset.y)
 	add_child(sprite)
-	var shadow := MeshInstance3D.new()
+	shadow = MeshInstance3D.new()
 	var disk := PlaneMesh.new()
 	disk.size = Vector2(0.65, 0.45)
 	shadow.mesh = disk
@@ -47,6 +50,17 @@ func _ready() -> void:
 	shadow.position.y = 0.012
 	shadow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(shadow)
+	compass = MeshInstance3D.new()
+	var compass_plane := PlaneMesh.new()
+	compass_plane.size = Vector2(1.05, 1.05)
+	compass.mesh = compass_plane
+	var compass_material := ShaderMaterial.new()
+	compass_material.shader = preload("res://features/actor_view/facing_compass.gdshader")
+	compass_material.render_priority = -5
+	compass.material_override = compass_material
+	compass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	compass.hide()
+	add_child(compass)
 	health = Label3D.new()
 	health.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	health.font_size = 22
@@ -79,11 +93,29 @@ func _ready() -> void:
 	_process(0.0)
 
 func _process(_delta: float) -> void:
+	update_projection()
+
+## Shift the visual anchor along its ground plane, preserving terrain/flight height.
+## Simulation position remains unchanged; the offset is measured in viewport pixels.
+static func projected_position(camera: Camera3D, at: Vector3) -> Vector3:
+	if not camera: return at
+	var point := camera.unproject_position(at) + SCREEN_OFFSET
+	var hit = Plane(Vector3.UP, at.y).intersects_ray(camera.project_ray_origin(point), camera.project_ray_normal(point))
+	return hit if hit is Vector3 else at
+
+func visual_position() -> Vector3:
+	return projected_position(get_viewport().get_camera_3d(), global_position)
+
+func update_projection() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if not camera or not sprite: return
-	# Foot readouts are screen-aligned and below the grounded anchor.
-	health_bar.position = -camera.global_basis.y * 0.15
-	skill_hint.position = camera.global_basis.y * (display_height() + 0.12)
+	var anchor := visual_position()
+	sprite.position = to_local(anchor)
+	shadow.position = to_local(anchor + Vector3.UP * 0.012)
+	compass.position = to_local(anchor + Vector3.UP * 0.008)
+	health.position = to_local(anchor + camera.global_basis.y * (height + 0.12))
+	health_bar.position = to_local(anchor - camera.global_basis.y * 0.15)
+	skill_hint.position = to_local(anchor + camera.global_basis.y * (display_height() + 0.12))
 
 func display_height() -> float:
 	if not sprite or not sprite.texture: return height
@@ -94,6 +126,8 @@ func display_height() -> float:
 	return (sprite.offset.y + image_texture.get_height() * 0.5 - used.position.y) * sprite.pixel_size
 
 func apply_state(state: Dictionary, is_enemy: bool) -> void:
+	compass.visible = not is_enemy and fade_left < 0
+	compass.rotation.y = -int(state.get("facing", 2)) * PI / 2.0
 	if appearance and appearance.poses.size() >= 4:
 		var facing := int(state.get("facing", 2))
 		var attacking: bool = not state.get("action", {}).is_empty()
@@ -143,6 +177,7 @@ func hit(healing := false) -> void:
 	sprite.modulate = Color("a5ffae") if healing else Color("ffad7f")
 
 func depart() -> void:
+	compass.hide()
 	fade_left = 0.25
 	skill_ready = false
 	_update_skill_glow()

@@ -26,6 +26,7 @@ var start_button: Button
 var retreat_button: Button
 var skill_button: Button
 var skill_status: Label
+var normal_skill_style: StyleBoxFlat
 var ready_skill_style: StyleBoxFlat
 var direction_panel: PanelContainer
 var end_panel: PanelContainer
@@ -39,6 +40,10 @@ var top: HBoxContainer
 var bottom: HBoxContainer
 var economy: Label
 var deployment_count: Label
+var operator_portrait: TextureRect
+var skill_portrait: TextureRect
+var skill_description: Label
+var operator_anchor := Vector2.ZERO
 var game_menu: PanelContainer
 
 func _draw() -> void:
@@ -61,23 +66,26 @@ func _ready() -> void:
 	top.add_theme_constant_override("separation", 10)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top)
-	_button(top, "☰", func(): game_menu.visible = not game_menu.visible)
+	var menu_button := _button(top, "☰", func(): game_menu.visible = not game_menu.visible)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(spacer)
 	speed_button = _button(top, "1×", func(): speed_requested.emit())
 	pause_button = _button(top, "Ⅱ", func(): pause_requested.emit())
+	for button in [menu_button, speed_button, pause_button]:
+		button.custom_minimum_size = Vector2(93, 63)
+		button.add_theme_font_size_override("font_size", 29)
 	var progress := _panel_container()
 	progress.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	progress.offset_left = -165; progress.offset_right = 165
-	progress.offset_top = 12; progress.offset_bottom = 58
+	progress.offset_left = -198; progress.offset_right = 198
+	progress.offset_top = 12; progress.offset_bottom = 67
 	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status = _label(progress, "准备部署", 22)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	readouts = VBoxContainer.new()
 	readouts.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	readouts.offset_left = 18; readouts.offset_right = 285
+	readouts.offset_left = 80; readouts.offset_right = 347
 	readouts.offset_top = -100; readouts.offset_bottom = -18
 	readouts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(readouts)
@@ -108,7 +116,6 @@ func _ready() -> void:
 		var card := Button.new()
 		card.custom_minimum_size = Vector2(100, 128)
 		card.clip_contents = true
-		card.tooltip_text = roster[key].name + (" · 仅限地面" if roster[key].get("role", "melee") == "melee" else " · 仅限高台")
 		card.add_theme_stylebox_override("normal", _panel())
 		card.pressed.connect(func():
 			if not suppress_card_click: roster_selected.emit(key))
@@ -158,14 +165,51 @@ func _ready() -> void:
 	info_panel.custom_minimum_size = Vector2(235, 0)
 	var info := VBoxContainer.new()
 	info_panel.add_child(info)
-	selection = _label(info, "", 17)
-	retreat_button = _button(info, "撤退", func(): retreat_requested.emit())
-	skill_status = _label(info, "", 16)
-	skill_button = _button(info, "释放技能", func(): skill_requested.emit())
-	skill_button.custom_minimum_size = Vector2(210, 72)
+	operator_portrait = TextureRect.new()
+	operator_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	operator_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	operator_portrait.custom_minimum_size = Vector2(200, 160)
+	operator_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.add_child(operator_portrait)
+	selection = _label(info, "", 16)
+	var skill_info := HBoxContainer.new()
+	skill_info.add_theme_constant_override("separation", 10)
+	info.add_child(skill_info)
+	skill_portrait = TextureRect.new()
+	skill_portrait.custom_minimum_size = Vector2(48, 48)
+	skill_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	skill_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	skill_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	skill_info.add_child(skill_portrait)
+	skill_description = _label(skill_info, "", 15)
+	skill_description.custom_minimum_size.x = 142
+	skill_description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	skill_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	skill_status = _label(info, "", 14)
+	skill_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	retreat_button = _button(self, "↶", func(): retreat_requested.emit())
+	retreat_button.add_theme_font_size_override("font_size", 36)
+	retreat_button.accessibility_name = "撤退"
+	skill_button = _button(self, "", func(): skill_requested.emit())
+	skill_button.accessibility_name = "释放技能"
 	skill_button.expand_icon = true
-	skill_button.add_theme_constant_override("icon_max_width", 52)
-	ready_skill_style = _panel()
+	skill_button.add_theme_constant_override("icon_max_width", 44)
+	for button in [retreat_button, skill_button]:
+		button.custom_minimum_size = Vector2(56, 56)
+		button.size = Vector2(56, 56)
+		button.z_index = 10
+		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+			var square := StyleBoxFlat.new()
+			square.bg_color = Color("34464b") if state == "hover" else Color("172024")
+			if state == "pressed": square.bg_color = Color("485653")
+			if state == "disabled": square.bg_color = Color(0.07, 0.09, 0.10, 0.75)
+			if state == "focus": square.bg_color = Color.TRANSPARENT
+			square.border_color = Color("e5e4cd") if state == "focus" else Color("66716c")
+			square.set_border_width_all(1)
+			button.add_theme_stylebox_override(state, square)
+		button.hide()
+	normal_skill_style = skill_button.get_theme_stylebox("normal") as StyleBoxFlat
+	ready_skill_style = normal_skill_style.duplicate()
 	ready_skill_style.bg_color = Color("61451c")
 	ready_skill_style.border_color = Color("ffd66c")
 	ready_skill_style.set_border_width_all(2)
@@ -262,7 +306,7 @@ func cancel_drag() -> void:
 func _over_ui(point: Vector2) -> bool:
 	var hovered := get_viewport().gui_get_hovered_control()
 	if hovered and hovered != self and not is_ancestor_of(hovered): return true
-	for control in [top, bottom, readouts, info_panel, direction_panel, end_panel, game_menu, get_node("Economy")]:
+	for control in [top, bottom, readouts, retreat_button, skill_button, info_panel, direction_panel, end_panel, game_menu, get_node("Economy")]:
 		if control.visible and control.get_global_rect().has_point(point): return true
 	return false
 
@@ -278,7 +322,26 @@ func _fit() -> void:
 	var economy_panel := get_node("Economy") as Control
 	economy_panel.offset_top = bottom.offset_top - 124
 	economy_panel.offset_bottom = bottom.offset_top - 8
-	status.add_theme_font_size_override("font_size", 18 if compact else 22)
+	status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
+	operator_portrait.custom_minimum_size.y = 112 if compact else 160
+	info_panel.position = Vector2(18, 92)
+	info_panel.size = Vector2(228, 0)
+	_position_operator_actions()
+
+## Screen coordinates supplied by the game; HUD does not access the 3D scene.
+func set_operator_anchor(point: Vector2) -> void:
+	operator_anchor = point - global_position
+	_position_operator_actions()
+
+func _position_operator_actions() -> void:
+	if not retreat_button: return
+	for entry in [[retreat_button, Vector2(-86, -80)], [skill_button, Vector2(38, 20)]]:
+		var button: Button = entry[0]
+		button.position = operator_anchor + entry[1]
+		button.position = button.position.clamp(Vector2(8, 64), size - button.size - Vector2(8, 8))
+		if info_panel.visible and button.get_rect().intersects(info_panel.get_rect()):
+			button.position.x = info_panel.get_rect().end.x + 8
+
 
 func _label(parent: Node, value: String, font_size: int) -> Label:
 	var label := Label.new()
@@ -330,23 +393,32 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		cards[key].button.modulate = Color("ffdb8d") if key == chosen_roster else Color.WHITE
 		cards[key].value.text = "◇ %d" % roster[key].cost
 	info_panel.visible = not selected.is_empty() and not finished
+	retreat_button.visible = info_panel.visible
+	skill_button.visible = info_panel.visible
 	if not selected.is_empty():
-		selection.text = "%s\n生命 %d / %d\n阻挡 %d / %d\n技力 %.1f / %.1f\n技能剩余 %.1fs" % [selected.name, ceili(selected.hp), ceili(selected.max_hp), selected.blocked.size(), selected.block, selected.sp, selected.skill.required, selected.skill_left]
+		selection.text = "%s\n生命 %d / %d\n技力 %.1f / %.1f" % [selected.name, ceili(selected.hp), ceili(selected.max_hp), selected.sp, selected.skill.required]
 		var ready: bool = selected.skill.enabled and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
 		skill_button.disabled = not ready or state.phase != "running"
 		var appearance = catalog[selected.roster_id]
+		operator_portrait.texture = appearance.portrait
 		skill_button.icon = appearance.skill_icon if appearance.skill_icon else appearance.portrait
+		skill_portrait.texture = skill_button.icon
+		if selected.skill.enabled:
+			var recovery_text: String = {"auto": "自动回复", "attack": "攻击回复", "hit": "受击回复"}.get(selected.skill.recovery, selected.skill.recovery)
+			skill_description.text = "%s · 手动释放\n%s提升至 %.0f%%，持续 %.1f 秒。" % [recovery_text, "治疗量" if selected.role == "healer" else "攻击力", selected.skill.multiplier * 100.0, selected.skill.duration]
+		else:
+			skill_description.text = "无主动技能"
 		skill_button.tooltip_text = "点击技能图标释放" if ready else "技力充满后可释放"
 		if ready: skill_button.add_theme_stylebox_override("normal", ready_skill_style)
-		else: skill_button.add_theme_stylebox_override("normal", _panel())
+		else: skill_button.add_theme_stylebox_override("normal", normal_skill_style)
 		if not selected.skill.enabled: skill_status.text = "无主动技能"
 		elif selected.skill_left > 0: skill_status.text = "技能持续中 · %.1fs" % selected.skill_left
 		elif state.phase != "running": skill_status.text = "开始战斗后可释放" if ready else "技力充能中"
 		elif ready: skill_status.text = "技能就绪 · 点击图标释放"
 		else: skill_status.text = "技力充能中 · %.1f / %.1f" % [selected.sp, selected.skill.required]
 		skill_status.add_theme_color_override("font_color", Color("ffe08a") if ready else Color("bdc8c7"))
-		retreat_button.tooltip_text = "返还一半部署费用（向下取整，受费用上限限制）；再部署冷却 %.1f 秒" % selected.redeploy_time
-		selection.text += "\n撤退返费 ◇%d（受上限限制）\n再部署冷却 %.1fs" % [floori(selected.cost * 0.5), selected.redeploy_time]
+		retreat_button.tooltip_text = "撤退：返还一半部署费用（向下取整，受费用上限限制）；再部署冷却 %.1f 秒" % selected.redeploy_time
+		_position_operator_actions()
 	end_panel.visible = finished
 	if finished:
 		direction_panel.hide()

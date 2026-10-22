@@ -117,6 +117,7 @@ func _show_error(message: String) -> void:
 func fit_camera() -> void:
 	if camera and map_data:
 		StageView.fit_camera(camera, map_data.bounds, get_viewport().get_visible_rect().size)
+		update_operator_anchor()
 
 func _process(delta: float) -> void:
 	if not battle: return
@@ -134,8 +135,14 @@ func refresh(visual_delta := 0.0) -> void:
 		selected_roster = ""; candidate = Vector2i(-99, -99)
 		hud.cancel_drag()
 	hud.update_state(last_state, selected_roster, selected_unit, speed, configuration.deploy_limit)
+	update_operator_anchor()
 	observed.emit(last_state.duplicate(true), events.duplicate(true))
 	update_overlays()
+
+func update_operator_anchor() -> void:
+	if not hud or not presentation or not presentation.actors.has(selected_unit): return
+	var actor = presentation.actors[selected_unit]
+	hud.set_operator_anchor(camera.unproject_position(actor.visual_position() + camera.global_basis.y * actor.display_height() * 0.5))
 
 func command(method: String, args: Array) -> Dictionary:
 	if not battle: return {"ok": false, "reason": "invalid_level", "id": -1}
@@ -222,7 +229,7 @@ func confirm_deployment() -> void:
 	if selected_roster.is_empty() or candidate == Vector2i(-99, -99): return
 	var result := command("deploy", [selected_roster, candidate, facing])
 	if result.ok:
-		selected_unit = result.id; selected_roster = ""; candidate = Vector2i(-99, -99)
+		selected_unit = -1; selected_roster = ""; candidate = Vector2i(-99, -99)
 		hud.direction_panel.hide()
 		refresh()
 
@@ -293,13 +300,13 @@ func pick_unit(point: Vector2) -> int:
 	for unit in last_state.units:
 		var actor = presentation.actors.get(unit.id)
 		if not is_instance_valid(actor): continue
-		var feet: Vector2 = camera.unproject_position(actor.position)
-		var top: Vector2 = camera.unproject_position(actor.position + camera.global_basis.y * actor.display_height())
+		var feet: Vector2 = camera.unproject_position(actor.visual_position())
+		var top: Vector2 = camera.unproject_position(actor.visual_position() + camera.global_basis.y * actor.display_height())
 		var half_width: float = actor.sprite.texture.get_width() * actor.sprite.pixel_size * 0.5
-		var side: Vector2 = camera.unproject_position(actor.position + camera.global_basis.x * half_width)
+		var side: Vector2 = camera.unproject_position(actor.visual_position() + camera.global_basis.x * half_width)
 		var width: float = absf(side.x - feet.x) * 2.0
 		var rect := Rect2(Vector2(top.x - width / 2, top.y), Vector2(width, feet.y - top.y))
-		var distance: float = camera.position.distance_squared_to(actor.position)
+		var distance: float = camera.global_position.distance_squared_to(actor.visual_position())
 		if rect.has_point(point) and distance < closest:
 			closest = distance; result = unit.id
 	return result
@@ -314,7 +321,11 @@ func update_overlays() -> void:
 	if not selected_roster.is_empty():
 		for cell in configuration.terrain:
 			if battle.deployment_check(selected_roster, cell, facing).ok: deployable[cell] = true
-	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, hud.direction_panel.visible, deployable.keys()])
+	var inspected: Dictionary = {}
+	if selected_roster.is_empty():
+		for unit in last_state.units:
+			if unit.id == selected_unit: inspected = unit
+	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, hud.direction_panel.visible, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
 	if signature == overlay_signature: return
 	overlay_signature = signature
 	for child in overlays.get_children(): child.free()
@@ -330,7 +341,7 @@ func update_overlays() -> void:
 	if not selected_roster.is_empty():
 		for cell in deployable:
 			_cell_highlight(cell, Color(0.08, 0.84, 0.34, 0.36), Color("6cf0a0"), "deployable")
-	var selected: Dictionary = {}
+	var selected: Dictionary = inspected
 	if candidate != Vector2i(-99, -99) and not selected_roster.is_empty():
 		var matches: bool = deployable.has(candidate)
 		if matches:
@@ -349,15 +360,9 @@ func update_overlays() -> void:
 			selected.hp = selected.max_hp
 			selected.preview = true
 			deployment_preview.apply_state(selected, false)
+			deployment_preview.update_projection()
 			deployment_preview.health_bar.hide()
-			var at := Vector3(candidate.x, field.surface_height(candidate) + 0.04, candidate.y)
-			var forward: Vector3 = [Vector3.RIGHT, Vector3.BACK, Vector3.LEFT, Vector3.FORWARD][facing]
-			var side := forward.cross(Vector3.UP)
-			for step_index in 6:
-				_line(at + forward * (0.45 + step_index * 0.07), Vector3(0.065, 0.02, 0.065), Color("ffe38c"), overlays)
-			for sign_value in [-1, 1]:
-				for step_index in 4:
-					_line(at + forward * (0.8 - step_index * 0.06) + side * sign_value * step_index * 0.06, Vector3(0.07, 0.02, 0.07), Color("ffe38c"), overlays)
+
 	if (show_ranges or hud.direction_panel.visible) and not selected.is_empty():
 		for cell in preload("res://features/battle/combat.gd").range_cells(selected):
 			if map_data.cells().has(cell): _range_overlay(cell)

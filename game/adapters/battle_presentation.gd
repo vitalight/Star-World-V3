@@ -39,7 +39,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 	for effect in effects:
 		if is_instance_valid(effect) and not effect.is_queued_for_deletion():
 			if effect.kind == "projectile" and actors.has(effect.get_meta("target", -1)):
-				effect.destination = actors[effect.get_meta("target")].position + body_offset()
+				effect.destination = world.to_local(actors[effect.get_meta("target")].visual_position()) + body_offset()
 			effect.advance_visual(delta)
 	departing = departing.filter(func(a): return is_instance_valid(a) and not a.is_queued_for_deletion())
 	effects = effects.filter(func(a): return is_instance_valid(a) and not a.is_queued_for_deletion())
@@ -75,6 +75,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 			unit = unit.duplicate(true)
 			unit.skill_hint_allowed = false
 		actor.apply_state(unit, enemy)
+		actor.update_projection()
 		present[unit.id] = true
 	for event in events:
 		if event.type == "attack_start":
@@ -98,7 +99,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 			pulse(event_position(event.target, event.to), color, HEALING if event.type == "heal" else IMPACT, "heal" if event.type == "heal" else "impact")
 		elif event.type == "miss": finish_projectile(event.source)
 		elif event.type == "skill_start" and actors.has(event.source):
-			pulse(actors[event.source].position + body_offset(), Color.WHITE, BOOST, "skill")
+			pulse(world.to_local(actors[event.source].visual_position()) + body_offset(), Color.WHITE, BOOST, "skill")
 	for id in actors.keys():
 		if not present.has(id):
 			actors[id].depart()
@@ -139,7 +140,8 @@ func _sync_route_guides(state: Dictionary) -> void:
 			route_guides.erase(id)
 
 func event_position(id: int, at: Vector2) -> Vector3:
-	return position(at, combatants.get(id, {}).get("flying", false)) + body_offset()
+	var origin := position(at, combatants.get(id, {}).get("flying", false))
+	return world.to_local(Actor.projected_position(world.get_viewport().get_camera_3d(), world.to_global(origin))) + body_offset()
 
 func body_offset() -> Vector3:
 	var camera := world.get_viewport().get_camera_3d()
