@@ -24,9 +24,19 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
 
 初阶段首要目的，是开发一个高效率、低耦合的开发者工具。
 
+让网页上的ai总结明日方舟玩法，再实现。
+
 ## Todo
 
-- [ ] Logic Test：验收
-- [ ] Game Test：集成最终关卡 Art + Logic。支持tilemap编辑地图
-- [x] Story Test：初版
-- [ ] Game Test：集成剧情
+- [ ] Dev Mode
+    - [x] Logic Test：验收
+    - [x] Game Test：集成最终关卡 Art + Logic。支持tilemap编辑地图
+    - [x] Story Test：初版
+    - [ ] Game Test：集成剧情
+- [ ] Player Mode
+    - [ ] 产品化UI（初始界面，存档，关卡选择）
+    - [ ] 新手引导
+- [ ] Extra
+    - [ ] 干员技能树（消耗金币）
+
+改进头顶技能指示
