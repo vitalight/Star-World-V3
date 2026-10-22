@@ -14,6 +14,9 @@ const ENTRIES = [
 	{"title": "Game Test", "category": "集成预览", "number": "04", "accent": Color("b0a4cf"),
 		"description": "在完整美术战场中部署干员，验证真实战斗流程。", "detail": "可编辑地图 / 完整战斗 / 内嵌调试",
 		"scene": "res://devtools/game_test/game_workspace.tscn"},
+	{"title": "Story Test", "category": "剧情验证", "number": "05", "accent": Color("deb58a"),
+		"description": "运行基础剧情样例，检查对话推进、分支与结束。", "detail": "对话 / 分支选择 / 重播",
+		"scene": "res://devtools/story_test/story_workspace.tscn"},
 ]
 var scroll: ScrollContainer
 var content: VBoxContainer

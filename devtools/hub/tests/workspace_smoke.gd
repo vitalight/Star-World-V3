@@ -111,9 +111,11 @@ func run() -> void:
 		await settle()
 		check_path("Star World/Developer Hub")
 		if repeat == 0: await capture("hub")
-		for entry in ["Blueprint", "Art Test", "Logic Test", "Game Test"]:
+		for entry in ["Blueprint", "Art Test", "Logic Test", "Game Test", "Story Test"]:
 			var old = weakref(current_scene)
-			check(buttons(current_scene).size() == 4, "Hub exposes four workspaces")
+			check(buttons(current_scene).size() == 5, "Hub exposes five workspaces")
+			current_scene.scroll.ensure_control_visible(find_button(entry, true))
+			await settle()
 			await click_control(find_button(entry, true))
 			await settle()
 			check(old.get_ref() == null, "Departed hub freed")
@@ -125,6 +127,17 @@ func run() -> void:
 				await settle()
 				check(current_scene.preview.texture.resource_path.ends_with("concept_b.png"), "Blueprint B selection")
 				if repeat == 0: await capture("blueprint_b")
+			if entry == "Story Test":
+				await click_control(find_button("继续 →"))
+				await click_control(find_button("继续 →"))
+				await settle()
+				check(current_scene.choices.get_child_count() == 2, "Story exposes two branch choices")
+				if repeat == 0: await capture("story_choice")
+				await click_control(current_scene.choices.get_child(repeat))
+				await click_control(find_button("继续 →"))
+				check(current_scene.session.snapshot().finished, "Story reaches both endings")
+				await click_control(find_button("重播剧情"))
+				check(current_scene.session.snapshot().history.size() == 1, "Story replay clears transcript")
 			var workspace = weakref(current_scene)
 			if entry == "Game Test":
 				await click_control(find_button("☰"))

@@ -69,7 +69,7 @@ game 负责根据内容标识关联数值和外观，使 Logic Test 可以只加
 原始需求和参考图留在 Human；生成的评审概念图放在 devtools/blueprint/images。
 数据驱动主要用于属性、单位、关卡和波次，复杂行为仍用代码实现。
 
-## 四个开发工作区
+## 五个开发工作区
 
 | 工作区 | 组装方式 | 验证目标 |
 | --- | --- | --- |
@@ -77,8 +77,10 @@ game 负责根据内容标识关联数值和外观，使 Logic Test 可以只加
 | Art Test | 表现 feature + 模拟数据或具体外观 | 动画、特效、地图和 UI |
 | Logic Test | battle + 极简显示 + 测试配置 | 战斗规则 |
 | Game Test | 加载 game/battle 的实际组装场景 | 完整集成 |
+| Story Test | story 会话与演出 + 工作区专属剧情样例/外部素材 | 对话、分支、出入场、背景与重播 |
 
 Logic Test 与 Game Test 必须复用同一战斗实现；Art Test 与 Game Test 必须复用同一表现实现。
+Story Test 通过 `features/story` 的公共接口运行样例；正式剧情接入 game 前仍需模块评审，样例不作为正式 content。
 临时测试数据、占位图形和调试控制放在所属 devtools 工作区，正式配置放在 content。
 战斗模块支持不加载角色场景、动画和 UI 的模拟推进。Game Test 已通过 game/battle 加载实际组装，编辑方式和接口见 devtools/game_test/README.md。
 

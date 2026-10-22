@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://features/story/story_script.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "雪径之后 · 归途"
+start = "arrival"
+nodes = {
+"arrival": {"type": "line", "speaker": "烬", "speaker_actor": "scout", "actors": ["scout"], "background": "winter", "text": "风停了。雪地上还有新留下的脚印……巡逻队应该就在前面。", "next": "contact"},
+"contact": {"type": "line", "speaker": "铃", "speaker_actor": "guard", "actors": ["scout", "guard"], "background": "winter", "text": "烬，我找到旧城区的地图了。穿过这片废墟，就能看见哨站的信号灯。", "next": "route"},
+"route": {"type": "choice", "speaker": "烬", "speaker_actor": "scout", "actors": ["scout", "guard"], "background": "winter", "text": "高地的路更稳妥，水渠的路更近。你觉得我们该往哪边走？", "choices": [{"text": "沿高地绕行，保持通讯", "next": "ridge"}, {"text": "穿过旧水渠，尽快抵达", "next": "canal"}]},
+"ridge": {"type": "line", "speaker": "烬", "speaker_actor": "scout", "actors": ["scout"], "background": "garden", "text": "看见了吗？高地尽头就是花园。铃已经先去通知大家了，我们也该回家了。", "next": "ridge_end"},
+"canal": {"type": "line", "speaker": "铃", "speaker_actor": "guard", "actors": ["guard"], "background": "garden", "text": "原来水渠直接通向花园。烬去找巡逻队了，我就在喷泉旁边等你们。", "next": "canal_end"},
+"ridge_end": {"type": "end", "speaker": "旁白", "actors": [], "background": "garden", "text": "雪径留在了身后，花园的灯光迎来了归人。\n结局：高地的灯光"},
+"canal_end": {"type": "end", "speaker": "旁白", "actors": [], "background": "garden", "text": "水渠尽头的阳光里，新的地图被轻轻展开。\n结局：水渠的捷径"}
+}
