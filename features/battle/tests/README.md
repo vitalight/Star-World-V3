@@ -1,16 +1,18 @@
-# Logic Test：核心战斗规则测试集
+# Battle 自动化测试
 
-从开发者首页进入 **Logic Test**，或运行 `logic_workspace.tscn`。工作区提供 **6 个专项关＋1 个综合关，共 18 个可切换用例**。这是本项目的方舟式简化规则，不表示完整还原《明日方舟》职业特例。
+所有用例通过 battle 公共接口执行，无 Control、几何战场或美术资源依赖，可使用 --headless 运行。
 
-## 操作
+- battle_test.gd：基础规则和边界检查，包括部署、阻挡、伤害、治疗、技能倍率、暂停单步、终局和重置。
+- scenario_test.gd：从已移除的 Logic Test 保留的18个命令回放场景；scenario_fixtures.gd 保存配置，scenario_replay.gd 按固定时刻提交命令并观察快照／事件。每个场景另按逐帧分片重放，比对最终状态一致。
+- 游戏层的 game/tests/battle_integration_test.gd 继续负责地图与组装、固定获胜／空场失败、重置与生命周期；game/tests/battle_visual_test.gd 验证实际输入与画面。手动验证统一使用 Game Test。
 
-1. 第一项下拉选择场景组，第二项下拉选择用例；切换会创建独立战斗并清空旧状态。
-2. **预设演示**：重置后按固定时间表部署、撤退、释放技能。非法命令演示也通过正常公开接口执行，检查拒绝原因和费用是否保持不变。
-3. **手动操作**：选择编队干员和朝向，再点击空格部署；点击在场干员查看方向范围、生命、阻挡、攻击次数和技力，使用撤退/技能按钮操作。
-4. **开始 / 暂停 / 单步 / 1×、2×、4× / 重置** 控制模拟。单步只在暂停时推进 1/60 秒；暂停时允许部署、撤退等明确的玩家命令，模拟时钟全部冻结。
-5. 向下滚动查看逐条规则的 **待验证 / 通过 / 失败**、预期与实际值，以及最近 8 条事件。胜负和规则检查是不同结果。
+```powershell
+& $env:GODOT_PATH --headless --path . --script res://features/battle/tests/battle_test.gd
+& $env:GODOT_PATH --headless --path . --script res://features/battle/tests/scenario_test.gd
+& $env:GODOT_PATH --headless --path . --script res://game/tests/battle_integration_test.gd
+```
 
-用例到观察截止时间或战斗结束时停止并完成验收；重置可重新运行。静止靶和部署测试有意不追求战斗终局。手动操作可用于探索和反例验证；“预设命令结果”检查专用于预设演示，手动流程未执行这些命令时不会通过此项。
+日志和截图放入根目录 temp/。以下为纯规则测试场景及约定，不提供单独测试界面。
 
 ## 场景与验收
 
@@ -39,28 +41,3 @@
 - 每个主动技能选择一种技力来源：auto 每秒1点；attack 每次有效攻击/治疗1点；hit 每次受到有效攻击1点。达到上限后才能手动释放，释放清空技力；持续期间攻击力乘配置倍率、不回复、不叠加，结束后恢复基础数值。主动倍率和被动倍率相乘。
 - 费用在战斗进行时持续回复，不超过上限。主动撤退返还本次部署费用50%，向下取整；死亡不返费。两者均进入配置的再部署冷却。再部署费用不递增，新实例满生命、初始技力、全新计数和ID。
 - 所有配置波次生成完、在场敌人全部处理完且基地生命大于零才胜利；基地生命归零立即失败。漏怪按敌人配置扣血。终局停止模拟且拒绝部署、撤退和技能命令。
-
-## 实现归属
-
-- `features/battle/`：唯一战斗状态和规则，支持无窗口模拟。公开配置、接口和确定性说明见该目录 README。
-- `test_config.gd`：工具专用地图、编队、敌人、波次、18个用例与预设命令。
-- `test_session.gd`：通过公开接口回放命令，观察快照和事件，给出规则检查结果；不修改内部战斗状态。
-- `logic_workspace.gd` / `battle_canvas.gd`：操作、几何显示和事件可视化。不加载正式美术、角色场景或 StarterContent。
-- Game Test 继续保留待集成入口。本轮没有加入特殊职业、群攻、异常状态、位移、召唤物和复杂寻路。
-
-后续 Game Test 集成现已完成，见 `devtools/game_test/README.md` 和 `docs/reviews/game_test.md`；上段“待集成”指 Logic Test 实现时的阶段状态。两者继续复用同一 battle 模块。
-
-## 自动验证
-
-先设置本机 `GODOT_PATH` 指向标准版 Godot 4.x 可执行文件，在项目根目录运行：
-
-```powershell
-New-Item -ItemType Directory -Force temp/logic_test | Out-Null
-if (-not (Test-Path temp/.gdignore)) { New-Item -ItemType File temp/.gdignore | Out-Null }
-$env:APPDATA = (Resolve-Path temp/logic_test).Path
-& $env:GODOT_PATH --headless --path . --script res://features/battle/tests/battle_test.gd
-& $env:GODOT_PATH --headless --path . --script res://devtools/logic_test/workspace_test.gd
-& $env:GODOT_PATH --path . --script res://devtools/hub/tests/workspace_smoke.gd
-```
-
-最后一条使用实际图形渲染和 Godot 鼠标输入管线；验证截图在 `temp/verification/`。日志在 `temp/logic_test/`。不将程序化输入验证表述为人工操作桌面。

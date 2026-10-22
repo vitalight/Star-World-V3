@@ -39,8 +39,8 @@ StarWorldV3/
 │   ├── hub/                    # 默认启动场景
 │   ├── blueprint/images/       # 概念图及版本
 │   ├── art_test/               # 表现模块 + 模拟数据
-│   ├── logic_test/             # 战斗模块 + 极简显示
-│   └── game_test/              # 加载真实游戏组装场景
+│   ├── game_test/              # 加载真实游戏组装场景
+│   └── story_test/             # 剧情样例验证
 ├── game/                       # 最终组装、启动和流程
 │   ├── battle/                 # 战斗场景和生命周期
 │   ├── adapters/               # 状态、事件与表现之间的适配
@@ -57,3 +57,5 @@ StarWorldV3/
 Git 提交使用 `type(scope): description`，详见 [提交约定](docs/git_conventions.md)。
 - 新文件和目录使用 `snake_case`。外部输入目录 `Human/StarterContent/` 保留指定大小写。
 - Godot 的 `.uid` 和素材 `.import` 元数据纳入版本管理，`.godot/` 缓存不提交。
+
+战斗规则使用无界面代码测试，运行方式见 [Battle 测试](features/battle/tests/README.md)。手动战斗验证统一进入 Game Test。

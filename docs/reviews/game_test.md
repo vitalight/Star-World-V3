@@ -179,6 +179,12 @@ Art Test 新增第五页 Skill 和独立 skill_preview.tscn 入口，仅完整�
 
 导航补充：workspace_smoke 已覆盖第五个 Skill 页签与 skill_preview 独立入口，最终 Visual/navigation verification 为0失败。首轮合成鼠标导航在退出 Animation 时出现一次离场释放断言失败，单独完整复跑通过；本次未更改导航点击辅助实现。
 
+### 移除 Logic Test 界面
+
+Game Test 接管手动战斗验证，删除旧 Logic Test 工作区及绘制脚本，首页保留 Blueprint、Art Test、Game Test、Story Test 四个入口。18个有价值的固定命令场景和观察器迁入 features/battle/tests，无界面回放仍验证全部原场景及不同时间分片下的状态一致性；旧界面相关12项检查随界面退役，等价能力由现有Game Test与battle测试覆盖。测试迁移详情和运行命令见 features/battle/tests/README.md。
+
+验证：场景回归18 cases／86 checks、基础规则172项、游戏集成107项、真实游戏图形459项全部通过，首页／工作区导航0失败。已核对首页四入口截图 temp/verification/hub.png，当前代码与运行配置不再引用删除的工作区路径。日志 temp/verification/scenario_migration.log、logic_removed_*.log。历史Logic Test评审保留为当时状态，并标注迁移路径。
+
 ### 清理产品界面的注释式文案
 
 移除“技能就绪·点击图标释放”、充能／操作教学、部署鼠标说明、常驻成功提示及技能按钮指导性tooltip。技能可用性由图标亮光、禁用态和技力条表达，仅持续期间保留剩余时间；详情保留干员数值、技能名称和功能。notice 只承载简短失败原因，正常选择与操作清除并隐藏空提示，Art Battle 同步移除模拟快照提示。产品文案边界已写入 docs/architecture.md。

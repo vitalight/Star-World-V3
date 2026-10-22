@@ -62,24 +62,23 @@ Human/StarterContent 中的外部输入保留原始名称，整理为正式内�
 ### 资源归属
 
 一个角色目录可以包含 stats.tres、view.tscn、textures/。stats.tres 只描述战斗所需数据，不引用外观场景、贴图和动画。
-game 负责根据内容标识关联数值和外观，使 Logic Test 可以只加载战斗数据。
+game 负责根据内容标识关联数值和外观，纯规则测试仅加载战斗数据。
 通用展示行为放在 features/actor_view，具体角色的外观配置和专属资源放在 content。
 
 已有原始图集存放于 Human/StarterContent，保留其 character、effects、texture 子目录。外部输入与正式内容分开管理：原件留在此处，经过切片、配置或其他加工后用于游戏的资源归入 content 对应目录。
 原始需求和参考图留在 Human；生成的评审概念图放在 devtools/blueprint/images。
 数据驱动主要用于属性、单位、关卡和波次，复杂行为仍用代码实现。
 
-## 五个开发工作区
+## 四个开发工作区
 
 | 工作区 | 组装方式 | 验证目标 |
 | --- | --- | --- |
 | Blueprint | 参考图与概念图 | 视觉方向 |
 | Art Test | 表现 feature + 模拟数据或具体外观 | 动画、特效、地图和 UI |
-| Logic Test | battle + 极简显示 + 测试配置 | 战斗规则 |
 | Game Test | 加载 game/battle 的实际组装场景 | 完整集成 |
 | Story Test | story 会话与演出 + 工作区专属剧情样例/外部素材 | 对话、分支、出入场、背景与重播 |
 
-Logic Test 与 Game Test 必须复用同一战斗实现；Art Test 与 Game Test 必须复用同一表现实现。
+战斗手动验证统一由 Game Test 提供；基础规则及固定命令场景位于 features/battle/tests，须能无界面执行，并与 Game Test 复用同一 battle 实现。Art Test 与 Game Test 必须复用同一表现实现。
 Story Test 通过 `features/story` 的公共接口运行样例；正式剧情接入 game 前仍需模块评审，样例不作为正式 content。
 临时测试数据、占位图形和调试控制放在所属 devtools 工作区，正式配置放在 content。
 战斗模块支持不加载角色场景、动画和 UI 的模拟推进。Game Test 已通过 game/battle 加载实际组装，编辑方式和接口见 devtools/game_test/README.md。

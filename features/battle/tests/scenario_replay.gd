@@ -1,12 +1,12 @@
 extends RefCounted
-## Tool-side command replay and observations. It never edits battle state.
+## Test-only command replay and observations. It never edits battle state.
 const Battle = preload("res://features/battle/battle.gd")
 var battle: RefCounted
 var spec: Dictionary
 var history: Array = []
 var results: Array = []
 var command_results: Array = []
-var demo = false
+var replaying = false
 var complete = false
 var cursor = 0
 var accumulator = 0.0
@@ -18,8 +18,8 @@ func _init(case_spec: Dictionary) -> void:
 	battle = Battle.new(spec.config)
 	results = spec.checks.map(func(check): return {"label": check.label, "status": "待验证", "actual": "尚无足够证据"})
 
-func start_demo() -> void:
-	demo = true
+func start_replay() -> void:
+	replaying = true
 	_execute_due()
 	battle.start()
 	collect()
@@ -35,7 +35,7 @@ func single_step() -> void:
 	if not complete and battle.snapshot().paused and battle.snapshot().phase == "running": _tick(true)
 
 func _tick(single: bool) -> void:
-	if demo: _execute_due()
+	if replaying: _execute_due()
 	if single: battle.step()
 	else: battle.advance(Battle.STEP)
 	collect()

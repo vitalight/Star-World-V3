@@ -111,9 +111,9 @@ func run() -> void:
 		await settle()
 		check_path("Star World/Developer Hub")
 		if repeat == 0: await capture("hub")
-		for entry in ["Blueprint", "Art Test", "Logic Test", "Game Test", "Story Test"]:
+		for entry in ["Blueprint", "Art Test", "Game Test", "Story Test"]:
 			var old = weakref(current_scene)
-			check(buttons(current_scene).size() == 5, "Hub exposes five workspaces")
+			check(buttons(current_scene).size() == 4, "Hub exposes four workspaces")
 			current_scene.scroll.ensure_control_visible(find_button(entry, true))
 			await settle()
 			await click_control(find_button(entry, true))
@@ -236,71 +236,5 @@ func run() -> void:
 	await click_control(find_button("Developer Hub"))
 	await settle()
 	check(departed_actor.get_ref() == null and departed_effect.get_ref() == null, "Leaving frees animation nodes")
-	change_scene_to_file("res://devtools/logic_test/logic_workspace.tscn")
-	await settle()
-	var canvas = current_scene.canvas
-	# Select the combined fixture, then deploy through actual canvas mouse input.
-	current_scene.group_select.select(6)
-	current_scene._fill_cases()
-	current_scene._load_case()
-	await settle()
-	var cells = [Vector2i(6, 3), Vector2i(6, 2), Vector2i(8, 2)]
-	for i in range(cells.size()):
-		current_scene.roster_select.select(i)
-		var point: Vector2 = canvas.cell_screen(cells[i])
-		var down = InputEventMouseButton.new()
-		down.button_index = MOUSE_BUTTON_LEFT
-		down.pressed = true
-		down.position = point
-		root.push_input(down, true)
-		var up = InputEventMouseButton.new()
-		up.button_index = MOUSE_BUTTON_LEFT
-		up.position = point
-		root.push_input(up, true)
-		await settle()
-	check(current_scene.battle.snapshot().units.size() == 3, "Actual GUI input deploys guard, sniper and medic")
-	await click_control(current_scene.start_button)
-	await create_timer(2.5).timeout
-	await capture("logic_running")
-	current_scene.session.advance(35.0)
-	await settle()
-	check(current_scene.battle.snapshot().phase == "victory", "GUI configured battle wins")
-	await create_timer(0.3).timeout
-	await capture("logic_won")
-	current_scene._reset()
-	await click_control(current_scene.start_button)
-	current_scene.session.advance(35.0)
-	await settle()
-	check(current_scene.battle.snapshot().phase == "defeat", "Empty battlefield loses")
-	await capture("logic_lost")
-	current_scene._demo()
-	current_scene.session.advance(7.0)
-	current_scene.battle.set_paused(true)
-	current_scene._refresh()
-	await settle()
-	await capture("logic_rules")
-	var frozen = current_scene.battle.snapshot()
-	await click_control(current_scene.step_button)
-	check(current_scene.battle.snapshot().time > frozen.time, "GUI single-step advances paused battle")
-	for group_index in range(7):
-		current_scene.group_select.select(group_index)
-		current_scene._fill_cases()
-		current_scene._load_case()
-		current_scene._demo()
-		current_scene.session.advance(4.0)
-		current_scene.battle.set_paused(true)
-		current_scene._refresh()
-		await settle()
-		await capture("logic_group_%d" % (group_index + 1))
-	root.content_scale_size = Vector2i(800, 650)
-	root.size = Vector2i(800, 650)
-	await settle()
-	check(current_scene.canvas.size.x <= 800, "Logic canvas fits narrow viewport")
-	await capture("logic_narrow")
-	var logic_scroll: ScrollContainer = current_scene.checks.get_parent().get_parent()
-	logic_scroll.scroll_vertical = 10000
-	await settle()
-	check(current_scene.checks.get_global_rect().intersects(Rect2(Vector2.ZERO, Vector2(root.size))), "Rule checks accessible by scrolling in narrow window")
-	await capture("logic_narrow_checks")
 	print("Visual/navigation verification: %d failures" % failures)
 	quit(failures)

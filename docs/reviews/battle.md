@@ -17,7 +17,7 @@ Logic Test 提供6个专项关与1个综合关，共18个用例，支持预设�
 - devtools的配置、演示回放与观察检查只使用公共命令、快照及事件，不向内部状态写入。
 - 快照、配置和公开ID查询返回深拷贝；事件消费也返回深拷贝。
 - 公共部署接口由旧的槽位索引迁移为编队ID、格子和朝向；命令提供结构化失败原因。现有工作区与首页图形冒烟测试同步迁移。
-- API和配置见 `features/battle/README.md`；结构化规则与场景说明见 `devtools/logic_test/README.md`。
+- API和配置见 `features/battle/README.md`；结构化规则与场景说明现见 `features/battle/tests/README.md`。
 
 ## 验证证据
 
@@ -49,3 +49,9 @@ Logic Test 提供6个专项关与1个综合关，共18个用例，支持预设�
 新增可选 defense_multiplier 与 interval_multiplier，缺省均为1，旧配置行为保持不变。防御强化只影响物理伤害，保留最低伤害；攻速技能在起手时确定冷却，不短于前摇，结束后下一次起手恢复基础间隔。基础属性不被覆盖，充能、暂停、持续时间与重置继续复用原接口。UnitSpec 与配置归一化校验正倍率。
 
 独立规则检查：battle_test 172 项通过，新增13项覆盖三种伤害类型下的防御强化与到期恢复、攻击次数、技能前后间隔及基础数值保留。跨模块五技能战斗验证纯逻辑与游戏快照一致且胜利，Logic Test 18 cases / 98 checks 与原关卡107项回归通过；本次扩展满足接入条件。日志 temp/verification/skill_battle.log、skill_integration.log、skill_logic_regression.log、skill_game_regression.log。
+
+### Logic Test 界面退役与测试迁移
+
+根据用户要求移除 Logic Test 页面、几何战场和开发者首页入口。原18个固定命令场景迁入 features/battle/tests/scenario_fixtures.gd，回放观察器迁入 scenario_replay.gd，驱动为 scenario_test.gd，均不加载Control／场景／美术。原98项中保留86项纯规则／确定性检查；12项旧界面生命周期检查随界面删除，暂停、单步、重置、胜负和离场释放继续由既有battle规则与Game Test集成／图形测试覆盖。
+
+命令：GODOT_PATH --headless --path . --script res://features/battle/tests/scenario_test.gd。迁移后18用例／86检查通过，基础规则172项和游戏集成107项通过；日志 temp/verification/scenario_migration.log、logic_removed_rules.log、logic_removed_integration.log。前述 Logic Test 页面与旧路径记录为历史验收状态。

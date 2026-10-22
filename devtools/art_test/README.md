@@ -1,6 +1,6 @@
 # Art Test
 
-从 Developer Hub 进入后默认打开 Character，固定提供 Character / Effect / Animation / Battle / Skill 五个 tab。顶部路径统一为 `Star World/Developer Hub/Art Test`，点击 Developer Hub 返回首页。首页及 Blueprint、Logic Test、Game Test 复用相同路径组件。
+从 Developer Hub 进入后默认打开 Character，固定提供 Character / Effect / Animation / Battle / Skill 五个 tab。顶部路径统一为 `Star World/Developer Hub/Art Test`，点击 Developer Hub 返回首页。首页及 Blueprint、Game Test、Story Test 复用相同路径组件。
 
 - Character：全部 16 个角色按英雄、敌人、图集编号和行号排序。每列一个角色，依次显示正面待机、背面待机、正面攻击、背面攻击；水平滚动浏览，较矮窗口支持垂直滚动。来源与角色行号随列显示。
 - Effect：两张特效图集全部 32 个静态切片，包括大小变体；卡片随窗口宽度换行，垂直滚动浏览，显示来源及行列。此页不播放动画。
@@ -31,7 +31,7 @@ Battle 引用正式 content：关卡编队中的 character_001、003～006，敌
 
 ## 验证
 
-`devtools/hub/tests/workspace_smoke.gd` 使用引擎原生鼠标事件及视口截图，检查四个工作区导航、独立入口、tab 切换、素材数量及切片唯一性、静态像素稳定、播放状态、隐藏暂停、释放，以及默认／窄窗口滚动和网格换行；同时回归 Blueprint 与 Logic Test。日志位于 `temp/devtools/art_smoke.log`，截图位于 `temp/verification/`。
+`devtools/hub/tests/workspace_smoke.gd` 使用引擎原生鼠标事件及视口截图，检查四个工作区导航、独立入口、tab 切换、素材数量及切片唯一性、静态像素稳定、播放状态、隐藏暂停、释放，以及默认／窄窗口滚动和网格换行；同时回归 Blueprint、Game Test 与 Story Test。日志位于 `temp/devtools/art_smoke.log`，截图位于 `temp/verification/`。
 
 Battle 专项：用真实 Compatibility 渲染器运行 `--script res://devtools/art_test/battle_visual_smoke.gd`，检查通过主窗口缩放路径点击暂停和倍速、隐藏视口停渲染、播放偏好、重播、释放及 1280×800 / 960×600 适配。截图包括 `battle_canvas.png`、`battle_graybox.png`、`battle_1280x800.png` 和 `battle_960x600.png`，日志为 `temp/devtools/battle_visual.log`。请勿使用 headless 模式做视觉验收。
 

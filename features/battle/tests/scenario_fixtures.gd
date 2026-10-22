@@ -1,5 +1,5 @@
 extends RefCounted
-## Reproducible tool-only fixtures. Values are intentionally easy to inspect.
+## Pure battle regression fixtures; no scene, content or presentation dependencies.
 static func long_range() -> Array:
 	var cells: Array = []
 	for x in range(5):

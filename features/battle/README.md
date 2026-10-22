@@ -55,7 +55,7 @@ battle.reset()
 
 敌人额外字段：`speed=1, ranged=false, range=3, flying=false, leak_damage=1`。`range` 为连续距离。飞行只改变受击资格和阻挡；默认仍沿配置路线前进，不自动攻击干员，除非启用ranged。
 
-具体规则、测试关与观察方式见 `devtools/logic_test/README.md`。测试配置留在 devtools；正式战斗模块不加载它。
+具体规则、18个命令回放场景与无界面运行方式见 `tests/README.md`。测试配置仅存放于 tests，正式模块不加载它。手动验证使用 Game Test。
 
 ## 状态与事件
 
