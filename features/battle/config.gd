@@ -2,11 +2,11 @@ extends RefCounted
 ## Trusted developer configuration. Runtime commands validate user input separately.
 static func normalize(input: Dictionary) -> Dictionary:
 	var c = input.duplicate(true)
-	var defaults = {"life": 3, "initial_cost": 30.0, "cost_cap": 99.0, "cost_regen": 1.0, "deploy_limit": 8}
+	var defaults = {"life": 3, "initial_cost": 30.0, "cost_cap": 99.0, "cost_regen": 1.0, "deploy_limit": 8, "route_warning_duration": 0.0}
 	for key in defaults:
 		if not c.has(key): c[key] = defaults[key]
 	assert(c.life > 0 and c.cost_cap >= c.initial_cost and c.initial_cost >= 0)
-	assert(c.cost_regen >= 0 and c.deploy_limit > 0)
+	assert(c.cost_regen >= 0 and c.deploy_limit > 0 and c.route_warning_duration >= 0)
 	for key in c.routes:
 		assert(c.routes[key].size() >= 2)
 		for i in range(1, c.routes[key].size()): assert(c.routes[key][i - 1].distance_to(c.routes[key][i]) > 0)

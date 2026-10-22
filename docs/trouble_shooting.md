@@ -11,3 +11,16 @@
 ## `Could not create editor data/config directory`
 - 原因：受限环境无法写入默认 Godot 用户目录。
 - 结论：启动 BAT 在局部环境中将 APPDATA 指向 `temp/devtools/user/`，不修改系统设置。
+
+
+## 俯视镜头下草丛／高台切掉干员头部
+
+- 现象：道路干员靠近后排高台草丛时，头部出现水平裁切；移除草叶仍有部分头部消失。
+- 原因：全 billboard 的可见平面会伸入后方地形，其几何深度不适合作为角色站立位置的遮挡判定。
+- 最终处理（2026-10-22）：保持完整 billboard 与原始比例，通过 actor_view/billboard_depth.gdshader 计算经过脚底的竖直平面深度。可见顶点不倾斜、不拉伸，保留实际前景遮挡。此前 Y 轴 billboard 加纵向补偿的尝试会导致视觉变形，已撤销。
+- 验证：使用 GODOT_PATH 执行 `--path . --script res://game/tests/actor_occlusion_test.gd --log-file temp/actor_occlusion.log`。比较三个窗口尺寸的原生 billboard 轮廓与地形显示／隐藏时的头部像素，并验证前景墙、受击闪烁和离场淡出。头部九个用例均 100% 可见，专项共 21 项零失败。
+
+
+### 立片左右朝向相反
+
+当前角色和敌人的 pose 原图默认朝左，不能把 facing=0（右）当作“不翻转”。actor_view_3d 应只在 facing=0 时设置 flip_h=true，facing=2（左）保持原图。不要改战斗的朝向编号或范围旋转来补偿画面，否则会使攻击范围与箭头反向。敌人首次创建时先按其路线当前段初始化朝向并放到逻辑位置，再根据后续实际位移更新；使用新节点默认原点计算首帧位移会误判朝向。回归入口 game/tests/facing_test.gd。

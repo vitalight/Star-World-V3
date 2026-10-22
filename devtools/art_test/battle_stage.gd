@@ -1,17 +1,23 @@
 extends AspectRatioContainer
-## Preview state and presentation controls; no combat dependency.
-const ACTOR = preload("res://features/actor_view/actor_view_3d.gd")
-const HUD = preload("res://features/battle_hud/battle_hud_overlay.gd")
+## Mock snapshots use exactly the game's presentation adapter and HUD.
+const Presentation = preload("res://game/adapters/battle_presentation.gd")
+const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
+const HUD = preload("res://features/battle_hud/playable_hud.gd")
 const MAP = preload("res://content/scenes/scene_001/field.tscn")
-const FLASH = preload("res://features/effects/effect_view_3d.gd")
 var viewport: SubViewport
 var world: Node3D
 var field: Node3D
 var camera: Camera3D
 var hud: Control
+var markers: Node3D
+var presentation: RefCounted
+var mock_state: Dictionary
+var configuration: Dictionary
+var catalog := {}
 var actors: Array[Node3D] = []
-var effects: Array[MeshInstance3D] = []
-var flashes: Array[Node3D] = []
+var preview_enemies: Array = []
+var next_attack := 2.4
+var pending_hits: Array = []
 var active := false
 var paused := false
 var speed := 1.0
@@ -38,80 +44,68 @@ func _ready() -> void:
 	field = MAP.instantiate()
 	field.graybox = graybox
 	world.add_child(field)
-	var environment := WorldEnvironment.new()
-	environment.environment = Environment.new()
-	environment.environment.background_mode = Environment.BG_COLOR
-	environment.environment.background_color = Color("33352e")
-	environment.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.environment.ambient_light_color = Color("c1c9ce")
-	environment.environment.ambient_light_energy = 0.62
-	world.add_child(environment)
-	var light := DirectionalLight3D.new()
-	light.rotation_degrees = Vector3(-57, -32, 0)
-	light.light_color = Color("ffe5b0")
-	light.light_energy = 0.78
-	light.shadow_enabled = true
-	light.directional_shadow_max_distance = 35
-	world.add_child(light)
-	camera = Camera3D.new()
-	camera.fov = 27
-	camera.position = Vector3(4.5, 12.9, 13.5)
-	world.add_child(camera)
-	camera.look_at(Vector3(4.5, 0, 3.0))
-	camera.current = true
-	var cells := [Vector2i(5, 0), Vector2i(6, 0), Vector2i(4, 1), Vector2i(7, 2), Vector2i(8, 3), Vector2i(6, 4), Vector2i(1, 0), Vector2i(2, 2), Vector2i(1, 3), Vector2i(1, 5)]
-	var portraits: Array[Texture2D] = []
-	var unit_paths := [
-		"characters/character_001", "characters/character_003", "characters/character_004",
-		"characters/character_005", "characters/character_006", "characters/character_007",
-		"characters/character_002", "enemies/character_008", "enemies/character_009", "enemies/character_010",
-	]
-	for i in cells.size():
-		var texture: Texture2D = load("res://content/%s/portrait.tres" % unit_paths[i])
-		var actor := Node3D.new()
-		actor.set_script(ACTOR)
-		actor.texture = texture
-		actor.height = 1.18 if i < 6 else 1.02
-		actor.position = Vector3(cells[i].x, field.surface_height(cells[i]) + 0.045, cells[i].y)
-		world.add_child(actor)
-		actors.append(actor)
-		if i < 5: portraits.append(texture)
-		if i < 6:
-			bar(actor.position, i)
-			if i in [0, 2, 4]: ring(actor.position, Color("f2db75"), 0.32)
-			if i in [0, 1]:
-				var status := Label3D.new()
-				status.text = "✦" if i == 0 else "+"
-				status.modulate = Color("a9e582")
-				status.font_size = 48
-				status.pixel_size = 0.006
-				status.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-				status.position = Vector3(0, 1.35, 0)
-				actor.add_child(status)
-	var flash := Node3D.new()
-	flash.set_script(FLASH)
-	flash.texture = preload("res://content/effects/effect_001/texture.tres")
-	flash.position = actors[2].position + Vector3(-0.45, 0.5, 0.1)
-	world.add_child(flash)
-	flashes.append(flash)
-	portal(Vector3(0, 0.06, 0), Color("ec5743"))
-	portal(Vector3(0, 0.06, 5), Color("ec5743"))
-	portal(Vector3(9, 0.06, 0), Color("63c6f5"))
+	StageView.setup_environment(world)
+	camera = StageView.create_camera(world)
+	var source = field.map_source.instantiate()
+	configuration = source.configuration()
+	StageView.fit_camera(camera, source.bounds, Vector2(viewport.size))
+	markers = Node3D.new(); world.add_child(markers)
+	StageView.route_markers(markers, configuration.routes, field)
+	for key in source.level.roster:
+		catalog[key] = load("res://content/characters/%s/appearance.tres" % source.level.roster[key].content_id)
+	for key in source.level.enemies:
+		catalog[key] = load("res://content/enemies/%s/appearance.tres" % source.level.enemies[key].content_id)
+	source.free()
+	_build_mock()
+	presentation = Presentation.new(world, field, catalog, configuration)
+	presentation.sync(mock_state, [], 0.0)
+	for actor in presentation.actors.values(): actors.append(actor)
 	var layer := CanvasLayer.new()
 	viewport.add_child(layer)
-	hud = Control.new()
-	hud.set_script(HUD)
-	hud.portraits = portraits
-	hud.readout = {"progress": "34 / 43", "life": "5", "cost": "55", "available": "1"}
-	hud.card_costs = PackedInt32Array([9, 17, 19, 26, 39])
-	hud.card_symbols = PackedStringArray(["◇", "✦", "◇", "✚", "◷"])
-	hud.card_cooldowns = PackedFloat32Array([0, 0, 0, 0, 18.8])
+	hud = HUD.new()
+	hud.roster = configuration.roster
+	hud.catalog = catalog
 	layer.add_child(hud)
 	hud.pause_requested.connect(func(): paused = not paused; sync_playback())
 	hud.speed_requested.connect(func(): speed = 2.0 if speed == 1.0 else 1.0; sync_playback())
-	hud.reset_speed_requested.connect(func(): speed = 1.0; sync_playback())
 	hud.replay_requested.connect(replay)
+	hud.reset_speed_requested.connect(func(): speed = 1.0; sync_playback())
+	# Same menu and controls; only their data source differs from the game.
+	hud.menu_requested.connect(func(): get_tree().change_scene_to_file("res://devtools/hub/developer_hub.tscn"))
+	hud.notice.text = "美术展示 · 模拟快照"
 	sync_playback()
+
+func _build_mock() -> void:
+	mock_state = {"phase": "running", "paused": false, "time": 0.0, "cost": 55.0,
+		"life": 5, "killed": 34, "escaped": 0, "remaining": 9, "units": [], "enemies": [], "redeploy": {}}
+	var cells := {"guard": Vector2i(3,1), "tank": Vector2i(3,4), "sniper": Vector2i(5,2), "caster": Vector2i(4,3), "medic": Vector2i(4,2)}
+	var index := 0
+	for key in configuration.roster:
+		var spec: Dictionary = configuration.roster[key]
+		var unit := spec.duplicate(true)
+		unit.merge({"id": index + 1, "roster_id": key, "cell": cells[key], "position": Vector2(cells[key]),
+			"hp": spec.max_hp * (0.92 - index * 0.06), "sp": float(spec.skill.get("initial_sp", index)), "skill_left": 2.5 if index == 0 and spec.skill.enabled else 0.0,
+			"blocked": [], "facing": 2, "action": {}}, true)
+		mock_state.units.append(unit)
+		mock_state.redeploy[key] = 0.0
+		index += 1
+	for key in configuration.enemies:
+		var spec: Dictionary = configuration.enemies[key]
+		var unit := spec.duplicate(true)
+		var cell: Vector2i = {"soldier": Vector2i(1,1), "rifle": Vector2i(1,4), "drone": Vector2i(2,4)}[key]
+		unit.merge({"id": index + 1, "template": key, "position": Vector2(cell), "hp": spec.max_hp * 0.8,
+			"cell": cell, "facing": 0, "action": {}}, true)
+		preview_enemies.append(unit)
+		index += 1
+	_update_preview_wave()
+
+func _update_preview_wave() -> void:
+	mock_state.time = phase
+	mock_state.enemies = [] if phase < 2.0 else preview_enemies
+	mock_state.route_warnings = []
+	if phase < 2.0:
+		for route in configuration.routes:
+			mock_state.route_warnings.append({"id": mock_state.route_warnings.size(), "route": route, "start": 0.0, "duration": 2.0, "spawn_at": 2.0})
 
 func set_active(enabled: bool) -> void:
 	active = enabled
@@ -120,60 +114,55 @@ func set_active(enabled: bool) -> void:
 func sync_playback() -> void:
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS if active else SubViewport.UPDATE_DISABLED
 	set_process(active and not paused)
-	hud.set_playback(paused, speed)
+	mock_state.paused = paused
+	hud.update_state(mock_state, "", -1, speed, configuration.deploy_limit)
 
 func replay() -> void:
 	phase = 0.0
 	paused = false
-	_update_effects()
+	next_attack = 2.4
+	pending_hits.clear()
+	for source in mock_state.units + preview_enemies: source.action = {}
+	_update_preview_wave()
+	presentation.clear()
+	presentation.sync(mock_state, [], 0.0)
+	actors.clear()
+	for actor in presentation.actors.values(): actors.append(actor)
+	hud.game_menu.hide()
 	sync_playback()
 
 func _process(delta: float) -> void:
 	phase += delta * speed
-	_update_effects()
+	_update_preview_wave()
+	presentation.sync(mock_state, _preview_events(), delta * speed)
+	actors.clear()
+	for actor in presentation.actors.values(): actors.append(actor)
 
-func _update_effects() -> void:
-	for flash in flashes:
-		flash.show_phase(phase)
-	for i in effects.size():
-		var pulse := 1.0 + sin(phase * 2.4 + i) * 0.08
-		effects[i].scale = Vector3(pulse, 1, pulse)
+func _preview_events() -> Array:
+	var events: Array = []
+	if mock_state.enemies.is_empty(): return events
+	for hit in pending_hits.duplicate():
+		if hit.at <= phase:
+			events.append(hit.event)
+			for source in mock_state.units + mock_state.enemies:
+				if source.id == hit.event.source: source.action = {}
+			pending_hits.erase(hit)
+	if phase >= next_attack:
+		next_attack = phase + 1.4
+		for source in mock_state.units + mock_state.enemies:
+			var friendly: bool = source.has("roster_id")
+			var key: String = source.roster_id if friendly else source.template
+			if key not in ["guard", "sniper", "medic", "soldier", "rifle"]: continue
+			var healing: bool = key == "medic"
+			var target: Dictionary = mock_state.units[0] if not friendly or healing else mock_state.enemies[-1]
+			var attack := {"type": "attack_start", "source": source.id, "target": target.id,
+				"from": source.position, "to": target.position, "friendly": friendly}
+			events.append(attack)
+			source.action = {"target": target.id}
+			var hit := attack.duplicate(true)
+			hit.type = "heal" if healing else "damage"
+			pending_hits.append({"at": phase + source.windup, "event": hit})
+	return events
 
-func emissive(color: Color) -> StandardMaterial3D:
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.albedo_color = color
-	return mat
-
-func ring(at: Vector3, color: Color, radius: float) -> void:
-	var instance := MeshInstance3D.new()
-	var mesh := TorusMesh.new()
-	mesh.inner_radius = radius
-	mesh.outer_radius = radius + 0.025
-	instance.mesh = mesh
-	instance.material_override = emissive(color)
-	instance.position = at + Vector3(0, 0.035, 0)
-	world.add_child(instance)
-	effects.append(instance)
-
-func portal(at: Vector3, color: Color) -> void:
-	var material := emissive(color)
-	for edge in 12:
-		var instance := MeshInstance3D.new()
-		var mesh := BoxMesh.new()
-		var axis := edge / 4
-		mesh.size = Vector3(0.025, 0.025, 0.025)
-		mesh.size[axis] = 0.85
-		var offset := Vector3.ZERO
-		var a := (axis + 1) % 3
-		var b := (axis + 2) % 3
-		offset[a] = -0.425 if edge % 4 < 2 else 0.425
-		offset[b] = -0.425 if edge % 2 == 0 else 0.425
-		instance.mesh = mesh
-		instance.material_override = material
-		instance.position = at + Vector3(0, 0.43, 0) + offset
-		world.add_child(instance)
-
-func bar(at: Vector3, index: int) -> void:
-	field.block(at + Vector3(0, 0.04, 0.3), Vector3(0.65, 0.015, 0.065), emissive(Color("253334")))
-	field.block(at + Vector3(-0.04, 0.052, 0.3), Vector3(0.54 - index * 0.025, 0.015, 0.045), emissive(Color("9bd8bd")))
+func _exit_tree() -> void:
+	if presentation: presentation.clear()

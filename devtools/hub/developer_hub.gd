@@ -12,7 +12,7 @@ const ENTRIES = [
 		"description": "在几何沙盒中验证部署、攻击与战斗胜负。", "detail": "部署 / 波次 / 重置",
 		"scene": "res://devtools/logic_test/logic_workspace.tscn"},
 	{"title": "Game Test", "category": "集成预览", "number": "04", "accent": Color("b0a4cf"),
-		"description": "完整游戏的组装入口，等待模块评审与接入。", "detail": "待集成",
+		"description": "在完整美术战场中部署干员，验证真实战斗流程。", "detail": "可编辑地图 / 完整战斗 / 内嵌调试",
 		"scene": "res://devtools/game_test/game_workspace.tscn"},
 ]
 var scroll: ScrollContainer

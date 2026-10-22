@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Texture2D" path="res://content/characters/character_003/portrait.tres" id="1_isgbe"]
+[ext_resource type="Texture2D" path="res://content/characters/character_003/pose_0.png" id="2_5llj8"]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="2_n8f7b"]
+[ext_resource type="Texture2D" path="res://content/characters/character_003/pose_1.png" id="3_8jwh6"]
+[ext_resource type="Texture2D" path="res://content/characters/character_003/pose_2.png" id="4_l14b1"]
+[ext_resource type="Texture2D" path="res://content/characters/character_003/pose_3.png" id="5_sqehd"]
+
+[resource]
+script = ExtResource("2_n8f7b")
+poses = Array[Texture2D]([ExtResource("2_5llj8"), ExtResource("3_8jwh6"), ExtResource("4_l14b1"), ExtResource("5_sqehd")])
+portrait = ExtResource("1_isgbe")

@@ -10,6 +10,8 @@ var _events: Array = []
 var _accumulator = 0.0
 var _next_id = 0
 var _schedule: Array = []
+var _warning_schedule: Array = []
+var _next_warning := 0
 
 func _init(config: Dictionary) -> void:
 	_config = Config.normalize(config)
@@ -18,20 +20,27 @@ func _init(config: Dictionary) -> void:
 func reset() -> void:
 	_state = {"phase": "ready", "paused": false, "time": 0.0, "life": _config.life,
 		"cost": _config.initial_cost, "spawned": 0, "killed": 0, "escaped": 0,
-		"remaining": 0, "units": [], "enemies": [], "redeploy": {}, "wave": 0}
+		"remaining": 0, "units": [], "enemies": [], "redeploy": {}, "wave": 0, "route_warnings": []}
 	_schedule.clear()
+	_warning_schedule.clear()
+	_next_warning = 0
 	for wave in _config.waves:
+		var first_spawn: float = maxf(wave.time, _config.route_warning_duration)
+		if _config.route_warning_duration > 0:
+			_warning_schedule.append({"id": _warning_schedule.size(), "route": wave.route, "wave": wave.get("number", 1),
+				"start": first_spawn - _config.route_warning_duration, "spawn_at": first_spawn, "duration": _config.route_warning_duration})
 		for i in range(wave.count):
-			_schedule.append({"time": wave.time + i * wave.interval, "enemy": wave.enemy,
+			_schedule.append({"time": first_spawn + i * wave.interval, "enemy": wave.enemy,
 				"route": wave.route, "wave": wave.get("number", 1), "sequence": _schedule.size()})
 	_schedule.sort_custom(func(a, b): return a.time < b.time if a.time != b.time else a.sequence < b.sequence)
+	_warning_schedule.sort_custom(func(a, b): return a.start < b.start if a.start != b.start else a.id < b.id)
 	_state.remaining = _schedule.size()
 	for key in _config.roster: _state.redeploy[key] = 0.0
 	_events.clear()
 	_accumulator = 0.0
 	_next_id = 0
 
-func deploy(roster_id: String, cell: Vector2i, facing: int = 0) -> Dictionary:
+func deployment_check(roster_id: String, cell: Vector2i, facing: int = 0) -> Dictionary:
 	var reason = ""
 	if _state.phase not in ["ready", "running"]: reason = "finished"
 	elif not _config.roster.has(roster_id): reason = "unknown_unit"
@@ -46,6 +55,11 @@ func deploy(roster_id: String, cell: Vector2i, facing: int = 0) -> Dictionary:
 		if reason.is_empty() and _state.units.size() >= _config.deploy_limit: reason = "deploy_limit"
 		if reason.is_empty() and _state.cost + 0.000001 < spec.cost: reason = "insufficient_cost"
 	if not reason.is_empty(): return _result(false, reason)
+	return _result(true)
+
+func deploy(roster_id: String, cell: Vector2i, facing: int = 0) -> Dictionary:
+	var checked := deployment_check(roster_id, cell, facing)
+	if not checked.ok: return checked
 	var unit: Dictionary = _config.roster[roster_id].duplicate(true)
 	_next_id += 1
 	unit.merge({"id": _next_id, "order": _next_id, "roster_id": roster_id,
@@ -80,6 +94,7 @@ func activate_skill(unit_id: int) -> Dictionary:
 func start() -> bool:
 	if _state.phase != "ready": return false
 	_state.phase = "running"
+	_update_route_warnings()
 	return true
 
 func set_paused(value: bool) -> void:
@@ -136,8 +151,17 @@ func emit(type: String, data: Dictionary = {}) -> void:
 func _result(ok: bool, reason: String = "", id: int = -1) -> Dictionary:
 	return {"ok": ok, "reason": reason, "id": id}
 
+func _update_route_warnings() -> void:
+	while _next_warning < _warning_schedule.size() and _warning_schedule[_next_warning].start <= _state.time + 0.000001:
+		var warning: Dictionary = _warning_schedule[_next_warning].duplicate(true)
+		_state.route_warnings.append(warning)
+		emit("route_warning", warning)
+		_next_warning += 1
+	_state.route_warnings = _state.route_warnings.filter(func(warning): return _state.time + 0.000001 < warning.spawn_at)
+
 func _tick() -> void:
 	_state.time += STEP
+	_update_route_warnings()
 	_state.cost = minf(_config.cost_cap, _state.cost + _config.cost_regen * STEP)
 	for key in _state.redeploy: _state.redeploy[key] = maxf(0.0, _state.redeploy[key] - STEP)
 	while _state.spawned < _schedule.size() and _schedule[_state.spawned].time <= _state.time + 0.000001:
@@ -159,7 +183,9 @@ func _tick() -> void:
 	_state.remaining = _schedule.size() - _state.killed - _state.escaped
 	if _state.life <= 0: _state.phase = "defeat"
 	elif _state.spawned == _schedule.size() and _state.enemies.is_empty(): _state.phase = "victory"
-	if _state.phase != "running": emit("finished", {"phase": _state.phase})
+	if _state.phase != "running":
+		_state.route_warnings.clear()
+		emit("finished", {"phase": _state.phase})
 
 func _remove_unit(unit: Dictionary, cause: String) -> void:
 	Navigation.release(self, unit)

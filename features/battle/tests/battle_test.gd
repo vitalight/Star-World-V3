@@ -53,6 +53,8 @@ func unit_id(b, roster: String) -> int:
 func deployment() -> void:
 	var c = fixture()
 	var b = Battle.new(c)
+	var original: Dictionary = b.snapshot()
+	check(b.deployment_check("g",Vector2i.ZERO).ok and b.snapshot() == original and b.take_events().is_empty(), "Deployment preview is read-only and emits no events")
 	for command in [["missing", Vector2i.ZERO, 0, "unknown_unit"], ["g", Vector2i(0, 1), 0, "wrong_terrain"], ["s", Vector2i.ZERO, 0, "wrong_terrain"], ["h", Vector2i.ZERO, 0, "wrong_terrain"], ["g", Vector2i(99, 0), 0, "wrong_terrain"], ["g", Vector2i.ZERO, 4, "invalid_facing"]]:
 		var result = b.deploy(command[0], command[1], command[2])
 		check(not result.ok and result.reason == command[3], "deployment rejects " + command[3])

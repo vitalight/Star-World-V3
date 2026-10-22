@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_82f63"]
+
+[resource]
+script = ExtResource("1_82f63")
+content_id = "character_003"
+display_name = "重装"
+max_hp = 1600.0
+attack = 35.0
+defense = 18.0
+block = 3

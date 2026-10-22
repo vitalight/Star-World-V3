@@ -92,10 +92,13 @@ func set_readout(values: Dictionary) -> void:
 	readout.merge(values, true)
 	queue_redraw()
 
+func status_readout(progress: String, life: String) -> String:
+	return "⚑  " + progress + "      ♜  " + life
+
 func _draw() -> void:
 	var font := ThemeDB.fallback_font
 	draw_style_box(_panel(), Rect2(465, 12, 350, 43))
-	draw_string(font, Vector2(489, 42), "⚑  " + readout.progress + "      ♜  " + readout.life, HORIZONTAL_ALIGNMENT_LEFT, -1, 26)
+	draw_string(font, Vector2(489, 42), status_readout(readout.progress, readout.life), HORIZONTAL_ALIGNMENT_LEFT, -1, 26)
 	draw_style_box(_panel(), Rect2(1080, 479, 178, 95))
 	draw_string(font, Vector2(1132, 522), "◇ " + readout.cost, HORIZONTAL_ALIGNMENT_LEFT, -1, 37)
 	draw_string(font, Vector2(1090, 554), "可部署角色：" + readout.available, HORIZONTAL_ALIGNMENT_LEFT, -1, 18)

@@ -1,13 +1,17 @@
+@tool
 extends Node3D
 ## Externally supplied layout and materials; coordinates are cell centers on X/Z.
 @export var atlas: Texture2D
 @export var layout: PackedStringArray = []
 @export var decorations: Array[Vector3] = []
 @export var graybox := false
+var cells: Dictionary = {}
 var tops: Array[Material] = []
 var side: StandardMaterial3D
 
 func surface_height(cell: Vector2i) -> float:
+	if not cells.is_empty(): return float(cells.get(cell, {}).get("height", 0.0))
+	if cell.y < 0 or cell.y >= layout.size() or cell.x < 0 or cell.x >= layout[cell.y].length(): return 0.0
 	return 0.42 if layout[cell.y][cell.x] in ["H", "G"] else 0.0
 
 func material(color: Color) -> StandardMaterial3D:
@@ -47,12 +51,12 @@ func beveled_tile(at: Vector3, height: float) -> void:
 	add_child(instance)
 
 func _ready() -> void:
-	side = material(Color("75654e"))
+	side = material(Color("847660"))
 	# Extract each region once; filtering never samples its neighbouring atlas cell.
 	for index in 16:
 		var mat := material(Color.WHITE)
 		if atlas and not graybox:
-			mat.albedo_color = Color(0.82, 0.79, 0.72)
+			mat.albedo_color = Color(0.82, 0.81, 0.77)
 			var source := atlas.get_image()
 			var cell := Vector2i(source.get_size() / 4)
 			mat.albedo_texture = ImageTexture.create_from_image(source.get_region(Rect2i(Vector2i(index % 4, index / 4) * cell + Vector2i.ONE, cell - Vector2i(2, 2))))
@@ -61,6 +65,7 @@ func _ready() -> void:
 		tops.append(mat)
 	for z in layout.size():
 		for x in layout[z].length():
+			if not cells.is_empty() and not cells.has(Vector2i(x, z)): continue
 			var symbol := layout[z][x]
 			var elevation := surface_height(Vector2i(x, z))
 			beveled_tile(Vector3(x, 0, z), elevation)
@@ -97,10 +102,12 @@ func _ready() -> void:
 			column.position = at + Vector3(0.3, 0.4, 0.15)
 			column.rotation.z = 0.17
 			add_child(column)
-	block(Vector3(4.5, -0.3, 2.5), Vector3(12.5, 0.2, 8.4), material(Color("41443c")))
+	var width := layout[0].length() if not layout.is_empty() else 10
+	var depth := layout.size()
+	block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("767667")))
 
 func grass(at: Vector3) -> void:
-	# Dense radial tufts with bent, folded leaves, lit by the same scene lights.
+	# Low, separated tufts keep tactical silhouettes clear.
 	# Each leaf has a central ridge and two differently oriented surfaces.
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 6143 + int(at.x) * 7381 + int(at.z) * 1931
@@ -109,17 +116,17 @@ func grass(at: Vector3) -> void:
 	mat.vertex_color_use_as_albedo = true
 	var builder := SurfaceTool.new()
 	builder.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for tuft in 49:
-		var root := Vector3((tuft % 7 - 3) * 0.125 + rng.randf_range(-0.035, 0.035), 0, (tuft / 7 - 3) * 0.125 + rng.randf_range(-0.035, 0.035))
-		var tuft_height := rng.randf_range(0.19, 0.31)
-		for leaf in 7:
-			var angle := leaf * TAU / 7.0 + rng.randf_range(-0.45, 0.45)
+	for tuft in 25:
+		var root := Vector3((tuft % 5 - 2) * 0.175 + rng.randf_range(-0.035, 0.035), 0, (tuft / 5 - 2) * 0.175 + rng.randf_range(-0.035, 0.035))
+		var tuft_height := rng.randf_range(0.12, 0.21)
+		for leaf in 5:
+			var angle := leaf * TAU / 5.0 + rng.randf_range(-0.45, 0.45)
 			var outward := Vector3(cos(angle), 0, sin(angle))
 			var across := Vector3(-sin(angle), 0, cos(angle))
 			var height := tuft_height * rng.randf_range(0.7, 1.15)
 			var lean := rng.randf_range(0.05, 0.16)
 			var width := rng.randf_range(0.018, 0.033)
-			var color := Color("aa9448").lerp(Color("d5bd73"), rng.randf())
+			var color := Color("817843").lerp(Color("ac9d60"), rng.randf())
 			var sections: Array[PackedVector3Array] = []
 			for segment in 6:
 				var t := segment / 5.0
@@ -129,7 +136,7 @@ func grass(at: Vector3) -> void:
 				sections.append(PackedVector3Array([center - across * spread, ridge, center + across * spread]))
 			for segment in 5:
 				for face in 2:
-					builder.set_smooth_group((tuft * 7 + leaf) * 2 + face)
+					builder.set_smooth_group((tuft * 5 + leaf) * 2 + face)
 					var indices: Array[Vector2i] = [Vector2i(segment, face), Vector2i(segment + 1, face), Vector2i(segment + 1, face + 1), Vector2i(segment, face), Vector2i(segment + 1, face + 1), Vector2i(segment, face + 1)]
 					for vertex in indices:
 						var t := vertex.x / 5.0

@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="PackedScene" path="res://content/scenes/scene_001/field.tscn" id="1"]
+[sub_resource type="Environment" id="Environment_preview"]
+background_mode = 1
+background_color = Color(0.2, 0.21, 0.18, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.66, 0.75, 0.85, 1)
+ambient_light_energy = 0.68
+[node name="MapPreview" type="Node3D"]
+[node name="Field" parent="." instance=ExtResource("1")]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_preview")
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-57, -32, 0)
+light_color = Color(1, 0.9, 0.69, 1)
+light_energy = 0.95
+shadow_enabled = true
+[node name="Camera" type="Camera3D" parent="."]
+position = Vector3(4.5, 14.5, 11.36)
+rotation_degrees = Vector3(-58.57, 0, 0)
+current = true
+fov = 32.0

@@ -48,6 +48,8 @@
 - `logic_workspace.gd` / `battle_canvas.gd`：操作、几何显示和事件可视化。不加载正式美术、角色场景或 StarterContent。
 - Game Test 继续保留待集成入口。本轮没有加入特殊职业、群攻、异常状态、位移、召唤物和复杂寻路。
 
+后续 Game Test 集成现已完成，见 `devtools/game_test/README.md` 和 `docs/reviews/game_test.md`；上段“待集成”指 Logic Test 实现时的阶段状态。两者继续复用同一 battle 模块。
+
 ## 自动验证
 
 先设置本机 `GODOT_PATH` 指向标准版 Godot 4.x 可执行文件，在项目根目录运行：

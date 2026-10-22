@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Texture2D" path="res://content/enemies/character_010/portrait.tres" id="1_2x574"]
+[ext_resource type="Texture2D" path="res://content/enemies/character_010/pose_0.png" id="2_gdvep"]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="2_hayiw"]
+[ext_resource type="Texture2D" path="res://content/enemies/character_010/pose_1.png" id="3_3r4fu"]
+[ext_resource type="Texture2D" path="res://content/enemies/character_010/pose_2.png" id="4_y7e5v"]
+[ext_resource type="Texture2D" path="res://content/enemies/character_010/pose_3.png" id="5_vegtr"]
+
+[resource]
+script = ExtResource("2_hayiw")
+poses = Array[Texture2D]([ExtResource("2_gdvep"), ExtResource("3_3r4fu"), ExtResource("4_y7e5v"), ExtResource("5_vegtr")])
+portrait = ExtResource("1_2x574")
+height = 1.02

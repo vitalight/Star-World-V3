@@ -19,6 +19,7 @@ battle.reset()
 ```
 
 - `deploy(roster_id: String, cell: Vector2i, facing: int = 0)`、`retreat(unit_id: int)`、`activate_skill(unit_id: int)` 返回 `{ok: bool, reason: String, id: int}`；仅部署成功时 `id` 为新实例ID，其余为-1。拒绝命令不改变费用及战斗状态。
+- `deployment_check(roster_id, cell, facing=0)` 以同一规则只读检查部署，返回同结构结果，成功 id 仍为 -1；不扣费、不生成单位、不发事件。正式 deploy 也调用该校验，供界面精确预览可部署格。
 - 部署失败原因包括 `finished`、`unknown_unit`、`invalid_facing`、`redeploy_cooldown`、`wrong_terrain`、`already_deployed`、`occupied`、`deploy_limit`、`insufficient_cost`。多项同时非法时只报告一项，不保证所有失败原因的优先级。
 - 技能还可能返回 `not_running`、`skill_active`、`no_skill`、`insufficient_sp`。
 - `start() -> bool` 只接受准备态。准备态允许部署和撤退，但不推进费用和再部署时间。
@@ -80,3 +81,14 @@ battle.reset()
 同一配置、同一命令时间表和同一步长数得到一致状态与事件。到期出怪按time排序，同一时间按配置顺序；同帧角色按稳定插入顺序执行。每帧依次推进时钟与出怪、技能/攻击冷却、敌方攻击动作、移动与阻挡、我方攻击动作、离场清理、胜负。不同帧分片不改变模拟；命令必须在相同模拟时刻提交。
 
 模块专属自动测试：`tests/battle_test.gd`。Game Test 集成仍需独立模块评审。
+
+Game Test 已按 `docs/reviews/game_test.md` 的检查和回归接入。`unit_spec.gd`、`wave_spec.gd`、`level_spec.gd` 是 Inspector 可编辑的纯数据 Resource，输出上述同一份字典协议；battle 本身仍不加载场景和这些具体资源。地图采集、输入与表现适配位于对应表现 feature 和 game，不改动模拟规则。
+
+
+## 路线预告与生成时序
+
+配置 `route_warning_duration` 为预告时长；原始字典未提供时默认 0 保持既有纯规则用例，正式 Level Resource 默认 2 秒，scene_001 明确设为 2。
+
+每个波次 Resource 是一组出怪：首个实际出怪时刻为 `max(wave.time, route_warning_duration)`，预告从首个出怪前 `route_warning_duration` 秒开始。同组后续敌人沿用 interval，不重复预告。开始时到期的预告在 `start()` 立即进入快照；后续预告与生成都由固定步长推进，暂停冻结，单步推进。多条路线可同时预告。
+
+快照 `route_warnings` 保存当前预告字典数组：id、route、wave、start、spawn_at、duration。事件 `route_warning` 在开始预告时发出一次；`spawn` 仅在完整预告结束后发出。结束、重置清理当前预告。该时序属于 battle，表现层不能延迟或直接生成敌人。

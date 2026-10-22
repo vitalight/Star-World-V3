@@ -30,7 +30,7 @@ Godot 自动管理的 `.godot/` 缓存维持引擎默认位置。
 ## Feature 的组织
 
 battle 是一个对外统一的战斗模块，units、deployment、targeting、navigation、waves 是它的内部实现目录，不是分别对外暴露的顶层模块。
-未来由 battle.gd 提供战斗创建、命令提交、模拟推进和状态/事件读取等必要接口，具体接口随首个可运行战斗实现确定。
+由 battle.gd 提供战斗创建、命令提交、模拟推进和状态/事件读取等必要接口，当前公共接口见 features/battle/README.md。
 
 actor_view、effects、battlefield_view、battle_hud 可以独立展示；它们不计算伤害、波次、部署合法性和胜负，也不直接查找战斗内部节点。
 game/adapters 将战斗事件与状态转成表现更新，并将用户操作意图交给战斗模块验证。
@@ -80,7 +80,9 @@ game 负责根据内容标识关联数值和外观，使 Logic Test 可以只加
 
 Logic Test 与 Game Test 必须复用同一战斗实现；Art Test 与 Game Test 必须复用同一表现实现。
 临时测试数据、占位图形和调试控制放在所属 devtools 工作区，正式配置放在 content。
-战斗模块应支持不加载角色场景、动画和 UI 的模拟推进。当前工作区仅为占位入口，上述功能随模块开发实现。
+战斗模块支持不加载角色场景、动画和 UI 的模拟推进。Game Test 已通过 game/battle 加载实际组装，编辑方式和接口见 devtools/game_test/README.md。
+
+scene_001 的 TileMapLayer 是地形唯一数据源。features/battlefield_view/editable_map.gd 通过关卡资源的 configuration / errors 协议导出战斗配置及编辑器诊断；关卡、单位与波次资源类型由 features/battle 定义。3D 地形生成器只消费格子外观和高度，不计算部署合法性。角色外观由 features/actor_view 定义资源类型，game 按内容 ID 将数值与外观关联。
 
 ## 验证与评审
 
@@ -90,3 +92,9 @@ Logic Test 与 Game Test 必须复用同一战斗实现；Art Test 与 Game Test
 流程：独立开发 → 对应工作区验证 → 记录 review → 在 game 连接模块 → Game Test 回归。
 使用 docs/module_review.md 模板，将具体记录保存在 docs/reviews/。未评审或未通过的模块不接入正式游戏组装。
 评审后保留模块路径，避免维护实验版和正式版两份实现。
+
+
+Art Test 的 Battle 页使用模拟快照调用 game/adapters/battle_presentation.gd 和同一 playable_hud，不创建战斗模拟器；Game Test 使用真实 battle 快照。镜头、光照及路线端点标记由 features/battlefield_view/battlefield_stage.gd 提供，具体地图与 appearance 由调用方传入；共享显示不得反向引用 devtools。
+
+
+路线预告时序由 battle 维护，并通过 route_warnings 快照与 route_warning 事件输出；features/battlefield_view/route_guide.gd 只接收路线、地表高度回调及进度，使用 shader 播放单次流动引导线。game/adapters 管理其生命周期，Art Test 以模拟快照复用，不由表现层阻塞或生成敌人。

@@ -19,8 +19,14 @@ func buttons(node: Node) -> Array[Button]:
 		if child is Button: result.append(child)
 		result.append_array(buttons(child))
 	return result
+func move_pointer(point: Vector2) -> void:
+	var motion := InputEventMouseMotion.new()
+	motion.position = point
+	root.push_input(motion, true)
+	await process_frame
 func click_control(control: Control) -> void:
 	var point = control.get_global_rect().get_center()
+	await move_pointer(point)
 	for pressed in [true, false]:
 		var event = InputEventMouseButton.new()
 		event.button_index = MOUSE_BUTTON_LEFT
@@ -53,6 +59,7 @@ func check_path(expected: String) -> void:
 func select_tab(index: int) -> void:
 	var bar: TabBar = current_scene.tabs.get_tab_bar()
 	var point := bar.get_global_rect().position + bar.get_tab_rect(index).get_center()
+	await move_pointer(point)
 	for pressed in [true, false]:
 		var event := InputEventMouseButton.new()
 		event.button_index = MOUSE_BUTTON_LEFT
@@ -110,7 +117,8 @@ func run() -> void:
 			await click_control(find_button(entry, true))
 			await settle()
 			check(old.get_ref() == null, "Departed hub freed")
-			check_path("Star World/Developer Hub/" + entry)
+			if entry != "Game Test": check_path("Star World/Developer Hub/" + entry)
+			else: check(current_scene.game.battle != null and not current_scene.debug_window.visible, "Game Test loads full battle with debug hidden")
 			if repeat == 0: await capture(entry.to_snake_case())
 			if entry == "Blueprint":
 				await click_control(find_button("B /", true))
@@ -118,6 +126,9 @@ func run() -> void:
 				check(current_scene.preview.texture.resource_path.ends_with("concept_b.png"), "Blueprint B selection")
 				if repeat == 0: await capture("blueprint_b")
 			var workspace = weakref(current_scene)
+			if entry == "Game Test":
+				await click_control(find_button("☰"))
+				await settle()
 			await click_control(find_button("Developer Hub"))
 			await settle()
 			check(workspace.get_ref() == null, "Departed workspace freed")

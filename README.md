@@ -9,6 +9,8 @@
 
 项目默认入口为 `devtools/hub/developer_hub.tscn`。
 
+Game Test 已接入完整战斗：从首页进入后可部署干员、开始防守、释放技能、撤退和重开；F3 打开内嵌调试窗。地图使用 TileMapLayer 编辑并生成 3D 战场，路线和波次均可在编辑器配置。操作、编辑与验证说明见 [Game Test](devtools/game_test/README.md)。
+
 ## 目录结构
 
 采用 **Feature-oriented + Data-driven + Composition**。

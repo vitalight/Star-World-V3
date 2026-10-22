@@ -14,4 +14,6 @@
 
 切片使用原图尺寸除以 4，边界四舍五入到像素；保留源图透明背景及原有杂色边缘。没有新增战斗数值配置。
 
+Game Test 集成补充：character_001、003、004、005、006 增加 pose_0～pose_3.png（同一行的正面待机、背面待机、正面攻击、背面攻击），边界仍按四分之一尺寸四舍五入。appearance.tres 关联四种姿态、既有头像和显示高度；stats.tres 单独保存近卫、重装、射手、术师、医疗数值，不引用美术。上述“没有新增战斗数值配置”描述的是此前 Art Test 阶段。
+
 character_008、character_009、character_010 的敌方外观已归入 `content/enemies/`，来源登记见 `../enemies/README.md`；内容 ID 保持不变。
