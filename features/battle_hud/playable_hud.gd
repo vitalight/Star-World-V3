@@ -89,7 +89,8 @@ func _ready() -> void:
 	readouts.offset_top = -100; readouts.offset_bottom = -18
 	readouts.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(readouts)
-	notice = _label(readouts, "点击或拖动干员卡部署", 16)
+	notice = _label(readouts, "", 16)
+	notice.hide()
 	notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	start_button = _button(readouts, "开始战斗", func(): start_requested.emit())
 	var economy_panel := _panel_container()
@@ -229,7 +230,7 @@ func _ready() -> void:
 	direction_panel.position = size / 2 - Vector2(150, 100)
 	var choices := VBoxContainer.new()
 	direction_panel.add_child(choices)
-	_label(choices, "移动鼠标定向，左键确认", 18)
+	_label(choices, "部署方向", 18)
 	var directions := HBoxContainer.new()
 	choices.add_child(directions)
 	for facing in 4:
@@ -404,23 +405,24 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		skill_button.icon = appearance.skill_icon if appearance.skill_icon else appearance.portrait
 		skill_portrait.texture = skill_button.icon
 		if selected.skill.enabled:
-			var recovery_text: String = {"auto": "自动回复", "attack": "攻击回复", "hit": "受击回复"}.get(selected.skill.recovery, selected.skill.recovery)
-			skill_description.text = "%s · 手动释放\n%s提升至 %.0f%%，持续 %.1f 秒。" % [recovery_text, "治疗量" if selected.role == "healer" else "攻击力", selected.skill.multiplier * 100.0, selected.skill.duration]
+			skill_description.text = "%s提升至 %.0f%%，持续 %.1f 秒。" % ["治疗量" if selected.role == "healer" else "攻击力", selected.skill.multiplier * 100.0, selected.skill.duration]
+			if not selected.skill.get("description", "").is_empty():
+				skill_description.text = "%s\n%s" % [selected.skill.get("name", "技能"), selected.skill.description]
 		else:
 			skill_description.text = "无主动技能"
-		skill_button.tooltip_text = "点击技能图标释放" if ready else "技力充满后可释放"
+		skill_button.tooltip_text = ""
 		if ready: skill_button.add_theme_stylebox_override("normal", ready_skill_style)
 		else: skill_button.add_theme_stylebox_override("normal", normal_skill_style)
-		if not selected.skill.enabled: skill_status.text = "无主动技能"
-		elif selected.skill_left > 0: skill_status.text = "技能持续中 · %.1fs" % selected.skill_left
-		elif state.phase != "running": skill_status.text = "开始战斗后可释放" if ready else "技力充能中"
-		elif ready: skill_status.text = "技能就绪 · 点击图标释放"
-		else: skill_status.text = "技力充能中 · %.1f / %.1f" % [selected.sp, selected.skill.required]
-		skill_status.add_theme_color_override("font_color", Color("ffe08a") if ready else Color("bdc8c7"))
-		retreat_button.tooltip_text = "撤退：返还一半部署费用（向下取整，受费用上限限制）；再部署冷却 %.1f 秒" % selected.redeploy_time
+		skill_status.visible = selected.skill_left > 0
+		skill_status.text = "剩余 %.1fs" % selected.skill_left if selected.skill_left > 0 else ""
+		retreat_button.tooltip_text = "撤退"
 		_position_operator_actions()
 	end_panel.visible = finished
 	if finished:
 		direction_panel.hide()
 		end_label.text = "防守成功" if state.phase == "victory" else "基地失守"
 		_fit()
+
+func set_notice(message: String) -> void:
+	notice.text = message
+	notice.visible = not message.is_empty()

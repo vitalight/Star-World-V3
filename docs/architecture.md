@@ -100,3 +100,7 @@ Art Test 的 Battle 页使用模拟快照调用 game/adapters/battle_presentatio
 
 
 路线预告时序由 battle 维护，并通过 route_warnings 快照与 route_warning 事件输出；features/battlefield_view/route_guide.gd 只接收路线、地表高度回调及进度，使用 shader 播放单次流动引导线。game/adapters 管理其生命周期，Art Test 以模拟快照复用，不由表现层阻塞或生成敌人。
+
+## 产品界面文案
+
+Game Test 与正式游戏按游戏产品设计：常规界面只显示必要的状态、数值、技能功能与操作结果，不加入注释式操作说明或调试描述，例如“技能就绪，点击图标释放”“点击或拖动干员卡部署”“美术展示·模拟快照”。技能是否可用通过图标亮光、禁用态及状态条表达；失败原因简短明确。操作文档写入 README，开发信息只放调试窗。Art Test 只承担美术预览，不展示技能效果、数值或其他玩法说明。

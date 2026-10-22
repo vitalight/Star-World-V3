@@ -6,7 +6,7 @@ const ENTRIES = [
 		"description": "查看与对比概念方案，确定战场的视觉方向。", "detail": "A / B 概念对比",
 		"scene": "res://devtools/blueprint/blueprint_workspace.tscn"},
 	{"title": "Art Test", "category": "素材检视", "number": "02", "accent": Color("7dc6ba"),
-		"description": "浏览角色、特效与动画，检查战场组合效果。", "detail": "Character / Effect / Animation / Battle",
+		"description": "浏览角色、特效与动画，检查战场组合效果。", "detail": "Character / Effect / Animation / Battle / Skill",
 		"scene": "res://devtools/art_test/art_workspace.tscn"},
 	{"title": "Logic Test", "category": "规则验证", "number": "03", "accent": Color("90b5e4"),
 		"description": "在几何沙盒中验证部署、攻击与战斗胜负。", "detail": "部署 / 波次 / 重置",

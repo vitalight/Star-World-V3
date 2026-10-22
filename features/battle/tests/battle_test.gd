@@ -13,6 +13,7 @@ func _initialize() -> void:
 	targeting()
 	healing()
 	skills()
+	skill_modifiers()
 	boundary_contracts()
 	waves_and_determinism()
 	print("Battle rules: %d checks, %d failures" % [checks, failures])
@@ -495,3 +496,33 @@ func waves_and_determinism() -> void:
 	large.start()
 	large.advance(3)
 	check(large.snapshot() == expected, "reset replay deterministic")
+
+func skill_modifiers() -> void:
+	# Defense applies only while the skill is active and retains physical minimum damage.
+	for kind in ["physical", "arts", "true"]:
+		var c = fixture()
+		c.roster.g.attack = 0.0
+		c.roster.g.defense = 10.0
+		c.roster.g.skill = {"enabled":true,"initial_sp":1.0,"required":1.0,"duration":0.3,"multiplier":1.0,"defense_multiplier":2.5}
+		c.enemies.e.attack = 50.0
+		c.enemies.e.damage_type = kind
+		c.enemies.e.interval = 0.5
+		var b = Battle.new(c)
+		var id: int = b.deploy("g",Vector2i.ZERO).id
+		b.start(); b.activate_skill(id); b.advance(0.2)
+		near(1000.0 - b.find_unit(id).hp, 25.0 if kind == "physical" else 50.0, "Active defense modifier against " + kind)
+		near(b.find_unit(id).defense,10.0,"Skill preserves base defense")
+		b.advance(0.45)
+		near(1000.0 - b.find_unit(id).hp, 65.0 if kind == "physical" else 100.0, "Defense returns to normal after expiry")
+	var c = fixture()
+	c.roster.g.skill = {"enabled":true,"initial_sp":1.0,"required":1.0,"duration":0.7,"multiplier":1.0,"interval_multiplier":0.5}
+	c.roster.g.interval = 0.6
+	var b = Battle.new(c)
+	var id: int = b.deploy("g",Vector2i.ZERO).id
+	b.start(); b.activate_skill(id); b.advance(1.6)
+	var attacks: Array = events(b,"attack_start",true)
+	check(attacks.size() == 5, "Rapid-fire skill increases actual attack count")
+	if attacks.size() >= 5:
+		near(attacks[1].time - attacks[0].time,0.3,"Active rapid-fire interval is halved")
+		near(attacks[4].time - attacks[3].time,0.6,"Base attack interval resumes after expiry")
+	near(b.find_unit(id).interval,0.6,"Rapid-fire preserves base interval")

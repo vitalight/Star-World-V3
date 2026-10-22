@@ -12,3 +12,14 @@ damage_type = "arts"
 role = "ranged"
 block = 0
 range_cells = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, -1), Vector2i(2, 0), Vector2i(2, 1)])
+
+skill = {
+"name": "聚能爆破",
+"description": "法术攻击力提升至 220%，持续 6.0 秒。",
+"enabled": true,
+"recovery": "auto",
+"required": 12.0,
+"initial_sp": 6.0,
+"duration": 6.0,
+"multiplier": 2.2
+}

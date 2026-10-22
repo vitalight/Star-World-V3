@@ -92,3 +92,7 @@ Game Test 已按 `docs/reviews/game_test.md` 的检查和回归接入。`unit_sp
 每个波次 Resource 是一组出怪：首个实际出怪时刻为 `max(wave.time, route_warning_duration)`，预告从首个出怪前 `route_warning_duration` 秒开始。同组后续敌人沿用 interval，不重复预告。开始时到期的预告在 `start()` 立即进入快照；后续预告与生成都由固定步长推进，暂停冻结，单步推进。多条路线可同时预告。
 
 快照 `route_warnings` 保存当前预告字典数组：id、route、wave、start、spawn_at、duration。事件 `route_warning` 在开始预告时发出一次；`spawn` 仅在完整预告结束后发出。结束、重置清理当前预告。该时序属于 battle，表现层不能延迟或直接生成敌人。
+
+## 技能倍率
+
+skill 可提供 name、description（显示文案）、multiplier（攻击／治疗倍率，默认2）、defense_multiplier（物理防御倍率，默认1）、interval_multiplier（攻击间隔倍率，默认1）。三种倍率必须大于零，只在 skill_left > 0 时读取；不修改基础属性。防御倍率只影响物理伤害，保留5%最低伤害；间隔最短为原攻击前摇。当前一次攻击使用起手时确定的冷却间隔，到期后下一次起手使用基础间隔。其余充能、持续时间、暂停、撤退和再部署规则保持原协议。

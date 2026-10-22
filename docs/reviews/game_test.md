@@ -168,3 +168,19 @@
 共享 actor_view 新增纯 shader 绘制的半透明圆面／圆环及三角方向箭头，无新增图片。水平 PlaneMesh 跟随视觉脚点，方向读取同一快照 facing，覆盖四向待机与攻击，待部署时同步鼠标选向。使用较低绘制优先级的地面覆盖层，避免在高台边缘被截掉，角色和脚下状态条保持可读；敌人不显示此标识，撤退／离场立即移除，重开随角色清理。删除游戏层旧的待部署点状箭头。
 
 真实渲染验证 facing_test 185 项、deployment_view_test 62 项、operator_actions_test 49 项、presentation_parity_test 84 项、actor_occlusion_test 21 项全部通过。包含五类干员四向姿态、三种窗口尺寸下的脚点对齐、待部署朝向、敌人排除和撤退清理。四向对照图 temp/verification/compass_four_directions.png，原图 facing_0.png 至 facing_3.png；日志 temp/verification/compass_*.log。
+
+### 五名干员技能与正式图集图标
+
+采用用户提供的 Human/StarterContent/icon/skill-atlas-01.png，原件保留；正式副本与16张 AtlasTexture 位于 content/ui/skill_icons。近卫锋刃（攻击200%／5秒）、重装坚城（防御250%／8秒）、射手疾风连射（间隔50%／6秒）、术师聚能爆破（法术攻击220%／6秒）、医疗急救增幅（治疗200%／8秒），五项手动释放，分别配置自动／受击／攻击回复。具体数值保持在 stats.tres，外观资源引用对应图标，不由HUD计算效果。
+
+Art Test 新增第五页 Skill 和独立 skill_preview.tscn 入口，仅完整展示16张美术素材及其编号、来源行列；Game Test 左侧详情和附近按钮引用同一纹理，技能功能文案仅在 Game Test 显示。描述含技能名称与配置文案。额外处理场景组装期间镜头尚未拟合的投影零深度，消除 headless 集成检查的投影报错。
+
+验证：规则172项、五技能集成53项、原关卡107项、技能／撤退交互49项、显示一致性84项、全图形459项通过；Logic Test 18 cases / 98 checks 和 Art Battle smoke 通过。五技能集成用真实战斗充能并释放全部技能，比对纯逻辑与游戏最终快照一致且胜利；在1280×800、960×600、1600×900渲染 Skill 页，图标切片与操作面板已核对。截图 temp/verification/skill_art_*.png、skill_atlas_*.png、skill_game_*.png；日志 temp/verification/skill_*.log。
+
+导航补充：workspace_smoke 已覆盖第五个 Skill 页签与 skill_preview 独立入口，最终 Visual/navigation verification 为0失败。首轮合成鼠标导航在退出 Animation 时出现一次离场释放断言失败，单独完整复跑通过；本次未更改导航点击辅助实现。
+
+### 清理产品界面的注释式文案
+
+移除“技能就绪·点击图标释放”、充能／操作教学、部署鼠标说明、常驻成功提示及技能按钮指导性tooltip。技能可用性由图标亮光、禁用态和技力条表达，仅持续期间保留剩余时间；详情保留干员数值、技能名称和功能。notice 只承载简短失败原因，正常选择与操作清除并隐藏空提示，Art Battle 同步移除模拟快照提示。产品文案边界已写入 docs/architecture.md。
+
+真实渲染与交互检查 operator_actions_test 49项、deployment_view_test 62项通过，覆盖三种窗口尺寸、技能就绪／充能／持续、撤退及非法部署反馈。截图 temp/verification/operator_actions_*.png，日志 temp/verification/product_copy_*.log。

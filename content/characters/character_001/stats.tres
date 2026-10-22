@@ -8,13 +8,15 @@ content_id = "character_001"
 display_name = "近卫"
 max_hp = 1000.0
 passive = true
-skill = {
-"duration": 5.0,
-"enabled": true,
-"initial_sp": 5.0,
-"multiplier": 2.0,
-"recovery": "auto",
-"required": 5.0
-}
-
 range_cells = Array[Vector2i]([Vector2i(0, 0), Vector2i(1, 0)])
+
+skill = {
+"name": "锋刃",
+"description": "攻击力提升至 200%，持续 5.0 秒。",
+"enabled": true,
+"recovery": "auto",
+"required": 5.0,
+"initial_sp": 5.0,
+"duration": 5.0,
+"multiplier": 2.0
+}

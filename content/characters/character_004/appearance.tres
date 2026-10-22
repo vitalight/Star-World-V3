@@ -7,7 +7,11 @@
 [ext_resource type="Texture2D" path="res://content/characters/character_004/pose_2.png" id="4_2cri2"]
 [ext_resource type="Texture2D" path="res://content/characters/character_004/pose_3.png" id="5_k4mqr"]
 
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_04.tres" id="6_skill"]
+
 [resource]
 script = ExtResource("2_0ac02")
 poses = Array[Texture2D]([ExtResource("2_ilvfd"), ExtResource("3_yplob"), ExtResource("4_2cri2"), ExtResource("5_k4mqr")])
 portrait = ExtResource("1_nuwee")
+
+skill_icon = ExtResource("6_skill")

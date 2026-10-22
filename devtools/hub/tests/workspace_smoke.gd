@@ -146,7 +146,7 @@ func run() -> void:
 			await settle()
 			check(workspace.get_ref() == null, "Departed workspace freed")
 	check_catalog()
-	var scenes := ["character_preview", "effect_preview", "animation_preview", "battle_preview"]
+	var scenes := ["character_preview", "effect_preview", "animation_preview", "battle_preview", "skill_preview"]
 	for index in scenes.size():
 		change_scene_to_file("res://devtools/art_test/" + scenes[index] + ".tscn")
 		await settle()
@@ -156,7 +156,7 @@ func run() -> void:
 	change_scene_to_file("res://devtools/art_test/art_workspace.tscn")
 	await settle()
 	check(current_scene.character_columns.get_child_count() == 16, "16 character columns")
-	check(current_scene.tabs.get_tab_count() == 4, "Four persistent tabs")
+	check(current_scene.tabs.get_tab_count() == 5, "Five persistent tabs")
 	for panel in current_scene.character_columns.get_children():
 		var images = panel.get_child(0).get_children().filter(func(n): return n is TextureRect)
 		check(images.size() == 4, "Four visible static poses in each column")

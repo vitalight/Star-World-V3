@@ -4,14 +4,15 @@ const ACTOR = preload("res://features/actor_view/actor_view.gd")
 const EFFECT = preload("res://features/effects/effect_view.gd")
 const UI = preload("res://devtools/ui/workspace_style.gd")
 const CATALOG = preload("res://devtools/art_test/asset_catalog.gd")
-const TAB_NAMES = ["Character", "Effect", "Animation", "Battle"]
+const TAB_NAMES = ["Character", "Effect", "Animation", "Battle", "Skill"]
 const PREVIEW_SCALE = 0.44
 const PREVIEW_CENTER = Vector2(104, 74)
-@export_enum("Character", "Effect", "Animation", "Battle") var page: int = 0
+@export_enum("Character", "Effect", "Animation", "Battle", "Skill") var page: int = 0
 var tabs: TabContainer
 var character_scroll: ScrollContainer
 var character_columns: HBoxContainer
 var effect_grid: HFlowContainer
+var skill_grid: HFlowContainer
 var animation_actors: Array[Node2D] = []
 var animation_effects: Array[Node2D] = []
 var battle_stage: Control
@@ -33,6 +34,7 @@ func _ready() -> void:
 	build_effects(tabs.get_child(1))
 	build_animations(tabs.get_child(2))
 	build_battle(tabs.get_child(3))
+	build_skills(tabs.get_child(4))
 	tabs.current_tab = page
 	tabs.tab_changed.connect(_tab_changed)
 	_tab_changed(page)
@@ -203,3 +205,17 @@ func build_battle(box: VBoxContainer) -> void:
 	battle_stage.set_script(preload("res://devtools/art_test/battle_stage.gd"))
 	battle_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(battle_stage)
+
+func build_skills(box: VBoxContainer) -> void:
+	label(box, "技能图标 · 16 张静态素材")
+	var body := scroll_body(box)
+	label(body, "skill-atlas-01.png · 4 × 4", 18)
+	skill_grid = HFlowContainer.new()
+	skill_grid.add_theme_constant_override("h_separation", 12)
+	skill_grid.add_theme_constant_override("v_separation", 12)
+	body.add_child(skill_grid)
+	for entry in CATALOG.skills():
+		var column := card(skill_grid)
+		label(column, entry.name, 18)
+		image_cell(column, entry.texture)
+		label(column, "行 %d / 列 %d" % [entry.row + 1, entry.column + 1], 15)

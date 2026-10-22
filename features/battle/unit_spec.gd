@@ -46,4 +46,6 @@ func errors() -> PackedStringArray:
 		result.append("费用、冷却、阻挡、移速或漏怪伤害非法")
 	if skill.get("required", 5.0) <= 0 or skill.get("duration", 3.0) <= 0 or skill.get("recovery", "auto") not in ["auto", "attack", "hit"]:
 		result.append("技能配置非法")
+	if skill.get("multiplier", 2.0) <= 0 or skill.get("defense_multiplier", 1.0) <= 0 or skill.get("interval_multiplier", 1.0) <= 0:
+		result.append("技能倍率必须大于零")
 	return result

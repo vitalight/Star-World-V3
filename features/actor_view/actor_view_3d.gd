@@ -99,6 +99,8 @@ func _process(_delta: float) -> void:
 ## Simulation position remains unchanged; the offset is measured in viewport pixels.
 static func projected_position(camera: Camera3D, at: Vector3) -> Vector3:
 	if not camera: return at
+	# Scene assembly can create actors before the camera has been fitted.
+	if (camera.get_camera_transform().affine_inverse() * at).z >= -0.0001: return at
 	var point := camera.unproject_position(at) + SCREEN_OFFSET
 	var hit = Plane(Vector3.UP, at.y).intersects_ray(camera.project_ray_origin(point), camera.project_ray_normal(point))
 	return hit if hit is Vector3 else at

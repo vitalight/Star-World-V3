@@ -72,7 +72,7 @@ func _ready() -> void:
 	hud.reset_speed_requested.connect(func(): speed = 1.0; sync_playback())
 	# Same menu and controls; only their data source differs from the game.
 	hud.menu_requested.connect(func(): get_tree().change_scene_to_file("res://devtools/hub/developer_hub.tscn"))
-	hud.notice.text = "美术展示 · 模拟快照"
+	hud.set_notice("")
 	sync_playback()
 
 func _build_mock() -> void:

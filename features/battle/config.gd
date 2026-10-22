@@ -22,9 +22,10 @@ static func normalize(input: Dictionary) -> Dictionary:
 		assert(u.terrain == ("ground" if role == "melee" else "high"))
 		assert(u.cost >= 0 and u.redeploy_time >= 0 and u.block >= 0)
 		var skill = {"enabled": false, "recovery": "auto", "required": 5.0,
-			"initial_sp": 0.0, "duration": 3.0, "multiplier": 2.0}
+			"initial_sp": 0.0, "duration": 3.0, "multiplier": 2.0, "defense_multiplier": 1.0, "interval_multiplier": 1.0}
 		skill.merge(u.get("skill", {}), true)
 		assert(skill.required > 0 and skill.duration > 0)
+		assert(skill.multiplier > 0 and skill.defense_multiplier > 0 and skill.interval_multiplier > 0)
 		assert(skill.recovery in ["auto", "attack", "hit"])
 		skill.initial_sp = clampf(skill.initial_sp, 0, skill.required)
 		u.skill = skill

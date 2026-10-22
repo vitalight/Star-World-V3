@@ -43,3 +43,9 @@ Logic Test 提供6个专项关与1个综合关，共18个用例，支持预设�
 - 每个用例到观察截止时间后停止，静止靶测试可能保持running＋paused；规则完成状态与战斗胜负分开。
 - 未接入正式Game Test。独立评审通过后，由game/adapters将同一battle状态和事件关联正式表现。
 - 本轮首次使用旧Mono可执行文件触发已有程序集访问/崩溃问题；最终全部验证改用项目约定的GODOT_PATH标准版，无项目解析或运行错误。导入时曾出现受限环境Safe save提示，最终核心、工作区与渲染测试日志均无该提示。
+
+### 技能图标接入对应的规则扩展
+
+新增可选 defense_multiplier 与 interval_multiplier，缺省均为1，旧配置行为保持不变。防御强化只影响物理伤害，保留最低伤害；攻速技能在起手时确定冷却，不短于前摇，结束后下一次起手恢复基础间隔。基础属性不被覆盖，充能、暂停、持续时间与重置继续复用原接口。UnitSpec 与配置归一化校验正倍率。
+
+独立规则检查：battle_test 172 项通过，新增13项覆盖三种伤害类型下的防御强化与到期恢复、攻击次数、技能前后间隔及基础数值保留。跨模块五技能战斗验证纯逻辑与游戏快照一致且胜利，Logic Test 18 cases / 98 checks 与原关卡107项回归通过；本次扩展满足接入条件。日志 temp/verification/skill_battle.log、skill_integration.log、skill_logic_regression.log、skill_game_regression.log。

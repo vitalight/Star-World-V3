@@ -1,13 +1,15 @@
 # Art Test
 
-从 Developer Hub 进入后默认打开 Character，固定提供 Character / Effect / Animation / Battle 四个 tab。顶部路径统一为 `Star World/Developer Hub/Art Test`，点击 Developer Hub 返回首页。首页及 Blueprint、Logic Test、Game Test 复用相同路径组件。
+从 Developer Hub 进入后默认打开 Character，固定提供 Character / Effect / Animation / Battle / Skill 五个 tab。顶部路径统一为 `Star World/Developer Hub/Art Test`，点击 Developer Hub 返回首页。首页及 Blueprint、Logic Test、Game Test 复用相同路径组件。
 
 - Character：全部 16 个角色按英雄、敌人、图集编号和行号排序。每列一个角色，依次显示正面待机、背面待机、正面攻击、背面攻击；水平滚动浏览，较矮窗口支持垂直滚动。来源与角色行号随列显示。
 - Effect：两张特效图集全部 32 个静态切片，包括大小变体；卡片随窗口宽度换行，垂直滚动浏览，显示来源及行列。此页不播放动画。
 - Animation：32 个角色方向预览（每个角色正背面各一项）与 32 个特效预览；默认循环播放，支持统一播放、暂停和重播。隐藏页面停止更新，返回后恢复原先播放／暂停状态；重播从开头开始并播放。
 - Battle：16:9 自适应 3D 荒原哨站，10×6 地块、道路与高台、有受光层次的麦黄色草丛、岩石围墙、红蓝出入口、使用正式编队的 5 名干员和 3 类敌人模拟快照（开始先展示 2 秒路线预告，再出现敌人）；角色、血条、HUD、镜头与入口标记复用 Game Test 显示实现，已部署卡片按同一规则隐藏。没有移动、伤害、部署或波次计算。小窗口完整缩放战场并留边。
 
-`art_workspace.tscn`、`character_preview.tscn` 默认 Character；`effect_preview.tscn`、`animation_preview.tscn`、`battle_preview.tscn` 分别直接打开对应 tab，均可独立 F6 运行。离开场景销毁其表现节点。
+- Skill：仅展示16张技能图标、素材编号和图集行列位置，支持窄窗口换行与纵向滚动。
+
+`art_workspace.tscn`、`character_preview.tscn` 默认 Character；`effect_preview.tscn`、`animation_preview.tscn`、`battle_preview.tscn`、`skill_preview.tscn` 分别直接打开对应 tab，均可独立 F6 运行。离开场景销毁其表现节点。
 
 ## 素材来源与切片
 
@@ -45,3 +47,7 @@ Battle 攻击展示使用周期性模拟 attack_start／damage／heal 事件，�
 
 
 重播 Battle 会先重置为五名干员与两条路线预告，不显示敌人；2 秒后移除预告并显示三类敌人，然后播放模拟攻击事件。路线光效通过同一 route_guide feature 由模拟快照驱动，暂停／倍速同样生效。
+
+## Skill
+
+新增第五个 Skill 页签，可 F6 运行 skill_preview.tscn 独立打开。仅按原图行列顺序展示全部16张图标、素材编号和来源行列。此页不加载干员数值配置，不展示技能名称、效果、充能方式或其他玩法文案。图标使用正式 AtlasTexture 切片。窄窗口自动换行并可纵向滚动；素材来自 Human/StarterContent/icon/skill-atlas-01.png，正式副本与切片位于 content/ui/skill_icons。

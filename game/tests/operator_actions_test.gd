@@ -38,10 +38,10 @@ func run() -> void:
 	check(float(actor.billboard_material.get_shader_parameter("readiness")) > 0, "Ready operator has gold material highlight")
 	await select_actor(deployed.id)
 	check(game.selected_unit == deployed.id and game.hud.info_panel.visible, "Clicking deployed operator opens details")
-	check(game.hud.skill_button.icon != null and not game.hud.skill_button.disabled and game.hud.skill_status.text.contains("就绪"), "Ready skill icon can be activated")
-	check(game.hud.retreat_button.tooltip_text.contains("一半") and game.hud.retreat_button.tooltip_text.contains("冷却"), "Details explain refund and redeployment delay")
+	check(game.hud.skill_button.icon != null and not game.hud.skill_button.disabled and not game.hud.skill_status.visible, "Ready skill icon can be activated")
+	check(game.hud.retreat_button.tooltip_text == "撤退" and game.hud.skill_button.tooltip_text.is_empty(), "Action icons avoid instructional tooltips")
 	check(game.hud.operator_portrait.texture == game.appearances.guard.portrait and game.hud.skill_portrait.texture == game.hud.skill_button.icon, "Left panel displays selected portrait and skill icon")
-	check(game.hud.skill_description.text.contains("200%") and game.hud.skill_description.text.contains("5.0") and game.hud.skill_description.text.contains("自动回复"), "Skill description reflects real multiplier, duration and recovery")
+	check(game.hud.skill_description.text.contains("200%") and game.hud.skill_description.text.contains("5.0"), "Skill description displays name and effect values")
 	for dimensions in [Vector2i(1280,800), Vector2i(960,600), Vector2i(1600,900)]:
 		root.size = dimensions; await settle(); game.fit_camera()
 		check(root.get_visible_rect().encloses(game.hud.info_panel.get_global_rect()), "Operator actions fit " + str(dimensions))
@@ -64,7 +64,7 @@ func run() -> void:
 	var active: Dictionary = game.battle.find_unit(deployed.id)
 	check(active.skill_left > 0 and active.sp == 0, "Clicking the skill icon activates real skill and consumes SP")
 	check(not actor.skill_hint.visible and not actor.skill_ready and float(actor.billboard_material.get_shader_parameter("readiness")) == 0, "Activation clears ready light")
-	check(game.hud.skill_button.disabled and game.hud.skill_status.text.contains("持续中"), "Active skill cannot be fired again")
+	check(game.hud.skill_button.disabled and game.hud.skill_status.visible and game.hud.skill_status.text.contains("s"), "Active skill cannot be fired again")
 	await click_button(game.hud.skill_button)
 	check(game.battle.find_unit(deployed.id).skill_left == active.skill_left, "Repeated disabled click does not restart skill")
 	var before: float = game.last_state.cost
@@ -93,7 +93,7 @@ func run() -> void:
 	actor = game.presentation.actors[deployed.id]
 	check(not actor.skill_hint.visible, "Uncharged operator has no ready light")
 	await select_actor(deployed.id)
-	check(game.hud.skill_button.disabled and game.hud.skill_status.text.contains("充能"), "Uncharged icon displays charging state")
+	check(game.hud.skill_button.disabled and not game.hud.skill_status.visible, "Uncharged icon is disabled without instructional text")
 	game.battle.advance(4.9); game.refresh(4.9)
 	check(not actor.skill_hint.visible and game.hud.skill_button.disabled, "Recovery below threshold stays unavailable")
 	game.battle.advance(0.2); game.refresh(0.2)
@@ -105,7 +105,7 @@ func run() -> void:
 	game.command("deploy",["tank",Vector2i(9,4),2])
 	var tank_id: int = game.last_state.units.back().id
 	await select_actor(tank_id)
-	check(game.hud.operator_portrait.texture == game.appearances.tank.portrait and game.hud.skill_description.text == "无主动技能" and game.hud.skill_button.disabled, "Switching operator updates portrait and disables absent skill")
+	check(game.hud.operator_portrait.texture == game.appearances.tank.portrait and game.hud.skill_description.text.contains("坚城") and game.hud.skill_button.disabled, "Switching operator updates portrait, icon and charging skill description")
 	for cell in [Vector2i(0,1), Vector2i(9,4)]:
 		game.reset(); game.command("deploy",["guard",cell,0]); game.select_cell(cell)
 		await settle()

@@ -17,7 +17,10 @@ static func in_range(unit: Dictionary, position: Vector2) -> bool:
 	return false
 
 static func damage(power: float, target: Dictionary, kind: String) -> float:
-	if kind == "physical": return maxf(power - target.defense, power * 0.05)
+	if kind == "physical":
+		var defense: float = target.defense
+		if target.get("skill_left", 0.0) > 0: defense *= target.get("skill", {}).get("defense_multiplier", 1.0)
+		return maxf(power - defense, power * 0.05)
 	if kind == "arts": return power * (1.0 - clampf(target.resistance, 0, 95) / 100.0)
 	return power
 
@@ -85,6 +88,8 @@ static func unit_actions(b) -> void:
 static func begin(b, actor: Dictionary, target: Dictionary, friendly: bool) -> void:
 	actor.target = target.id
 	actor.cooldown = actor.interval
+	if friendly and actor.skill_left > 0:
+		actor.cooldown = maxf(actor.windup, actor.interval * actor.skill.get("interval_multiplier", 1.0))
 	actor.action = {"target": target.id, "left": actor.windup}
 	b.emit("attack_start", {"source": actor.id, "target": target.id, "from": actor.position,
 		"to": target.position, "friendly": friendly})

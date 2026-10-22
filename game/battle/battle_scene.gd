@@ -148,14 +148,14 @@ func command(method: String, args: Array) -> Dictionary:
 	if not battle: return {"ok": false, "reason": "invalid_level", "id": -1}
 	var result: Dictionary = battle.callv(method, args)
 	if hud:
-		hud.notice.text = "操作成功" if result.ok else "无法操作：" + reason_text(result.reason)
+		hud.set_notice("" if result.ok else reason_text(result.reason))
 	refresh()
 	return result
 
 func start() -> void:
 	if battle:
 		battle.start()
-		hud.notice.text = "点击场上干员查看技能与撤退"
+		hud.set_notice("")
 		refresh()
 
 func toggle_pause() -> void:
@@ -181,14 +181,14 @@ func reset() -> void:
 	hud.cancel_drag()
 	hud.direction_panel.hide()
 	hud.game_menu.hide()
-	hud.notice.text = "点击或拖动干员卡部署"
+	hud.set_notice("")
 	refresh()
 
 func select_roster(key: String) -> void:
 	if last_state.phase not in ["ready", "running"]: return
 	selected_roster = key; selected_unit = -1; candidate = Vector2i(-99, -99)
 	hud.direction_panel.hide()
-	hud.notice.text = configuration.roster[key].name + "：" + deployment_hint(key)
+	hud.set_notice("")
 	refresh()
 
 func preview_drag(point: Vector2) -> void:
@@ -203,22 +203,23 @@ func drop_roster(key: String, point: Vector2) -> void:
 	else: select_cell(cell)
 
 func deployment_hint(key: String) -> String:
-	return "近战干员只能部署在地面" if configuration.roster[key].terrain == "ground" else "远程／医疗干员只能部署在高台"
+	return "该干员仅限地面" if configuration.roster[key].terrain == "ground" else "该干员仅限高台"
 
 func select_cell(cell: Vector2i) -> void:
 	if not battle or last_state.phase not in ["ready", "running"]: return
+	hud.set_notice("")
 	if not selected_roster.is_empty():
 		candidate = cell
 		var checked: Dictionary = battle.deployment_check(selected_roster, cell, facing)
 		if not checked.ok:
 			hud.direction_panel.hide()
-			hud.notice.text = deployment_hint(selected_roster) if checked.reason == "wrong_terrain" else "无法部署：" + reason_text(checked.reason)
+			hud.set_notice(deployment_hint(selected_roster) if checked.reason == "wrong_terrain" else reason_text(checked.reason))
 			refresh()
 			return
 		direction_chosen = false
 		hud.direction_panel.show()
 		hud._fit()
-		hud.notice.text = "待部署：移动鼠标选择朝向，左键确认；右键取消"
+		hud.set_notice("")
 	else:
 		selected_unit = -1
 		for unit in last_state.units:
@@ -238,7 +239,7 @@ func cancel_selection() -> void:
 	if hud and battle:
 		hud.cancel_drag()
 		hud.direction_panel.hide()
-		hud.notice.text = "点击场上干员查看技能与撤退" if last_state.phase == "running" else ("准备就绪，点击开始战斗" if last_state.units.size() == configuration.roster.size() else "点击或拖动干员卡部署")
+		hud.set_notice("")
 		refresh()
 
 func aim_deployment(point: Vector2) -> void:
@@ -256,7 +257,7 @@ func aim_deployment(point: Vector2) -> void:
 			best = score
 			facing = index
 	direction_chosen = true
-	hud.notice.text = "朝向：%s；左键确认部署，右键取消" % ["右", "下", "左", "上"][facing]
+	hud.set_notice("")
 	update_overlays()
 
 func _unhandled_input(event: InputEvent) -> void:

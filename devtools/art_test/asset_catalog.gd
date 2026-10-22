@@ -42,3 +42,11 @@ static func frames(poses: Array, back: bool) -> SpriteFrames:
 	result.add_frame(&"default", poses[first])
 	result.add_frame(&"default", poses[first + 2])
 	return result
+
+## Formal icon slices shared with character appearances in Game Test.
+static func skills() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for index in 16:
+		result.append({"name": "图标 %02d" % (index + 1), "row": index / 4, "column": index % 4,
+			"texture": load("res://content/ui/skill_icons/icon_%02d.tres" % (index + 1))})
+	return result
