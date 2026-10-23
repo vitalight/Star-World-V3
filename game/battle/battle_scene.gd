@@ -21,6 +21,7 @@ var selected_unit := -1
 var candidate := Vector2i(-99, -99)
 var facing := 2
 var direction_chosen := false
+var deployment_pending := false
 var deployment_preview: Node3D
 var speed := 1.0
 var last_state: Dictionary = {}
@@ -31,6 +32,7 @@ var show_routes := false
 var show_ranges := true
 var appearances := {}
 var overlay_signature := ""
+var auto_start_left := 0.0
 
 func _ready() -> void:
 	StageView.setup_environment(self)
@@ -47,6 +49,7 @@ func reload_level() -> void:
 	field = null; markers = null; overlays = null
 	last_state = {}; configuration = {}
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99); speed = 1.0
+	deployment_pending = false; direction_chosen = false
 	overlay_signature = ""
 	map_data = ResourceLoader.load(map_source.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP).instantiate()
 	map_data.hide()
@@ -59,6 +62,7 @@ func reload_level() -> void:
 	configuration = map_data.configuration()
 	battle = Battle.new(configuration)
 	configuration = battle.configuration()
+	reset_auto_start()
 	field = Field.instantiate()
 	field.configure(map_data.cells(), map_data.bounds)
 	world.add_child(field)
@@ -85,7 +89,6 @@ func reload_level() -> void:
 	hud.roster = configuration.roster
 	hud.catalog = appearances
 	layer.add_child(hud)
-	hud.start_requested.connect(start)
 	hud.pause_requested.connect(toggle_pause)
 	hud.speed_requested.connect(func(): set_speed(2.0 if speed == 1.0 else 1.0))
 	hud.replay_requested.connect(reset)
@@ -95,8 +98,6 @@ func reload_level() -> void:
 	hud.roster_dropped.connect(drop_roster)
 	hud.drop_hit_test = func(_key: String, point: Vector2):
 		return last_state.phase in ["ready", "running"] and pick_cell(point) != Vector2i(-99, -99)
-	hud.facing_selected.connect(func(value): facing = value; direction_chosen = true; refresh())
-	hud.deploy_confirmed.connect(confirm_deployment)
 	hud.cancel_requested.connect(cancel_selection)
 	hud.retreat_requested.connect(func(): command("retreat", [selected_unit]))
 	hud.skill_requested.connect(func(): command("activate_skill", [selected_unit]))
@@ -119,10 +120,24 @@ func fit_camera() -> void:
 		StageView.fit_camera(camera, map_data.bounds, get_viewport().get_visible_rect().size)
 		update_operator_anchor()
 
+func reset_auto_start() -> void:
+	# Include the existing battle-owned route warning in the three-second lead-in.
+	var first_spawn := INF
+	for wave in configuration.waves:
+		first_spawn = minf(first_spawn, maxf(wave.time, configuration.route_warning_duration))
+	auto_start_left = maxf(0.0, 3.0 - first_spawn)
+
 func _process(delta: float) -> void:
 	if not battle: return
+	var elapsed := delta * speed
+	var state: Dictionary = battle.snapshot()
+	if state.phase == "ready" and not state.paused:
+		var waiting := minf(elapsed, auto_start_left)
+		auto_start_left -= waiting
+		elapsed -= waiting
+		if auto_start_left <= 0.000001: start()
 	var previous: float = battle.snapshot().time
-	battle.advance(delta * speed)
+	battle.advance(elapsed)
 	refresh(battle.snapshot().time - previous)
 
 func refresh(visual_delta := 0.0) -> void:
@@ -133,13 +148,19 @@ func refresh(visual_delta := 0.0) -> void:
 	if selected_unit != -1 and battle.find_unit(selected_unit).is_empty(): selected_unit = -1
 	if last_state.phase in ["victory", "defeat"]:
 		selected_roster = ""; candidate = Vector2i(-99, -99)
+		deployment_pending = false; direction_chosen = false
 		hud.cancel_drag()
 	hud.update_state(last_state, selected_roster, selected_unit, speed, configuration.deploy_limit)
-	update_operator_anchor()
 	observed.emit(last_state.duplicate(true), events.duplicate(true))
 	update_overlays()
+	update_operator_anchor()
 
 func update_operator_anchor() -> void:
+	if hud:
+		if deployment_pending and is_instance_valid(deployment_preview):
+			deployment_preview.update_projection()
+			hud.set_pending_deployment(true, camera.unproject_position(deployment_preview.visual_position() + camera.global_basis.y * deployment_preview.display_height() * 0.5))
+		else: hud.set_pending_deployment(false)
 	if not hud or not presentation or not presentation.actors.has(selected_unit): return
 	var actor = presentation.actors[selected_unit]
 	hud.set_operator_anchor(camera.unproject_position(actor.visual_position() + camera.global_basis.y * actor.display_height() * 0.5))
@@ -177,9 +198,10 @@ func reset() -> void:
 	if not battle: return
 	presentation.clear()
 	battle.reset()
+	reset_auto_start()
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99); facing = 2; speed = 1.0
 	hud.cancel_drag()
-	hud.direction_panel.hide()
+	deployment_pending = false; direction_chosen = false
 	hud.game_menu.hide()
 	hud.set_notice("")
 	refresh()
@@ -187,7 +209,8 @@ func reset() -> void:
 func select_roster(key: String) -> void:
 	if last_state.phase not in ["ready", "running"]: return
 	selected_roster = key; selected_unit = -1; candidate = Vector2i(-99, -99)
-	hud.direction_panel.hide()
+	hud.game_menu.hide()
+	deployment_pending = false; direction_chosen = false
 	hud.set_notice("")
 	refresh()
 
@@ -212,13 +235,12 @@ func select_cell(cell: Vector2i) -> void:
 		candidate = cell
 		var checked: Dictionary = battle.deployment_check(selected_roster, cell, facing)
 		if not checked.ok:
-			hud.direction_panel.hide()
+			deployment_pending = false; direction_chosen = false
 			hud.set_notice(deployment_hint(selected_roster) if checked.reason == "wrong_terrain" else reason_text(checked.reason))
 			refresh()
 			return
 		direction_chosen = false
-		hud.direction_panel.show()
-		hud._fit()
+		deployment_pending = true
 		hud.set_notice("")
 	else:
 		selected_unit = -1
@@ -231,19 +253,20 @@ func confirm_deployment() -> void:
 	var result := command("deploy", [selected_roster, candidate, facing])
 	if result.ok:
 		selected_unit = -1; selected_roster = ""; candidate = Vector2i(-99, -99)
-		hud.direction_panel.hide()
+		deployment_pending = false; direction_chosen = false
 		refresh()
 
 func cancel_selection() -> void:
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99)
 	if hud and battle:
 		hud.cancel_drag()
-		hud.direction_panel.hide()
+		deployment_pending = false; direction_chosen = false
 		hud.set_notice("")
 		refresh()
 
 func aim_deployment(point: Vector2) -> void:
-	if selected_roster.is_empty() or not hud.direction_panel.visible: return
+	direction_chosen = false
+	if selected_roster.is_empty() or not deployment_pending: return
 	var origin := Vector3(candidate.x, field.surface_height(candidate), candidate.y)
 	var anchor := camera.unproject_position(origin)
 	var movement := point - anchor
@@ -259,10 +282,11 @@ func aim_deployment(point: Vector2) -> void:
 	direction_chosen = true
 	hud.set_notice("")
 	update_overlays()
+	update_operator_anchor()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not battle: return
-	if event is InputEventMouseMotion and hud.direction_panel.visible:
+	if event is InputEventMouseMotion and deployment_pending:
 		aim_deployment(event.position)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		cancel_selection()
@@ -270,7 +294,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_RIGHT: cancel_selection()
 		elif event.button_index == MOUSE_BUTTON_LEFT:
-			if hud.direction_panel.visible:
+			if deployment_pending:
+				aim_deployment(event.position)
 				if direction_chosen: confirm_deployment()
 				get_viewport().set_input_as_handled()
 				return
@@ -326,7 +351,7 @@ func update_overlays() -> void:
 	if selected_roster.is_empty():
 		for unit in last_state.units:
 			if unit.id == selected_unit: inspected = unit
-	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, hud.direction_panel.visible, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
+	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, deployment_pending, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
 	if signature == overlay_signature: return
 	overlay_signature = signature
 	for child in overlays.get_children(): child.free()
@@ -349,7 +374,7 @@ func update_overlays() -> void:
 			selected = configuration.roster[selected_roster].duplicate(true)
 			selected.cell = candidate; selected.facing = facing
 		_outline(candidate, Color("ffe38c") if matches else Color("ed786a"))
-		if hud.direction_panel.visible and matches:
+		if deployment_pending and matches:
 			var appearance = appearances[selected_roster]
 			deployment_preview = Presentation.Actor.new()
 			deployment_preview.appearance = appearance
@@ -364,7 +389,7 @@ func update_overlays() -> void:
 			deployment_preview.update_projection()
 			deployment_preview.health_bar.hide()
 
-	if (show_ranges or hud.direction_panel.visible) and not selected.is_empty():
+	if (show_ranges or deployment_pending) and not selected.is_empty():
 		for cell in preload("res://features/battle/combat.gd").range_cells(selected):
 			if map_data.cells().has(cell): _range_overlay(cell)
 

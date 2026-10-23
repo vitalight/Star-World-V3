@@ -142,7 +142,7 @@ func run() -> void:
 			if entry == "Game Test":
 				await click_control(find_button("☰"))
 				await settle()
-			await click_control(find_button("Developer Hub"))
+			await click_control(find_button("退出战斗" if entry == "Game Test" else "Developer Hub"))
 			await settle()
 			check(workspace.get_ref() == null, "Departed workspace freed")
 	check_catalog()

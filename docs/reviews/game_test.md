@@ -190,3 +190,58 @@ Game Test 接管手动战斗验证，删除旧 Logic Test 工作区及绘制脚�
 移除“技能就绪·点击图标释放”、充能／操作教学、部署鼠标说明、常驻成功提示及技能按钮指导性tooltip。技能可用性由图标亮光、禁用态和技力条表达，仅持续期间保留剩余时间；详情保留干员数值、技能名称和功能。notice 只承载简短失败原因，正常选择与操作清除并隐藏空提示，Art Battle 同步移除模拟快照提示。产品文案边界已写入 docs/architecture.md。
 
 真实渲染与交互检查 operator_actions_test 49项、deployment_view_test 62项通过，覆盖三种窗口尺寸、技能就绪／充能／持续、撤退及非法部署反馈。截图 temp/verification/operator_actions_*.png，日志 temp/verification/product_copy_*.log。
+
+### 头顶技能徽记与纯鼠标定向部署
+
+参考用户截图，将原Label3D菱形字符替换为金色底板、深色技能符号和柔光的SVG徽记，使用镜头平行Sprite3D显示于头顶；轻微缩放／浮动由同一模拟时钟驱动，暂停冻结，释放／离场／终局立即隐藏，待部署不显示。Art Test与Game Test共用。
+
+删除待部署方向菜单及其四向按钮、额外确认按钮，游戏层显式维护deployment_pending。鼠标移动仍预览方向；左键点击时按该次点击位置重新计算朝向并立即提交部署，中心24px死区不提交。待部署角色旁提供正方形撤退图标，仅取消预览，费用和编队不变，不穿透成部署命令；右键／Esc继续支持取消。重开、重新加载与终局清理待部署状态和按钮。界面不增加操作说明文案。
+
+验证：真实鼠标交互deployment_view_test 94项，覆盖三种窗口尺寸、四向直接点击、点击覆盖悬停方向、附近按钮取消、费用与编队保持、重载清理、调试窗隔离；operator_actions_test 52项，覆盖徽记头顶位置与暂停冻结；游戏集成107项、全图形449项、Art/Game显示一致性84项全部通过。截图 temp/verification/game_pending_*.png、operator_skill_ready.png；日志 temp/verification/direction_click.log、skill_ready_marker.log、pending_direction_*.log、skill_badge_parity.log。
+
+### 脚下罗盘上移、纹理Quad与场景遮挡
+
+罗盘改为固定在角色地形格心的水平PlaneMesh，不随立片的20px视觉下移偏移，因此较原版本上移约20px。使用facing_compass.svg透明纹理与StandardMaterial3D，替换关闭深度测试的程序shader；保留四向旋转，不使用billboard。启用正常深度测试，实际高度为地形+0.053，透明优先级3高于攻击预览填充的2，既能显示在预览格子之上，也能被前景场景遮挡。立片、血条、技能徽记和交互按钮位置不变。
+
+真实渲染compass_render_test 30项通过，覆盖地面／高台×三种窗口尺寸，验证上移20px、地面朝向、真实攻击范围存在、橙色填充上方的青色像素以及前景墙体完全遮挡；四向与单位回归facing_test 185项通过。截图 temp/verification/compass_world_*.png、compass_blocked_*.png；日志 temp/verification/compass_world_render.log、compass_world_facing.log。
+
+待部署鼠标交互94项、Art/Game显示一致性84项回归通过；日志 temp/verification/compass_world_deployment.log、compass_world_parity.log。
+
+
+## 游戏菜单与自动开场（2026-10-23）
+
+共享 playable_hud 左上角菜单只保留“退出战斗”“重新开始”。退出沿用正式场景的 exit_requested 意图，由 Game Test 宿主返回 Hub；独立运行时退出程序，不在 HUD 中绑定开发者导航。移除常驻开始按钮及其信号。
+
+自动开场由 game/battle 管理，复用 battle 的波次和路线预告时序。默认准备1秒、路线预告2秒，在进入或重开后的第3秒生成首个敌人；不改战斗规则与敌人配置。开场计时受暂停和倍速控制，单帧跨过准备阶段时将剩余时间交给模拟，重开与重新加载重置计时，配置无效时不启动。显式 start 接口仍供纯代码测试与调试窗使用。
+
+验证：battle_integration_test 116项通过（包括无输入自动出怪、出怪前预告、暂停、倍速、跨帧余量、重开、重新加载、菜单内容）；真实渲染 battle_visual_test 448项通过，覆盖1280×800、960×600、1600×900、菜单重开与退出；Art/Game共享表现84项通过。截图和日志位于temp/verification/。
+
+
+## 部署确认、居中详情与职业图标（2026-10-23）
+
+确认沿用待部署交互：左侧不出现菜单或详情，点击地块中心之外的四向位置直接按该次点击方向确认；角色旁方形回转箭头按钮取消本次部署，不扣费或产生撤退冷却。
+
+选中干员详情按窗口和面板实际高度自动垂直居中，面板尺寸变动及窗口缩放后重排，邻近技能和撤退按钮继续避让面板。职业图集整理至content/ui/class_icons，五种AtlasTexture经角色appearance.class_icon注入共享HUD，卡片右上角显示职业图形。原始Human素材保持不变，战斗数值不引用美术资源。
+
+真实渲染验证：deployment_view_test 104项、operator_actions_test 55项、presentation_parity_test 84项全部通过。覆盖1280×800、960×600、1600×900的居中与可达性、四向点击部署、取消部署、图集职业对应和拖动输入穿透。截图及日志写入temp/verification/class_icons_*及operator_actions_*、game_pending_*。
+
+
+## Idle呼吸与Walk平移（2026-10-23）
+
+在共享actor_view_3d中为干员空闲姿态增加镜头竖轴上的正弦呼吸，为敌人未攻击／未阻挡状态增加镜头横轴上的正弦行走摆动。只改立片translation，保留billboard、不旋转缩放，不移动逻辑根节点、血条或地面标识；切换攻击／阻挡／预览时归零位移，离场时不继续推进摆动。动画继续使用外部提供的战斗／预览时钟，没有独立墙钟。
+
+真实渲染actor_motion_test 16项通过，覆盖呼吸与行走左右两端、逻辑位置和血条罗盘稳定、暂停、2倍速、攻击／阻挡／预览停播、重开ID复用清相位；battle_integration_test 116项、Art/Game共享表现84项通过。截图motion_operator_idle_*与motion_enemy_walk_*、日志actor_motion.log/motion_*.log均在temp/verification。
+
+
+## 部署卡信息精简（2026-10-23）
+
+按参考图将肖像铺满部署卡，左上角显示职业图标、右上角显示整数部署消耗，移除姓名和额外费用符号。姓名保留为无障碍名称，不作为可见标签或悬浮提示。冷却遮罩、费用禁用态、部署后隐藏收拢及拖动交互沿用原逻辑。共享HUD同时用于Art Test与Game Test。
+
+真实渲染battle_visual_test 448项通过，三种窗口尺寸的部署、卡片收拢、撤退冷却和导航均正常。日志temp/verification/roster_minimal_visual.log，截图game_1280x800.png、game_960x600.png、game_1600x900.png。
+
+部署卡顶部排布调整：职业图标与整数部署消耗统一靠左相邻排列，间距3像素，不再分居左右两端。
+
+
+## 敌人Walk摆动修正（2026-10-23）
+
+横向平移幅度从0.055降至0.012世界单位（减少约78%），改以脚下支点为中心、镜头平面内±0.035弧度（约2°）的轻微侧倾为主。shader在billboard投影前旋转局部顶点，保持面向镜头、脚下锚点及遮挡深度；攻击／阻挡时同时清零摆角。干员呼吸不变。真实渲染actor_motion_test 18项及Art/Game共享表现84项通过，日志walk_roll_motion.log、walk_roll_parity.log与motion_enemy_walk_*截图位于temp/verification/。

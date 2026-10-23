@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+<defs><radialGradient id="glow"><stop stop-color="#ffe878" stop-opacity="0.6"/><stop offset="1" stop-color="#ffd329" stop-opacity="0"/></radialGradient></defs>
+<circle cx="40" cy="40" r="40" fill="url(#glow)"/>
+<path d="M40 8 72 40 40 72 8 40Z" fill="#b87b0b"/>
+<path d="M40 11 69 40 40 69 11 40Z" fill="#ffe94d" stroke="#fff6b0" stroke-width="1.5"/>
+<path d="M40 14 14 40 40 40Z" fill="#fff9a3" opacity="0.65"/>
+<path d="M25 26 36 38 37 20 42 37 53 25 47 42 58 39 46 50 40 58 34 50 22 39 33 42Z" fill="#24231b"/>
+</svg>

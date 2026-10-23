@@ -63,7 +63,7 @@ func run() -> void:
 			var displacement: Vector2 = game.camera.unproject_position(actor.sprite.global_position) - game.camera.unproject_position(actor.global_position)
 			check(displacement.distance_to(Vector2(0,20)) < 0.05, "Actor is lowered by 20 screen pixels: " + str(dimensions))
 			check(is_equal_approx(actor.visual_position().y,actor.global_position.y), "Presentation shift preserves terrain/flight height")
-			check(actor.compass.global_position.distance_to(actor.visual_position() + Vector3.UP * 0.008) < 0.001, "Compass remains centered beneath the visual feet after resize")
+			check(actor.compass.global_position.distance_to(actor.global_position + Vector3.UP * 0.008) < 0.001, "Compass stays on the terrain anchor independently of camera and sprite offset")
 		for unit in game.last_state.units:
 			var actor = game.presentation.actors[unit.id]
 			var center: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height() * 0.5)

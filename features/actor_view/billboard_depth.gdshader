@@ -3,11 +3,15 @@ render_mode unshaded, cull_disabled, depth_draw_always;
 
 uniform sampler2D sprite_texture : source_color, filter_linear, repeat_disable;
 uniform float readiness = 0.0;
+uniform float walk_roll = 0.0;
 varying vec3 billboard_world;
 varying flat vec3 foot_world;
 
 void vertex() {
-	// Keep the visible quad exactly parallel to the camera, with no Y stretch.
+	// Roll within the camera plane around the feet, retaining full billboard alignment.
+	float c = cos(walk_roll);
+	float s = sin(walk_roll);
+	VERTEX.xy = mat2(vec2(c, s), vec2(-s, c)) * VERTEX.xy;
 	mat4 billboard = mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
 	MODELVIEW_MATRIX = VIEW_MATRIX * billboard;
 	MODELVIEW_NORMAL_MATRIX = mat3(MODELVIEW_MATRIX);

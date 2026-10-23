@@ -45,7 +45,11 @@ func run() -> void:
 	for dimensions in [Vector2i(1280,800), Vector2i(960,600), Vector2i(1600,900)]:
 		root.size = dimensions; await settle(); game.fit_camera()
 		check(root.get_visible_rect().encloses(game.hud.info_panel.get_global_rect()), "Operator actions fit " + str(dimensions))
+		check(absf(game.hud.info_panel.get_global_rect().get_center().y - root.get_visible_rect().get_center().y) < 1.0, "Selected operator details are vertically centered " + str(dimensions))
 		var center: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height() * 0.5)
+		var hint: Vector2 = game.camera.unproject_position(actor.skill_hint.global_position)
+		var head: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height())
+		check(root.get_visible_rect().has_point(hint) and hint.y < head.y, "Ready skill badge is visible above the operator at " + str(dimensions))
 		check(game.hud.retreat_button.get_global_rect().get_center().x < center.x and game.hud.retreat_button.get_global_rect().get_center().y < center.y, "Retreat icon is above-left of operator " + str(dimensions))
 		check(game.hud.skill_button.get_global_rect().get_center().x > center.x and game.hud.skill_button.get_global_rect().get_center().y > center.y, "Skill icon is below-right of operator " + str(dimensions))
 		for button in [game.hud.retreat_button, game.hud.skill_button]:
@@ -57,8 +61,9 @@ func run() -> void:
 	root.get_texture().get_image().save_png("res://temp/verification/operator_skill_ready.png")
 	game.toggle_pause()
 	var phase: float = actor.readiness_phase
+	var hint_transform: Transform3D = actor.skill_hint.global_transform
 	game._process(0.5)
-	check(actor.readiness_phase == phase, "Pause freezes readiness glow")
+	check(actor.readiness_phase == phase and actor.skill_hint.global_transform.is_equal_approx(hint_transform), "Pause freezes readiness glow and skill badge")
 	game.toggle_pause()
 	await click_button(game.hud.skill_button)
 	var active: Dictionary = game.battle.find_unit(deployed.id)

@@ -9,9 +9,13 @@
 
 [ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_07.tres" id="6_skill"]
 
+[ext_resource type="Texture2D" path="res://content/ui/class_icons/tank.tres" id="7_class"]
+
 [resource]
 script = ExtResource("2_n8f7b")
 poses = Array[Texture2D]([ExtResource("2_5llj8"), ExtResource("3_8jwh6"), ExtResource("4_l14b1"), ExtResource("5_sqehd")])
 portrait = ExtResource("1_isgbe")
 
 skill_icon = ExtResource("6_skill")
+
+class_icon = ExtResource("7_class")

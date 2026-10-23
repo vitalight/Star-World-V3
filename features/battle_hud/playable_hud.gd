@@ -1,12 +1,9 @@
 extends "res://features/battle_hud/battle_hud_overlay.gd"
 ## Interactive variant sharing the Art Test HUD's styles and playback intents.
-signal start_requested
 signal roster_selected(roster_id: String)
 signal roster_drag_started(roster_id: String)
 signal roster_drag_hovered(point: Vector2)
 signal roster_dropped(roster_id: String, point: Vector2)
-signal facing_selected(facing: int)
-signal deploy_confirmed
 signal cancel_requested
 signal retreat_requested
 signal skill_requested
@@ -22,13 +19,13 @@ var cards := {}
 var status: Label
 var notice: Label
 var selection: Label
-var start_button: Button
 var retreat_button: Button
 var skill_button: Button
 var skill_status: Label
 var normal_skill_style: StyleBoxFlat
 var ready_skill_style: StyleBoxFlat
-var direction_panel: PanelContainer
+var deployment_cancel_button: Button
+var deployment_anchor := Vector2.ZERO
 var end_panel: PanelContainer
 var end_label: Label
 var roster: Dictionary
@@ -92,7 +89,6 @@ func _ready() -> void:
 	notice = _label(readouts, "", 16)
 	notice.hide()
 	notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	start_button = _button(readouts, "开始战斗", func(): start_requested.emit())
 	var economy_panel := _panel_container()
 	economy_panel.name = "Economy"
 	economy_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -117,6 +113,7 @@ func _ready() -> void:
 		var card := Button.new()
 		card.custom_minimum_size = Vector2(100, 128)
 		card.clip_contents = true
+		card.accessibility_name = roster[key].name
 		card.add_theme_stylebox_override("normal", _panel())
 		card.pressed.connect(func():
 			if not suppress_card_click: roster_selected.emit(key))
@@ -131,7 +128,6 @@ func _ready() -> void:
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		portrait.offset_top = 16
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(portrait)
 		var strip := ColorRect.new()
@@ -140,15 +136,20 @@ func _ready() -> void:
 		strip.offset_bottom = 27
 		strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(strip)
-		var value := _label(card, "◇ %d" % roster[key].cost, 20)
-		value.position = Vector2(7, 0)
-		var title := _label(card, roster[key].name, 15)
-		title.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-		title.offset_top = -25
-		title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		title.add_theme_color_override("font_shadow_color", Color.BLACK)
-		title.add_theme_constant_override("shadow_offset_x", 1)
-		title.add_theme_constant_override("shadow_offset_y", 1)
+		var value := _label(card, "%d" % roster[key].cost, 20)
+		value.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		value.offset_left = 31; value.offset_right = 72
+		value.offset_bottom = 27
+		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		var class_icon := TextureRect.new()
+		class_icon.texture = catalog[key].class_icon
+		class_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		class_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		class_icon.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		class_icon.offset_left = 2; class_icon.offset_right = 28
+		class_icon.offset_top = 1; class_icon.offset_bottom = 27
+		class_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(class_icon)
 		var cooldown := ColorRect.new()
 		cooldown.color = Color(0.08, 0.06, 0.08, 0.82)
 		cooldown.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -160,9 +161,10 @@ func _ready() -> void:
 		timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		timer.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		cooldown.hide()
-		cards[key] = {"button": card, "value": value, "cooldown": cooldown, "timer": timer, "portrait": portrait}
+		cards[key] = {"button": card, "value": value, "cooldown": cooldown, "timer": timer, "portrait": portrait, "class_icon": class_icon}
 	info_panel = _panel_container()
-	info_panel.position = Vector2(18, 90)
+	info_panel.position.x = 18
+	info_panel.resized.connect(_center_info_panel)
 	info_panel.custom_minimum_size = Vector2(235, 0)
 	var info := VBoxContainer.new()
 	info_panel.add_child(info)
@@ -195,7 +197,11 @@ func _ready() -> void:
 	skill_button.accessibility_name = "释放技能"
 	skill_button.expand_icon = true
 	skill_button.add_theme_constant_override("icon_max_width", 44)
-	for button in [retreat_button, skill_button]:
+	deployment_cancel_button = _button(self, "↶", func(): cancel_requested.emit())
+	deployment_cancel_button.add_theme_font_size_override("font_size", 36)
+	deployment_cancel_button.accessibility_name = "取消部署"
+	deployment_cancel_button.tooltip_text = "取消部署"
+	for button in [retreat_button, skill_button, deployment_cancel_button]:
 		button.custom_minimum_size = Vector2(56, 56)
 		button.size = Vector2(56, 56)
 		button.z_index = 10
@@ -221,23 +227,9 @@ func _ready() -> void:
 	game_menu.position = Vector2(18, 110)
 	var menu_items := VBoxContainer.new()
 	game_menu.add_child(menu_items)
-	_button(menu_items, "关闭菜单", func(): game_menu.hide())
+	_button(menu_items, "退出战斗", func(): menu_requested.emit())
 	_button(menu_items, "重新开始", func(): game_menu.hide(); replay_requested.emit())
-	_button(menu_items, "Developer Hub", func(): menu_requested.emit())
 	game_menu.hide()
-	direction_panel = _panel_container()
-	direction_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	direction_panel.position = size / 2 - Vector2(150, 100)
-	var choices := VBoxContainer.new()
-	direction_panel.add_child(choices)
-	_label(choices, "部署方向", 18)
-	var directions := HBoxContainer.new()
-	choices.add_child(directions)
-	for facing in 4:
-		_button(directions, ["→", "↓", "←", "↑"][facing], func(): facing_selected.emit(facing))
-	_button(choices, "确认部署", func(): deploy_confirmed.emit())
-	_button(choices, "取消", func(): cancel_requested.emit())
-	direction_panel.hide()
 	end_panel = _panel_container()
 	end_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	var ending := VBoxContainer.new()
@@ -307,13 +299,13 @@ func cancel_drag() -> void:
 func _over_ui(point: Vector2) -> bool:
 	var hovered := get_viewport().gui_get_hovered_control()
 	if hovered and hovered != self and not is_ancestor_of(hovered): return true
-	for control in [top, bottom, readouts, retreat_button, skill_button, info_panel, direction_panel, end_panel, game_menu, get_node("Economy")]:
+	for control in [top, bottom, readouts, retreat_button, skill_button, info_panel, deployment_cancel_button, end_panel, game_menu, get_node("Economy")]:
 		if control.visible and control.get_global_rect().has_point(point): return true
 	return false
 
 func _fit() -> void:
-	if not direction_panel: return
-	direction_panel.position = Vector2(18, 150)
+	if not deployment_cancel_button: return
+	_position_deployment_cancel()
 	end_panel.position = (size - end_panel.size) / 2
 	var compact := size.x < 1100
 	var card_size := Vector2(82, 112) if compact else Vector2(104, 136)
@@ -325,8 +317,11 @@ func _fit() -> void:
 	economy_panel.offset_bottom = bottom.offset_top - 8
 	status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
 	operator_portrait.custom_minimum_size.y = 112 if compact else 160
-	info_panel.position = Vector2(18, 92)
 	info_panel.size = Vector2(228, 0)
+	_center_info_panel()
+
+func _center_info_panel() -> void:
+	info_panel.position = Vector2(18, (size.y - info_panel.size.y) * 0.5)
 	_position_operator_actions()
 
 ## Screen coordinates supplied by the game; HUD does not access the 3D scene.
@@ -376,9 +371,8 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	economy.text = "◇ %d" % floori(state.cost)
 	deployment_count.text = "可部署干员：%d" % maxi(0, deploy_limit - state.units.size())
 	set_playback(state.paused, speed)
-	pause_button.disabled = state.phase != "running"
+	pause_button.disabled = finished
 	speed_button.disabled = finished
-	start_button.visible = state.phase == "ready"
 	var deployed := {}
 	var selected := {}
 	for unit in state.units:
@@ -392,7 +386,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		cards[key].cooldown.visible = cooldown > 0
 		cards[key].timer.text = "%.1f" % cooldown
 		cards[key].button.modulate = Color("ffdb8d") if key == chosen_roster else Color.WHITE
-		cards[key].value.text = "◇ %d" % roster[key].cost
+		cards[key].value.text = "%d" % roster[key].cost
 	info_panel.visible = not selected.is_empty() and not finished
 	retreat_button.visible = info_panel.visible
 	skill_button.visible = info_panel.visible
@@ -419,10 +413,20 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		_position_operator_actions()
 	end_panel.visible = finished
 	if finished:
-		direction_panel.hide()
+		deployment_cancel_button.hide()
 		end_label.text = "防守成功" if state.phase == "victory" else "基地失守"
 		_fit()
 
 func set_notice(message: String) -> void:
 	notice.text = message
 	notice.visible = not message.is_empty()
+
+func set_pending_deployment(active: bool, point := Vector2.ZERO) -> void:
+	deployment_cancel_button.visible = active
+	if active:
+		info_panel.hide()
+		deployment_anchor = point - global_position
+		_position_deployment_cancel()
+
+func _position_deployment_cancel() -> void:
+	deployment_cancel_button.position = (deployment_anchor + Vector2(-86, -80)).clamp(Vector2(8, 80), size - deployment_cancel_button.size - Vector2(8, 8))

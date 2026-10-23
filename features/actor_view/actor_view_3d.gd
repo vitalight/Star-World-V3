@@ -19,9 +19,16 @@ var last_health := -1.0
 var texture_bounds := {}
 var billboard_material: ShaderMaterial
 var last_bars := Vector3(-1,-1,-1)
-var skill_hint: Label3D
+var skill_hint: Sprite3D
 var skill_ready := false
 var readiness_phase := 0.0
+var motion_phase := 0.0
+var motion_mode := ""
+const IDLE_PERIOD := 2.4
+const WALK_PERIOD := 0.55
+const IDLE_TRANSLATION := 0.025
+const WALK_TRANSLATION := 0.012
+const WALK_ROLL := 0.035
 
 func _ready() -> void:
 	sprite = Sprite3D.new()
@@ -54,10 +61,18 @@ func _ready() -> void:
 	var compass_plane := PlaneMesh.new()
 	compass_plane.size = Vector2(1.05, 1.05)
 	compass.mesh = compass_plane
-	var compass_material := ShaderMaterial.new()
-	compass_material.shader = preload("res://features/actor_view/facing_compass.gdshader")
-	compass_material.render_priority = -5
+	var compass_material := StandardMaterial3D.new()
+	compass_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	compass_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	compass_material.albedo_texture = preload("res://features/actor_view/facing_compass.svg")
+	compass_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	compass_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	compass_material.no_depth_test = false
+	compass_material.billboard_mode = BaseMaterial3D.BILLBOARD_DISABLED
+	# Range fills use priority 2; the compass blends above them with depth testing.
+	compass_material.render_priority = 3
 	compass.material_override = compass_material
+	compass.position.y = 0.008
 	compass.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	compass.hide()
 	add_child(compass)
@@ -78,16 +93,14 @@ func _ready() -> void:
 	health_bar.texture = health_texture
 	health_bar.hide()
 	add_child(health_bar)
-	skill_hint = Label3D.new()
-	skill_hint.text = "◆"
-	skill_hint.font_size = 42
-	skill_hint.pixel_size = 0.006
+	skill_hint = Sprite3D.new()
+	skill_hint.texture = preload("res://features/actor_view/skill_ready.svg")
+	skill_hint.pixel_size = 0.00525
 	skill_hint.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	skill_hint.no_depth_test = true
 	skill_hint.render_priority = 10
-	skill_hint.modulate = Color("ffe58b")
-	skill_hint.outline_modulate = Color("8d5716")
-	skill_hint.outline_size = 6
+	skill_hint.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR
+	skill_hint.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	skill_hint.hide()
 	add_child(skill_hint)
 	_process(0.0)
@@ -112,12 +125,20 @@ func update_projection() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if not camera or not sprite: return
 	var anchor := visual_position()
-	sprite.position = to_local(anchor)
+	var displacement := Vector3.ZERO
+	var roll := 0.0
+	if motion_mode == "idle":
+		displacement = camera.global_basis.y * sin(motion_phase * TAU / IDLE_PERIOD) * IDLE_TRANSLATION
+	elif motion_mode == "walk":
+		var sway := sin(motion_phase * TAU / WALK_PERIOD)
+		displacement = camera.global_basis.x * sway * WALK_TRANSLATION
+		roll = sway * WALK_ROLL
+	billboard_material.set_shader_parameter("walk_roll", roll)
+	sprite.position = to_local(anchor + displacement)
 	shadow.position = to_local(anchor + Vector3.UP * 0.012)
-	compass.position = to_local(anchor + Vector3.UP * 0.008)
 	health.position = to_local(anchor + camera.global_basis.y * (height + 0.12))
 	health_bar.position = to_local(anchor - camera.global_basis.y * 0.15)
-	skill_hint.position = to_local(anchor + camera.global_basis.y * (display_height() + 0.12))
+	skill_hint.position = to_local(anchor + camera.global_basis.y * (display_height() + 0.24 + sin(readiness_phase * 4.0) * 0.025))
 
 func display_height() -> float:
 	if not sprite or not sprite.texture: return height
@@ -128,6 +149,13 @@ func display_height() -> float:
 	return (sprite.offset.y + image_texture.get_height() * 0.5 - used.position.y) * sprite.pixel_size
 
 func apply_state(state: Dictionary, is_enemy: bool) -> void:
+	var mode := ""
+	if not state.get("preview", false) and fade_left < 0 and state.get("action", {}).is_empty():
+		if not is_enemy: mode = "idle"
+		elif state.get("blocked_by", -1) == -1: mode = "walk"
+	if mode != motion_mode:
+		motion_mode = mode
+		motion_phase = 0.0
 	compass.visible = not is_enemy and fade_left < 0
 	compass.rotation.y = -int(state.get("facing", 2)) * PI / 2.0
 	if appearance and appearance.poses.size() >= 4:
@@ -172,7 +200,8 @@ func _update_skill_glow() -> void:
 	skill_hint.visible = skill_ready
 	var strength := 0.72 + 0.28 * sin(readiness_phase * 4.0) if skill_ready else 0.0
 	billboard_material.set_shader_parameter("readiness", strength)
-	skill_hint.modulate = Color(1.0, 0.84 + 0.12 * strength, 0.35, 0.65 + 0.35 * strength)
+	skill_hint.modulate = Color(1.0, 1.0, 1.0, 0.85 + 0.15 * strength)
+	skill_hint.scale = Vector3.ONE * (0.94 + 0.06 * strength)
 
 func hit(healing := false) -> void:
 	flash_left = 0.16
@@ -188,6 +217,7 @@ func depart() -> void:
 	health_bar.hide()
 
 func advance_visual(delta: float) -> void:
+	if fade_left < 0 and not motion_mode.is_empty(): motion_phase += delta
 	if skill_ready:
 		readiness_phase += delta
 		_update_skill_glow()
@@ -197,7 +227,8 @@ func advance_visual(delta: float) -> void:
 		fade_left = maxf(0, fade_left - delta)
 		sprite.modulate.a = fade_left / 0.25
 		if fade_left <= 0: queue_free()
+	update_projection()
 
 func set_playing(_enabled: bool) -> void:
-	# This view intentionally holds a supplied static pose.
+	# The caller supplies the pause/speed-adjusted clock through advance_visual.
 	pass

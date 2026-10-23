@@ -51,3 +51,5 @@ Battle 攻击展示使用周期性模拟 attack_start／damage／heal 事件，�
 ## Skill
 
 新增第五个 Skill 页签，可 F6 运行 skill_preview.tscn 独立打开。仅按原图行列顺序展示全部16张图标、素材编号和来源行列。此页不加载干员数值配置，不展示技能名称、效果、充能方式或其他玩法文案。图标使用正式 AtlasTexture 切片。窄窗口自动换行并可纵向滚动；素材来自 Human/StarterContent/icon/skill-atlas-01.png，正式副本与切片位于 content/ui/skill_icons。
+
+Battle 的技能就绪提示与 Game Test 共用金色菱形／黑色符号徽记，柔光、缩放和浮动由表现时钟驱动；隐藏页面或暂停时不推进动画。Skill 页仍只浏览原图集素材，不展示玩法文案。
