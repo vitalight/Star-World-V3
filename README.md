@@ -7,7 +7,7 @@
 
 双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 一键导入资源并启动开发者首页。
 
-项目默认入口为 `devtools/hub/developer_hub.tscn`。
+项目默认入口为 `game/player/player_mode.tscn`：主界面 → 关卡选择 → 战斗。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。
 
 Game Test 已接入完整战斗：从首页进入后可部署干员、开始防守、释放技能、撤退和重开；F3 打开内嵌调试窗。地图使用 TileMapLayer 编辑并生成 3D 战场，路线和波次均可在编辑器配置。操作、编辑与验证说明见 [Game Test](devtools/game_test/README.md)。
 
@@ -36,12 +36,13 @@ StarWorldV3/
 │   ├── enemies/                # 敌人数值和外观
 │   └── levels/                 # 关卡、路径、波次配置
 ├── devtools/                   # 开发工具及人工验证入口
-│   ├── hub/                    # 默认启动场景
+│   ├── hub/                    # 开发者首页，独立启动
 │   ├── blueprint/images/       # 概念图及版本
 │   ├── art_test/               # 表现模块 + 模拟数据
 │   ├── game_test/              # 加载真实游戏组装场景
 │   └── story_test/             # 剧情样例验证
 ├── game/                       # 最终组装、启动和流程
+│   ├── player/                 # 默认玩家入口与菜单、关卡流程
 │   ├── battle/                 # 战斗场景和生命周期
 │   ├── adapters/               # 状态、事件与表现之间的适配
 │   └── tests/                  # 跨模块集成验证

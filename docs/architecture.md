@@ -102,4 +102,6 @@ Art Test 的 Battle 页使用模拟快照调用 game/adapters/battle_presentatio
 
 ## 产品界面文案
 
+正式玩家入口为 `game/player/player_mode.tscn`，由 game 管理主界面、关卡选择、关卡进度和战斗生命周期；战斗直接复用 `game/battle`，不经过开发工作区。项目默认运行 Player Mode，`scripts/run_devtools.bat` 保持 Developer Hub 入口。Hub 的 Player Mode 卡片只负责进入产品，产品不反向引用 devtools。菜单素材整理至 `content/ui/player`，Human 中蓝图仅作参考。
+
 Game Test 与正式游戏按游戏产品设计：常规界面只显示必要的状态、数值、技能功能与操作结果，不加入注释式操作说明或调试描述，例如“技能就绪，点击图标释放”“点击或拖动干员卡部署”“美术展示·模拟快照”。技能是否可用通过图标亮光、禁用态及状态条表达；失败原因简短明确。操作文档写入 README，开发信息只放调试窗。Art Test 只承担美术预览，不展示技能效果、数值或其他玩法说明。

@@ -2,6 +2,9 @@ extends Control
 ## Developer-only navigation. Each complete card is a keyboard-accessible button.
 const PATH = preload("res://devtools/ui/workspace_path.gd")
 const ENTRIES = [
+	{"title": "Player Mode", "category": "玩家入口", "number": "00", "accent": Color("83d8ec"),
+		"description": "从主界面选择关卡，进入完整的玩家战斗流程。", "detail": "主界面 / 关卡选择 / 战斗",
+		"scene": "res://game/player/player_mode.tscn"},
 	{"title": "Blueprint", "category": "视觉方向", "number": "01", "accent": Color("cfb287"),
 		"description": "查看与对比概念方案，确定战场的视觉方向。", "detail": "A / B 概念对比",
 		"scene": "res://devtools/blueprint/blueprint_workspace.tscn"},
