@@ -27,10 +27,26 @@ func select_actor(id: int) -> void:
 	var actor = game.presentation.actors[id]
 	await click(game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height() * 0.5))
 func run() -> void:
+	DirAccess.make_dir_recursive_absolute("res://temp/verification")
 	root.size = Vector2i(1280,800)
 	game = load("res://game/battle/battle_scene.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	await settle()
+	var before_selection: Dictionary = game.battle.snapshot()
+	for dimensions in [Vector2i(1280,800), Vector2i(960,600), Vector2i(1600,900)]:
+		root.size = dimensions; await settle()
+		for key in ["guard", "tank"]:
+			await click_button(game.hud.cards[key].button)
+			check(game.selected_roster == key and game.hud.info_panel.visible, "Roster card opens details: " + key)
+			check(game.hud.operator_portrait.texture == game.appearances[key].portrait and game.hud.selection.text.contains(game.configuration.roster[key].name), "Switching roster card updates portrait and name")
+			check(game.hud.selection.text.contains("生命上限") and game.hud.selection.text.contains("再部署") and game.hud.skill_description.text.contains(game.configuration.roster[key].skill.name), "Roster details show base stats and skill")
+			check(not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Undeployed roster has no deployed actions")
+		check(root.get_visible_rect().encloses(game.hud.info_panel.get_global_rect()), "Roster details fit viewport " + str(dimensions))
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("res://temp/verification/roster_details_%dx%d.png" % [dimensions.x,dimensions.y])
+	game.cancel_selection()
+	check(not game.hud.info_panel.visible and game.battle.snapshot() == before_selection, "Cancelling roster details preserves battle state and playback")
+	root.size = Vector2i(1280,800); await settle()
 	var deployed: Dictionary = game.command("deploy",["guard",Vector2i(3,1),2])
 	game.start()
 	var actor = game.presentation.actors[deployed.id]

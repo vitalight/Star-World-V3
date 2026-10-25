@@ -10,6 +10,7 @@ var routes: CheckBox
 var ranges: CheckBox
 var dragging := false
 var resizing := false
+var level_picker: OptionButton
 
 func _ready() -> void:
 	position = Vector2(30, 115)
@@ -44,6 +45,21 @@ func _ready() -> void:
 	for speed in [1.0, 2.0, 4.0]: button(controls, "%d×" % int(speed), func(): game.set_speed(speed))
 	button(controls, "重置", func(): events.clear(); game.reset())
 	button(controls, "重新加载关卡", func(): events.clear(); game.reload_level())
+	button(controls, "跳过战斗并胜利", func(): game.debug_victory())
+	level_picker = OptionButton.new()
+	level_picker.add_item("开发样例 · 防线")
+	level_picker.set_item_metadata(0, "")
+	var catalog = preload("res://game/content/content_catalog.gd").new()
+	catalog.reload()
+	for id in catalog.levels:
+		level_picker.add_item(catalog.levels[id].name)
+		level_picker.set_item_metadata(level_picker.item_count - 1, id)
+	level_picker.item_selected.connect(func(index: int):
+		events.clear()
+		game.campaign_level = level_picker.get_item_metadata(index)
+		if game.campaign_level.is_empty(): game.map_source = load("res://content/scenes/scene_001/map.tscn")
+		game.reload_level())
+	body.add_child(level_picker)
 	var switches := HBoxContainer.new(); body.add_child(switches)
 	grid = checkbox(switches, "网格", false)
 	routes = checkbox(switches, "路线", false)

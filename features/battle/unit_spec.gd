@@ -48,4 +48,5 @@ func errors() -> PackedStringArray:
 		result.append("技能配置非法")
 	if skill.get("multiplier", 2.0) <= 0 or skill.get("defense_multiplier", 1.0) <= 0 or skill.get("interval_multiplier", 1.0) <= 0:
 		result.append("技能倍率必须大于零")
+	if skill.get("cost_gain", 0.0) < 0: result.append("技能回费不可为负")
 	return result

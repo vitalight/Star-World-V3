@@ -1,5 +1,11 @@
 # 常见问题 / 踩坑记录
 
+## 导出 PCK 时无法写入 tmpproject.binary
+
+- 问题：受限环境中导出出现系统临时目录下 `tmpproject.binary` 无法读取，虽然生成 PCK，包内 project.binary 可能不完整。
+- 原因：当前进程使用的系统临时目录不可完成该导出写入。
+- 结论：创建项目 `temp/chapter_one/export_tmp`，仅在导出命令进程中将 TEMP／TMP 指向该目录；使用 GODOT_PATH 重新导出，并在独立空目录加载 PCK 验证。2026-10-25已通过三关战斗及六段剧情加载；编辑器设置 Safe save 警告需与实际运行包验证分开判断。
+
 ## `.NET assemblies not found`
 - 原因：此前使用 Mono 版，程序集文件实际存在，推断为沙箱内目录访问问题，未定位唯一根因。
 - 结论：已改用 `GODOT_PATH` 指向的标准版 Godot 4.7.2；2026-10-21 命令行验证导入、首页启动和战斗测试通过，未再出现该错误。

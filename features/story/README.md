@@ -1,6 +1,6 @@
 # Story
 
-独立的同步对话图模块，负责节点推进、分支选择、本次播放记录和可复用演出视图。没有 devtools、具体内容或 battle 依赖。尚未接入 game。
+独立的同步对话图模块，负责节点推进、分支选择、本次播放记录和可复用演出视图。没有 devtools、具体内容或 battle 依赖。game/player 已组装第一章的战前／战后线性剧情；Markdown 解析位于 game/content，存档与解锁由 game/player 负责。
 
 `story_script.gd` 定义 Resource：`title`、`start` 和以字符串 ID 为键的 `nodes`。节点均包含 `type`、`text` 和可选 `speaker`：
 

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="1"]
+[ext_resource type="Texture2D" path="res://content/characters/character_006/pose_0.png" id="p0"]
+[ext_resource type="Texture2D" path="res://content/characters/character_006/pose_1.png" id="p1"]
+[ext_resource type="Texture2D" path="res://content/characters/character_006/pose_2.png" id="p2"]
+[ext_resource type="Texture2D" path="res://content/characters/character_006/pose_3.png" id="p3"]
+[ext_resource type="Texture2D" path="res://content/ui/class_icons/medic.tres" id="class"]
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_05.tres" id="skill"]
+[resource]
+script = ExtResource("1")
+poses = Array[Texture2D]([ExtResource("p0"), ExtResource("p1"), ExtResource("p2"), ExtResource("p3")])
+portrait = ExtResource("p0")
+class_icon = ExtResource("class")
+skill_icon = ExtResource("skill")

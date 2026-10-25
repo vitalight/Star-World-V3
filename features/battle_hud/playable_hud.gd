@@ -8,6 +8,9 @@ signal cancel_requested
 signal retreat_requested
 signal skill_requested
 signal menu_requested
+signal debug_victory_requested
+signal continue_requested
+var developer_tools_enabled := false
 var dragged_roster := ""
 var pressed_roster := ""
 var suppress_card_click := false
@@ -28,6 +31,8 @@ var deployment_cancel_button: Button
 var deployment_anchor := Vector2.ZERO
 var end_panel: PanelContainer
 var end_label: Label
+var result_button: Button
+var result_victory := false
 var roster: Dictionary
 var catalog: Dictionary
 var selected_roster := ""
@@ -42,6 +47,9 @@ var skill_portrait: TextureRect
 var skill_description: Label
 var operator_anchor := Vector2.ZERO
 var game_menu: PanelContainer
+var developer_panel: PanelContainer
+var debug_victory_button: Button
+var objective_label: Label
 
 func _draw() -> void:
 	# The interactive layout replaces the fixed Art Test readout rectangles.
@@ -80,6 +88,15 @@ func _ready() -> void:
 	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	status = _label(progress, "准备部署", 22)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	objective_label = Label.new()
+	objective_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	objective_label.offset_left = -180; objective_label.offset_right = 180
+	objective_label.offset_top = 75; objective_label.offset_bottom = 104
+	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	objective_label.add_theme_font_size_override("font_size", 19)
+	objective_label.add_theme_color_override("font_color", Color("b5dfed"))
+	objective_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(objective_label)
 	readouts = VBoxContainer.new()
 	readouts.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
 	readouts.offset_left = 80; readouts.offset_right = 347
@@ -229,13 +246,32 @@ func _ready() -> void:
 	game_menu.add_child(menu_items)
 	_button(menu_items, "退出战斗", func(): menu_requested.emit())
 	_button(menu_items, "重新开始", func(): game_menu.hide(); replay_requested.emit())
+	if developer_tools_enabled:
+		_button(menu_items, "开发者面板", func(): game_menu.hide(); developer_panel.show())
 	game_menu.hide()
+	developer_panel = _panel_container()
+	developer_panel.position = Vector2(18, 110)
+	developer_panel.custom_minimum_size.x = 300
+	developer_panel.z_index = 20
+	var developer_items := VBoxContainer.new()
+	developer_panel.add_child(developer_items)
+	var developer_header := HBoxContainer.new()
+	developer_items.add_child(developer_header)
+	var developer_title := _label(developer_header, "开发者面板", 22)
+	developer_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_button(developer_header, "×", func(): developer_panel.hide())
+	debug_victory_button = _button(developer_items, "跳过战斗并胜利", func():
+		developer_panel.hide()
+		debug_victory_requested.emit())
+	developer_panel.hide()
 	end_panel = _panel_container()
 	end_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	var ending := VBoxContainer.new()
 	end_panel.add_child(ending)
 	end_label = _label(ending, "", 32)
-	_button(ending, "重新挑战", func(): replay_requested.emit())
+	result_button = _button(ending, "重新挑战", func():
+		if result_victory: continue_requested.emit()
+		else: replay_requested.emit())
 	end_panel.hide()
 	resized.connect(_fit)
 	_fit()
@@ -299,7 +335,7 @@ func cancel_drag() -> void:
 func _over_ui(point: Vector2) -> bool:
 	var hovered := get_viewport().gui_get_hovered_control()
 	if hovered and hovered != self and not is_ancestor_of(hovered): return true
-	for control in [top, bottom, readouts, retreat_button, skill_button, info_panel, deployment_cancel_button, end_panel, game_menu, get_node("Economy")]:
+	for control in [top, bottom, readouts, retreat_button, skill_button, info_panel, deployment_cancel_button, end_panel, game_menu, developer_panel, get_node("Economy")]:
 		if control.visible and control.get_global_rect().has_point(point): return true
 	return false
 
@@ -368,16 +404,23 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	selected_roster = chosen_roster; selected_unit = chosen_unit
 	var finished: bool = state.phase in ["victory", "defeat"]
 	status.text = status_readout("%d / %d" % [state.killed + state.escaped, state.remaining + state.killed + state.escaped], str(state.life))
+	objective_label.visible = state.has("objective")
+	if state.has("objective"):
+		objective_label.text = "节点修复  %d%%" % floori(100.0 * state.objective.elapsed / state.objective.duration)
 	economy.text = "◇ %d" % floori(state.cost)
 	deployment_count.text = "可部署干员：%d" % maxi(0, deploy_limit - state.units.size())
 	set_playback(state.paused, speed)
 	pause_button.disabled = finished
 	speed_button.disabled = finished
+	debug_victory_button.disabled = finished
+	if finished: developer_panel.hide()
 	var deployed := {}
 	var selected := {}
 	for unit in state.units:
 		deployed[unit.roster_id] = true
 		if unit.id == chosen_unit: selected = unit
+	var deployed_selection := not selected.is_empty()
+	if selected.is_empty() and roster.has(chosen_roster): selected = roster[chosen_roster]
 	for key in cards:
 		var cooldown: float = state.redeploy[key]
 		cards[key].button.visible = not deployed.has(key)
@@ -388,13 +431,16 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		cards[key].button.modulate = Color("ffdb8d") if key == chosen_roster else Color.WHITE
 		cards[key].value.text = "%d" % roster[key].cost
 	info_panel.visible = not selected.is_empty() and not finished
-	retreat_button.visible = info_panel.visible
-	skill_button.visible = info_panel.visible
+	retreat_button.visible = deployed_selection and not finished
+	skill_button.visible = deployed_selection and not finished
 	if not selected.is_empty():
-		selection.text = "%s\n生命 %d / %d\n技力 %.1f / %.1f" % [selected.name, ceili(selected.hp), ceili(selected.max_hp), selected.sp, selected.skill.required]
-		var ready: bool = selected.skill.enabled and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
+		if deployed_selection:
+			selection.text = "%s\n生命 %d / %d\n技力 %.1f / %.1f" % [selected.name, ceili(selected.hp), ceili(selected.max_hp), selected.sp, selected.skill.required]
+		else:
+			selection.text = "%s\n生命上限 %d\n攻击 %d  防御 %d\n法抗 %d  阻挡 %d\n费用 %d  再部署 %.1fs" % [selected.name, ceili(selected.max_hp), selected.attack, selected.defense, selected.resistance, selected.block, selected.cost, selected.redeploy_time]
+		var ready: bool = deployed_selection and selected.skill.enabled and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
 		skill_button.disabled = not ready or state.phase != "running"
-		var appearance = catalog[selected.roster_id]
+		var appearance = catalog[selected.roster_id if deployed_selection else chosen_roster]
 		operator_portrait.texture = appearance.portrait
 		skill_button.icon = appearance.skill_icon if appearance.skill_icon else appearance.portrait
 		skill_portrait.texture = skill_button.icon
@@ -407,11 +453,14 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		skill_button.tooltip_text = ""
 		if ready: skill_button.add_theme_stylebox_override("normal", ready_skill_style)
 		else: skill_button.add_theme_stylebox_override("normal", normal_skill_style)
-		skill_status.visible = selected.skill_left > 0
-		skill_status.text = "剩余 %.1fs" % selected.skill_left if selected.skill_left > 0 else ""
+		var skill_left: float = selected.get("skill_left", 0.0)
+		skill_status.visible = skill_left > 0
+		skill_status.text = "剩余 %.1fs" % skill_left if skill_left > 0 else ""
 		retreat_button.tooltip_text = "撤退"
 		_position_operator_actions()
 	end_panel.visible = finished
+	result_victory = state.phase == "victory"
+	result_button.text = "继续" if result_victory else "重新挑战"
 	if finished:
 		deployment_cancel_button.hide()
 		end_label.text = "防守成功" if state.phase == "victory" else "基地失守"
@@ -424,7 +473,6 @@ func set_notice(message: String) -> void:
 func set_pending_deployment(active: bool, point := Vector2.ZERO) -> void:
 	deployment_cancel_button.visible = active
 	if active:
-		info_panel.hide()
 		deployment_anchor = point - global_position
 		_position_deployment_cancel()
 

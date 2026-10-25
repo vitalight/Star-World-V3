@@ -88,6 +88,9 @@ func activate_skill(unit_id: int) -> Dictionary:
 	if unit.sp + 0.000001 < unit.skill.required: return _result(false, "insufficient_sp")
 	unit.sp = 0.0
 	unit.skill_left = unit.skill.duration
+	var gain: float = minf(unit.skill.cost_gain, _config.cost_cap - _state.cost)
+	_state.cost += gain
+	if gain > 0: emit("cost_gain", {"source": unit.id, "amount": gain})
 	emit("skill_start", {"source": unit.id, "duration": unit.skill_left})
 	return _result(true)
 
@@ -95,6 +98,14 @@ func start() -> bool:
 	if _state.phase != "ready": return false
 	_state.phase = "running"
 	_update_route_warnings()
+	return true
+
+## Explicit developer command; callers use the same terminal event as normal wins.
+func debug_finish_victory() -> bool:
+	if _state.phase not in ["ready", "running"]: return false
+	_state.phase = "victory"
+	_state.route_warnings.clear()
+	emit("finished", {"phase": "victory", "debug": true})
 	return true
 
 func set_paused(value: bool) -> void:
@@ -112,6 +123,8 @@ func step() -> void:
 
 func snapshot() -> Dictionary:
 	var copy = _state.duplicate(true)
+	if _config.defend_duration > 0:
+		copy.objective = {"duration": _config.defend_duration, "elapsed": minf(_state.time, _config.defend_duration)}
 	for unit in copy.units: unit.range_cells = Rules.range_cells(unit)
 	return copy
 
@@ -182,7 +195,7 @@ func _tick() -> void:
 	_cleanup()
 	_state.remaining = _schedule.size() - _state.killed - _state.escaped
 	if _state.life <= 0: _state.phase = "defeat"
-	elif _state.spawned == _schedule.size() and _state.enemies.is_empty(): _state.phase = "victory"
+	elif _state.spawned == _schedule.size() and _state.enemies.is_empty() and _state.time + 0.000001 >= _config.defend_duration: _state.phase = "victory"
 	if _state.phase != "running":
 		_state.route_warnings.clear()
 		emit("finished", {"phase": _state.phase})

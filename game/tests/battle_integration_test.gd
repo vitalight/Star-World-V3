@@ -199,7 +199,7 @@ func verify_roster(game: Node3D) -> void:
 
 func verify_auto_start(game: Node3D) -> void:
 	var menu: Array = game.hud.game_menu.get_child(0).get_children().map(func(button): return button.text)
-	check(menu == ["退出战斗", "重新开始"], "Shared game menu contains exactly exit and restart")
+	check(menu == ["退出战斗", "重新开始", "开发者面板"], "Battle menu exposes exit, restart and developer panel")
 	game._process(0.5)
 	check(game.last_state.phase == "ready" and game.last_state.spawned == 0, "Initial preparation does not spawn early")
 	game.toggle_pause()

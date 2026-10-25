@@ -179,7 +179,7 @@ func run() -> void:
 		check(game.deployment_pending and game.candidate == Vector2i(3,1),"Drag projection adapts to " + str(dimensions))
 		await motion(cell_point(Vector2i(3,1)) + Vector2(75,0),Vector2(75,0))
 		check(game.facing == 0 and game.direction_chosen and is_instance_valid(game.deployment_preview), "Pending mouse facing adapts to " + str(dimensions))
-		check(not game.hud.info_panel.visible and not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Pending deployment has no operator details or deployed actions")
+		check(game.hud.info_panel.visible and not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Pending deployment keeps roster details without deployed actions")
 		check(game.hud.deployment_cancel_button.visible and root.get_visible_rect().encloses(game.hud.deployment_cancel_button.get_global_rect()), "Pending retreat icon is visible and accessible")
 		check(not game.deployment_preview.skill_hint.visible, "Pending operator has no ready skill marker")
 		await shot("game_pending_%dx%d" % [dimensions.x,dimensions.y])

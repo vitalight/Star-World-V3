@@ -96,3 +96,15 @@ Game Test 已按 `docs/reviews/game_test.md` 的检查和回归接入。`unit_sp
 ## 技能倍率
 
 skill 可提供 name、description（显示文案）、multiplier（攻击／治疗倍率，默认2）、defense_multiplier（物理防御倍率，默认1）、interval_multiplier（攻击间隔倍率，默认1）。三种倍率必须大于零，只在 skill_left > 0 时读取；不修改基础属性。防御倍率只影响物理伤害，保留5%最低伤害；间隔最短为原攻击前摇。当前一次攻击使用起手时确定的冷却间隔，到期后下一次起手使用基础间隔。其余充能、持续时间、暂停、撤退和再部署规则保持原协议。
+
+## 回费与防守目标
+
+`skill.cost_gain` 默认0，必须非负。技能成功释放时立即增加费用，受 cost_cap 限制；事件 `cost_gain` 包含 source 和实际增加 amount，仅在实际增加大于0时发出。重复／非法释放不结算费用。可在暂停时执行合法技能命令，和既有技能规则一致。
+
+配置 `defend_duration` 默认为0，LevelSpec 也可编辑。大于0时，清完全部波次仍需等待该模拟时间，基地存活才胜利；完成计时不会跳过尚未处理的敌人。snapshot 此时额外包含 `objective: {duration, elapsed}`，elapsed 上限为 duration。准备态、暂停和终局不推进；单步推进一帧，reset归零。没有防守目标的旧配置不增加 objective 快照字段。
+
+验证：`features/battle/tests/campaign_rules_test.gd`；章节数值加载与流程属于 game，不由 battle 读取 CSV 或具体角色路径。
+
+## 开发者跳过
+
+`debug_finish_victory() -> bool` 是显式开发命令：仅接受 ready／running（包括暂停态），立即置为 victory，清除路线预告，发出一次 `finished {phase:"victory", debug:true}`。不伪造击杀、不推进时间；终局拒绝再次执行，reset 恢复原配置。game/battle 的 `debug_victory()` 调用该接口后按正常 refresh／observed 通路更新表现和产品进度。UI 只发出请求，不直接改写战斗快照或存档。

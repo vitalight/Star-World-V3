@@ -3,6 +3,8 @@ extends Node2D
 ## TileMapLayer is the sole terrain source. Paths use the same local pixel space.
 @export var level: Resource
 @export var bounds := Rect2i(0, 0, 10, 6)
+@export var tint := Color.WHITE
+@export var external_level := false
 
 func cells() -> Dictionary:
 	var result := {}
@@ -27,7 +29,7 @@ func routes() -> Dictionary:
 		result[str(path.name)] = points
 	return result
 
-func errors() -> PackedStringArray:
+func errors(check_level := true) -> PackedStringArray:
 	var result := PackedStringArray()
 	var data := cells()
 	if bounds.position != Vector2i.ZERO or bounds.size.x < 1 or bounds.size.y < 1:
@@ -60,8 +62,9 @@ func errors() -> PackedStringArray:
 			var steps := ceili(maxf(absf(delta.x), absf(delta.y)))
 			for step in range(steps + 1):
 				_check_route_cell(result, data, key, Vector2i((previous + delta * float(step) / steps).round()))
-	if level: result.append_array(level.errors(paths))
-	else: result.append("Level: 未指定关卡资源")
+	if check_level and not external_level:
+		if level: result.append_array(level.errors(paths))
+		else: result.append("Level: 未指定关卡资源")
 	return result
 
 func _check_route_cell(result: PackedStringArray, data: Dictionary, route: String, cell: Vector2i) -> void:

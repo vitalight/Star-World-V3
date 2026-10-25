@@ -1,0 +1,5 @@
+﻿id,name,appearance,max_hp,attack,defense,resistance,interval,windup,speed,ranged,range,leak_damage
+enemy_001,异常碎影,res://content/enemies/enemy_001/appearance.tres,240,55,5,0,1.4,0.25,0.45,false,0,1
+enemy_002,疾行碎影,res://content/enemies/enemy_002/appearance.tres,180,45,0,0,1.2,0.2,0.85,false,0,1
+enemy_003,节点重影,res://content/enemies/enemy_003/appearance.tres,650,95,25,5,1.5,0.3,0.3,false,0,2
+enemy_004,远射裂隙,res://content/enemies/enemy_004/appearance.tres,330,65,10,5,2.8,0.4,0.35,true,3.5,1

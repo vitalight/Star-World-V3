@@ -2,11 +2,12 @@ extends RefCounted
 ## Trusted developer configuration. Runtime commands validate user input separately.
 static func normalize(input: Dictionary) -> Dictionary:
 	var c = input.duplicate(true)
-	var defaults = {"life": 3, "initial_cost": 30.0, "cost_cap": 99.0, "cost_regen": 1.0, "deploy_limit": 8, "route_warning_duration": 0.0}
+	var defaults = {"life": 3, "initial_cost": 30.0, "cost_cap": 99.0, "cost_regen": 1.0, "deploy_limit": 8, "route_warning_duration": 0.0, "defend_duration": 0.0}
 	for key in defaults:
 		if not c.has(key): c[key] = defaults[key]
 	assert(c.life > 0 and c.cost_cap >= c.initial_cost and c.initial_cost >= 0)
 	assert(c.cost_regen >= 0 and c.deploy_limit > 0 and c.route_warning_duration >= 0)
+	assert(c.defend_duration >= 0)
 	for key in c.routes:
 		assert(c.routes[key].size() >= 2)
 		for i in range(1, c.routes[key].size()): assert(c.routes[key][i - 1].distance_to(c.routes[key][i]) > 0)
@@ -22,9 +23,10 @@ static func normalize(input: Dictionary) -> Dictionary:
 		assert(u.terrain == ("ground" if role == "melee" else "high"))
 		assert(u.cost >= 0 and u.redeploy_time >= 0 and u.block >= 0)
 		var skill = {"enabled": false, "recovery": "auto", "required": 5.0,
-			"initial_sp": 0.0, "duration": 3.0, "multiplier": 2.0, "defense_multiplier": 1.0, "interval_multiplier": 1.0}
+			"initial_sp": 0.0, "duration": 3.0, "multiplier": 2.0, "defense_multiplier": 1.0, "interval_multiplier": 1.0, "cost_gain": 0.0}
 		skill.merge(u.get("skill", {}), true)
 		assert(skill.required > 0 and skill.duration > 0)
+		assert(skill.cost_gain >= 0)
 		assert(skill.multiplier > 0 and skill.defense_multiplier > 0 and skill.interval_multiplier > 0)
 		assert(skill.recovery in ["auto", "attack", "hit"])
 		skill.initial_sp = clampf(skill.initial_sp, 0, skill.required)

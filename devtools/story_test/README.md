@@ -25,3 +25,6 @@
 ```
 
 渲染测试使用真实鼠标事件，截图写入 `temp/verification/`。Story 专项保存 `story_single`、`story_dual`、`story_garden`、`story_end`、`story_branch` 及窄屏版本，覆盖出入场、高亮、背景变化、选择、重播与记录弹层；Hub 测试覆盖入口、两条分支和退出。
+# 正式章节预览补充
+
+工具栏的内容下拉框提供原开发样例与第一章六段剧情。“重新加载”读取已保存的 CSV／Markdown；“重播剧情”从当前已加载脚本开头播放。角色名、背景与外观映射使用正式 catalog；编辑说明见 `content/campaign/README.md`。

@@ -1,0 +1,6 @@
+﻿id,name,description,recovery,required,initial_sp,duration,multiplier,interval_multiplier,cost_gain
+skill_001,守家之刃,攻击提升至180%，持续8秒。,auto,18,10,8,1.8,1,0
+skill_002,猫猫突袭,攻击提升至220%，持续5秒。,auto,10,10,5,2.2,1,0
+skill_003,精准连射,攻击间隔缩短至55%，持续10秒。,attack,8,4,10,1,0.55,0
+skill_004,紧急调度,立即获得12点部署费用，持续1秒。,auto,18,12,1,1,1,12
+skill_005,安心处方,治疗量提升至180%，持续10秒。,auto,20,12,10,1.8,1,0

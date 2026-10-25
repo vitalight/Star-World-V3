@@ -25,6 +25,8 @@ var modal_panel: PanelContainer
 var modal_title: Label
 var auto_play := false
 var _elapsed := 0.0
+var source_picker: OptionButton
+var source_catalog = preload("res://game/content/content_catalog.gd").new()
 
 func _ready() -> void:
 	theme = UI.make_theme(ACCENT)
@@ -50,6 +52,17 @@ func _ready() -> void:
 	_button(toolbar, "记录", _show_overlay.bind(false))
 	_button(toolbar, "重播剧情", _restart)
 	_button(toolbar, "调试", _show_overlay.bind(true))
+	source_picker = OptionButton.new()
+	source_picker.add_item("开发样例")
+	source_picker.set_item_metadata(0, [])
+	source_catalog.reload()
+	for id in source_catalog.levels:
+		for kind in ["before", "after"]:
+			source_picker.add_item(source_catalog.levels[id].name + (" · 战前" if kind == "before" else " · 战后"))
+			source_picker.set_item_metadata(source_picker.item_count - 1, [id, kind])
+	source_picker.item_selected.connect(_load_source)
+	toolbar.add_child(source_picker)
+	_button(toolbar, "重新加载", func(): _load_source(source_picker.selected))
 	_build_overlay()
 	resized.connect(_layout)
 	_layout()
@@ -72,6 +85,27 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button
+
+func _load_source(index: int) -> void:
+	_set_auto(false)
+	modal.hide()
+	var source: Array = source_picker.get_item_metadata(index)
+	var script: Resource = SAMPLE
+	var errors := PackedStringArray()
+	if source.is_empty():
+		stage.configure(BACKGROUNDS, {"scout": SCOUT.poses[0], "guard": GUARD.poses[0]})
+	else:
+		source_catalog.reload()
+		errors = source_catalog.diagnostics(source[0])
+		if errors.is_empty():
+			var textures: Dictionary = source_catalog.story_textures()
+			stage.configure(textures.backgrounds, textures.actors)
+			script = source_catalog.story(source_catalog.levels[source[0]][source[1]])
+	if errors.is_empty(): errors = session.load_story(script)
+	if not errors.is_empty():
+		status.text = "剧情配置错误：\n" + "\n".join(errors)
+		modal.show(); return
+	_refresh()
 
 func _build_overlay() -> void:
 	modal = Control.new()
@@ -168,7 +202,7 @@ func _refresh() -> void:
 	if state.type != "line":
 		_set_auto(false)
 	stage.show_snapshot(state)
-	status.text = "%s\n节点：%s  ·  %s  ·  已读 %d 段\n背景：%s  ·  出场：%s\n测试样例尚未连接 Game Test。" % [SAMPLE.title, state.id,
+	status.text = "%s\n节点：%s  ·  %s  ·  已读 %d 段\n背景：%s  ·  出场：%s" % [state.title, state.id,
 		{"line": "对话", "choice": "等待选择", "end": "剧情结束"}[state.type], state.history.size(),
 		state.get("background", "无"), ", ".join(state.get("actors", []))]
 	var lines := PackedStringArray()

@@ -85,6 +85,8 @@ Story Test 通过 `features/story` 的公共接口运行样例；正式剧情接
 
 scene_001 的 TileMapLayer 是地形唯一数据源。features/battlefield_view/editable_map.gd 通过关卡资源的 configuration / errors 协议导出战斗配置及编辑器诊断；关卡、单位与波次资源类型由 features/battle 定义。3D 地形生成器只消费格子外观和高度，不计算部署合法性。角色外观由 features/actor_view 定义资源类型，game 按内容 ID 将数值与外观关联。
 
+正式第一章使用 `content/campaign` 的 CSV 和各 scene 目录的 Markdown，`game/content/content_catalog.gd` 校验并转换成同一 Battle 字典协议与 StoryScript。这些源文件是正式数值和对白的唯一来源，不维护同步的 stats/level Resource 副本；scene_001 的 Inspector 资源继续作为开发样例。正式地图设置 external_level，只导出几何，关卡／波次语义由 catalog 校验。地形与 Path2D 仍只来自 TileMap 场景。通用可编辑地形显示位于 features/battlefield_view/editable_field.gd，具体图集、配色、地图由 game/content 外部注入。内容编辑与扩展方式见 content/campaign/README.md。
+
 ## 验证与评审
 
 模块专属自动测试放在 features/<module>/tests/；跨模块集成测试放在 game/tests/；devtools 负责人工验证，不能代替自动测试。

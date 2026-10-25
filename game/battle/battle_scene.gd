@@ -1,12 +1,15 @@
 extends Node3D
 signal observed(state: Dictionary, events: Array)
 signal exit_requested
+signal continue_requested
 const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
 const Battle = preload("res://features/battle/battle.gd")
 const Presentation = preload("res://game/adapters/battle_presentation.gd")
 const Hud = preload("res://features/battle_hud/playable_hud.gd")
-const Field = preload("res://content/scenes/scene_001/field.tscn")
+const Field = preload("res://features/battlefield_view/editable_field.gd")
+const Catalog = preload("res://game/content/content_catalog.gd")
 @export var map_source: PackedScene = preload("res://content/scenes/scene_001/map.tscn")
+@export var campaign_level := ""
 var battle: RefCounted
 var map_data: Node2D
 var field: Node3D
@@ -51,23 +54,34 @@ func reload_level() -> void:
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99); speed = 1.0
 	deployment_pending = false; direction_chosen = false
 	overlay_signature = ""
+	validation_errors.clear()
+	var catalog = null
+	if not campaign_level.is_empty():
+		catalog = Catalog.new()
+		catalog.reload()
+		validation_errors = catalog.diagnostics(campaign_level)
+		if not validation_errors.is_empty():
+			_show_error("关卡配置错误\n" + "\n".join(validation_errors)); return
+		map_source = load(catalog.levels[campaign_level].map)
 	map_data = ResourceLoader.load(map_source.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP).instantiate()
 	map_data.hide()
 	add_child(map_data)
-	validation_errors = map_data.errors()
+	validation_errors = catalog.map_errors(campaign_level, map_data) if catalog else map_data.errors()
 	world = Node3D.new(); add_child(world)
 	if not validation_errors.is_empty():
 		_show_error("关卡配置错误\n" + "\n".join(validation_errors))
 		return
-	configuration = map_data.configuration()
+	configuration = catalog.configuration(campaign_level, map_data) if catalog else map_data.configuration()
 	battle = Battle.new(configuration)
 	configuration = battle.configuration()
 	reset_auto_start()
-	field = Field.instantiate()
+	field = Field.new()
+	field.atlas = preload("res://content/terrains/terrain_001/atlas.png")
+	field.tint = map_data.tint
 	field.configure(map_data.cells(), map_data.bounds)
 	world.add_child(field)
 	appearances.clear()
-	for collection in [map_data.level.roster, map_data.level.enemies]:
+	for collection in ([] if catalog else [map_data.level.roster, map_data.level.enemies]):
 		for key in collection:
 			var unit = collection[key]
 			var folder := "enemies" if map_data.level.enemies.has(key) else "characters"
@@ -76,6 +90,7 @@ func reload_level() -> void:
 			if appearance == null or appearance.poses.size() < 4:
 				validation_errors.append("Appearance %s: 缺少四种姿态资源 %s" % [key, path])
 			else: appearances[key] = appearance
+	if catalog: appearances = catalog.appearances(campaign_level)
 	if not validation_errors.is_empty():
 		battle = null
 		_show_error("\n".join(validation_errors))
@@ -86,11 +101,12 @@ func reload_level() -> void:
 	overlays = Node3D.new(); world.add_child(overlays)
 	var layer := CanvasLayer.new(); add_child(layer)
 	hud = Hud.new()
+	hud.developer_tools_enabled = true
 	hud.roster = configuration.roster
 	hud.catalog = appearances
 	layer.add_child(hud)
 	hud.pause_requested.connect(toggle_pause)
-	hud.speed_requested.connect(func(): set_speed(2.0 if speed == 1.0 else 1.0))
+	hud.speed_requested.connect(func(): set_speed(speed * 2.0 if speed < 4.0 else 1.0))
 	hud.replay_requested.connect(reset)
 	hud.roster_selected.connect(select_roster)
 	hud.roster_drag_started.connect(select_roster)
@@ -101,6 +117,11 @@ func reload_level() -> void:
 	hud.cancel_requested.connect(cancel_selection)
 	hud.retreat_requested.connect(func(): command("retreat", [selected_unit]))
 	hud.skill_requested.connect(func(): command("activate_skill", [selected_unit]))
+	hud.debug_victory_requested.connect(debug_victory)
+	hud.continue_requested.connect(func():
+		if not continue_requested.get_connections().is_empty(): continue_requested.emit()
+		elif not exit_requested.get_connections().is_empty(): exit_requested.emit()
+		else: get_tree().quit())
 	hud.menu_requested.connect(func():
 		if exit_requested.get_connections().is_empty(): get_tree().quit()
 		else: exit_requested.emit())
@@ -110,10 +131,19 @@ func reload_level() -> void:
 func _show_error(message: String) -> void:
 	var layer := CanvasLayer.new(); add_child(layer)
 	hud = Control.new(); layer.add_child(hud)
-	var panel := PanelContainer.new(); panel.position = Vector2(30, 90)
+	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var panel := PanelContainer.new()
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.offset_left = 30; panel.offset_right = -30
+	panel.offset_top = 90; panel.offset_bottom = -30
 	hud.add_child(panel)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
 	var label := Label.new(); label.text = message
-	panel.add_child(label)
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	scroll.add_child(label)
 
 func fit_camera() -> void:
 	if camera and map_data:
@@ -179,6 +209,11 @@ func start() -> void:
 		hud.set_notice("")
 		refresh()
 
+func debug_victory() -> bool:
+	if not battle or not battle.debug_finish_victory(): return false
+	refresh()
+	return true
+
 func toggle_pause() -> void:
 	if battle:
 		battle.set_paused(not battle.snapshot().paused)
@@ -203,6 +238,7 @@ func reset() -> void:
 	hud.cancel_drag()
 	deployment_pending = false; direction_chosen = false
 	hud.game_menu.hide()
+	hud.developer_panel.hide()
 	hud.set_notice("")
 	refresh()
 
