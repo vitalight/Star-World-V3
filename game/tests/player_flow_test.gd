@@ -66,10 +66,10 @@ func run() -> void:
 		await settle()
 		await click("开始游戏")
 		check(player.page == "levels", "Start opens level selection")
-		for text in ["开始行动   ›", "‹   返回"]:
+		for text in ["开始行动   ›", "‹"]:
 			check(root.get_visible_rect().encloses(find_button(player, text).get_global_rect()), "Control stays in window: " + str(dimensions) + text)
 		await capture("levels_%dx%d" % [dimensions.x, dimensions.y])
-		await click("‹   返回")
+		await click("‹")
 		check(player.page == "main", "Back returns to main")
 	root.size = Vector2i(1280, 800)
 	await settle()
@@ -100,7 +100,7 @@ func run() -> void:
 	await click("退出战斗")
 	check(player.page == "levels" and player.battle_scene == null, "Battle menu exits back to level selection")
 	await capture("levels_completed")
-	await click("‹   返回")
+	await click("‹")
 	check(not find_button(player, "读取存档").disabled, "Continue becomes available")
 	player.queue_free(); await settle()
 	await spawn_player()

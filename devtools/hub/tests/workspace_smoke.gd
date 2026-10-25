@@ -113,7 +113,7 @@ func run() -> void:
 		if repeat == 0: await capture("hub")
 		for entry in ["Blueprint", "Art Test", "Game Test", "Story Test"]:
 			var old = weakref(current_scene)
-			check(buttons(current_scene).size() == 5, "Hub exposes four workspaces and Player Mode")
+			check(buttons(current_scene).size() == 6, "Hub exposes four workspaces and two Player Mode entrances")
 			current_scene.scroll.ensure_control_visible(find_button(entry, true))
 			await settle()
 			await click_control(find_button(entry, true))

@@ -90,11 +90,6 @@ func show_levels() -> void:
 	_text(canvas, "行 动 区 域", Rect2(50, 128, 900, 48), 28, Color("b9d9e4"))
 	_line(Vector2(50, 187), Vector2(1020, 187))
 	# The route panel deliberately lists only authored playable content.
-	var route := Line2D.new()
-	route.points = PackedVector2Array([Vector2(115, 625), Vector2(305, 525), Vector2(470, 470), Vector2(725, 395), Vector2(940, 290)])
-	route.width = 2
-	route.default_color = Color(0.4, 0.8, 0.9, 0.23)
-	canvas.add_child(route)
 	var halo := Panel.new()
 	halo.position = Vector2(345, 345); halo.size = Vector2(250, 250)
 	var halo_style := StyleBoxFlat.new()
@@ -119,7 +114,6 @@ func show_levels() -> void:
 	_text(canvas, "01 · 防线", Rect2(315, 620, 310, 50), 35).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_text(canvas, "已完成" if completed else "待行动", Rect2(315, 680, 310, 32), 23, Color("81ddea")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_line(Vector2(30, 815), Vector2(1020, 815))
-	_button(canvas, "‹   返回", Rect2(30, 842, 225, 63), show_main)
 	var detail := Panel.new()
 	detail.position = Vector2(1090, 112); detail.size = Vector2(553, 777)
 	var panel_style := StyleBoxFlat.new()

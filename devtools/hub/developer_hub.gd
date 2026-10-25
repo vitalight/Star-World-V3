@@ -37,9 +37,25 @@ func _ready() -> void:
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 16)
 	margin.add_child(layout)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 16)
+	layout.add_child(header)
 	var breadcrumb := PATH.new()
-	layout.add_child(breadcrumb)
+	breadcrumb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(breadcrumb)
 	breadcrumb.configure(PackedStringArray(["Star World", "Developer Hub"]))
+	var player_button := Button.new()
+	player_button.name = "PlayerModeShortcut"
+	player_button.text = "进入 Player Mode →"
+	player_button.custom_minimum_size = Vector2(230, 44)
+	player_button.add_theme_font_size_override("font_size", 18)
+	player_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	player_button.add_theme_stylebox_override("normal", card_style(Color("203440"), Color("568a9a")))
+	player_button.add_theme_stylebox_override("hover", card_style(Color("2a4654"), Color("83d8ec")))
+	player_button.add_theme_stylebox_override("pressed", card_style(Color("142b35"), Color("83d8ec")))
+	player_button.add_theme_color_override("font_color", Color("bcecf7"))
+	player_button.pressed.connect(func(): get_tree().change_scene_to_file("res://game/player/player_mode.tscn"))
+	header.add_child(player_button)
 	layout.add_child(divider())
 	scroll = ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
