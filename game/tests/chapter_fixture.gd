@@ -1,5 +1,12 @@
 extends RefCounted
 ## Replays use the same commands a player can submit; no state mutation.
+static func operator_ids(id: String) -> Array:
+	# Explicit player snapshots for these scripted battle replays, not level data.
+	if id == "scene_002": return ["character_011", "character_012"]
+	var result := ["character_011", "character_013", "character_014"]
+	if id == "scene_004": result.append("character_015")
+	return result
+
 static func deployments(id: String) -> Array:
 	if id == "scene_002": return [["character_011", Vector2i(4, 1), 2], ["character_012", Vector2i(5, 3), 2]]
 	var lower := 4 if id == "scene_003" else 5

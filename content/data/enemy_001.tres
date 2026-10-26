@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://c6i8hiycdrc3g"]
+
+[ext_resource type="Texture2D" path="res://content/enemies/character_008/portrait.tres" id="appearance_1_ixerf"]
+[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="appearance_2_6mpq7"]
+[ext_resource type="Texture2D" uid="uid://crloiamajd4wx" path="res://content/enemies/character_008/pose_0.png" id="appearance_2_dlyum"]
+[ext_resource type="Texture2D" uid="uid://d1t6jdkl22pmb" path="res://content/enemies/character_008/pose_1.png" id="appearance_3_rmiak"]
+[ext_resource type="Texture2D" uid="uid://vgjqqpls6g1g" path="res://content/enemies/character_008/pose_2.png" id="appearance_4_m0obx"]
+[ext_resource type="Texture2D" uid="uid://cbxdgqinm0vqc" path="res://content/enemies/character_008/pose_3.png" id="appearance_5_nsjsq"]
+[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="script"]
+[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="stats_type"]
+
+[sub_resource type="Resource" id="Appearance"]
+script = ExtResource("appearance_2_6mpq7")
+poses = Array[Texture2D]([ExtResource("appearance_2_dlyum"), ExtResource("appearance_3_rmiak"), ExtResource("appearance_4_m0obx"), ExtResource("appearance_5_nsjsq")])
+portrait = ExtResource("appearance_1_ixerf")
+height = 1.02
+
+[sub_resource type="Resource" id="Stats"]
+script = ExtResource("stats_type")
+content_id = "enemy_001"
+display_name = "异常碎影"
+max_hp = 240.0
+attack = 55.0
+defense = 5.0
+interval = 1.4
+windup = 0.25
+speed = 0.45
+attack_range = 0.0
+
+[resource]
+script = ExtResource("script")
+stats = SubResource("Stats")
+appearance = SubResource("Appearance")

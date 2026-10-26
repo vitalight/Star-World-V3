@@ -29,7 +29,7 @@ func run() -> void:
 	for key in game.configuration.roster:
 		var skill: Dictionary = game.configuration.roster[key].skill
 		check(skill.enabled and not skill.name.is_empty() and not skill.description.is_empty(),"Operator has named active skill: " + key)
-		var icon: Texture2D = game.appearances[key].skill_icon
+		var icon: Texture2D = game.skill_icons[key]
 		check(icon is AtlasTexture and icon.atlas.resource_path == "res://content/ui/skill_icons/atlas.png","Operator uses formal atlas icon: " + key)
 		assigned[icon.resource_path] = true
 	check(assigned.size() == 5,"Every operator has its own icon")
@@ -42,7 +42,7 @@ func run() -> void:
 			if unit.skill_left <= 0 and unit.sp + 0.000001 >= unit.skill.required:
 				if not activated.has(unit.roster_id):
 					game.select_cell(unit.cell); await settle()
-					check(game.hud.skill_button.icon == game.appearances[unit.roster_id].skill_icon and not game.hud.skill_button.disabled,"Ready skill uses matching clickable icon")
+					check(game.hud.skill_button.icon == game.skill_icons[unit.roster_id] and not game.hud.skill_button.disabled,"Ready skill uses matching clickable icon")
 					check(game.hud.skill_description.text.contains(unit.skill.name),"Details display actual skill name")
 					await capture("skill_game_" + unit.roster_id)
 				activated[unit.roster_id] = true
@@ -52,6 +52,17 @@ func run() -> void:
 	check(activated.size() == 5,"All five skills charge and activate in a real battle")
 	check(pure.snapshot() == game.last_state,"Pure and assembled battle results agree with all skills enabled")
 	check(game.last_state.phase == "victory","Five-skill defense remains winnable")
+	game.free(); await process_frame
+	game = load("res://game/battle/battle_scene.tscn").instantiate()
+	game.campaign_level = "scene_004"
+	game.operator_ids.assign(preload("res://game/tests/chapter_fixture.gd").operator_ids("scene_004"))
+	root.add_child(game); game.set_process(false)
+	await settle()
+	check(game.validation_errors.is_empty() and game.skill_icons.size() == 4, "Formal stage receives icons from skill resources")
+	for key in game.configuration.roster:
+		game.select_roster(key); await settle()
+		check(game.hud.skill_portrait.texture == game.skill_icons[key], "Formal roster detail uses skill-owned icon: " + key)
+	await capture("skill_formal_roster")
 	game.free(); await process_frame
 	var art = load("res://devtools/art_test/art_workspace.tscn").instantiate()
 	art.page = 4; root.add_child(art)

@@ -13,7 +13,7 @@
 
 `sample_story.tres` 是工作区专属假数据，不属于正式内容；新增样例可在此处编辑图数据。推进与演出复用 `features/story`，工作区传入素材并组装开发控制；尚未接入 Game Test。
 
-背景直接使用用户指定的 `Human/StarterContent/story/story-01.png` / `story-02.png`。角色复用 Game Test 使用的 `content/characters/character_001/appearance.tres` 和 `character_003/appearance.tres` 的 `poses[0]`；没有重画、复制角色素材或改变战斗外观映射。当前原素材是约 300px 的战斗立片，放大显示会偏柔和。
+背景直接使用用户指定的 `Human/StarterContent/story/story-01.png` / `story-02.png`。角色复用 Game Test 使用的 `content/data/character_001.tres` 和 `content/data/character_003.tres` 的 `appearance.poses[0]`；没有重画、复制角色素材或改变战斗外观映射。当前原素材是约 300px 的战斗立片，放大显示会偏柔和。
 
 自动验证：
 
@@ -27,4 +27,4 @@
 渲染测试使用真实鼠标事件，截图写入 `temp/verification/`。Story 专项保存 `story_single`、`story_dual`、`story_garden`、`story_end`、`story_branch` 及窄屏版本，覆盖出入场、高亮、背景变化、选择、重播与记录弹层；Hub 测试覆盖入口、两条分支和退出。
 # 正式章节预览补充
 
-工具栏的内容下拉框提供原开发样例与第一章六段剧情。“重新加载”读取已保存的 CSV／Markdown；“重播剧情”从当前已加载脚本开头播放。角色名、背景与外观映射使用正式 catalog；编辑说明见 `content/campaign/README.md`。
+工具栏的内容下拉框提供原开发样例与第一章六段剧情。“重新加载”读取已保存的角色／技能／外观资源、背景表及 Markdown；“重播剧情”从当前已加载脚本开头播放。角色名、背景与外观映射使用正式 catalog；编辑说明见 `content/campaign/README.md`。

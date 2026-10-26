@@ -22,6 +22,8 @@ func run() -> void:
 	for frame in 12: await process_frame
 	game.fit_camera()
 	check(art.hud.get_script() == game.hud.get_script(), "One HUD implementation")
+	check(art.hud.skill_icons.size() == game.hud.skill_icons.size() and art.hud.skill_icons.keys().all(func(key):
+		return game.hud.skill_icons.has(key) and art.hud.skill_icons[key].resource_path == game.hud.skill_icons[key].resource_path and art.hud.skill_icons[key].get_image().get_data() == game.hud.skill_icons[key].get_image().get_data()), "Art and Game inject visually identical skill-owned icons")
 	check(art.presentation.get_script() == game.presentation.get_script(), "One snapshot presentation adapter")
 	check(art.camera.transform.is_equal_approx(game.camera.transform) and is_equal_approx(art.camera.v_offset, game.camera.v_offset), "Same framing for same canvas")
 	check(art.markers.get_child_count() == game.markers.get_child_count(), "Route markers come from same map")

@@ -1,5 +1,7 @@
 # 第一章「上海」集成评审
 
+后续角色／敌人／技能已迁移为 `.tres`，当前编辑流程与验证见 [Resource 迁移评审](actor_resources.md)。下文保留最初 CSV 集成时的验证记录。
+
 - 模块与职责：`game/content` 读取和校验正式 CSV／Markdown；`game/player` 管理章节流程、剧情会话和存档；`features/battle` 只扩展回费与计时防守；`features/battlefield_view` 接收外部地图、图集和配色。三关与五名角色均为 content 实例。
 - 接口与依赖：CSV → Battle 既有配置字典；Markdown → StoryScript；game 连接 StorySession／StoryView。battle 不加载内容、不依赖 UI；正式 game/features 不依赖 devtools。通用 editable_field 从 scene_001 的显示代码提取，旧场景保留资源入口并继承相同实现。
 - 工作区：Game Test 保留原样例，并增加三关切换／重载；Story Test 保留分支样例，并增加六段正式剧情。Player Mode 直接组装共享模块。

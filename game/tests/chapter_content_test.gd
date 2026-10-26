@@ -16,11 +16,17 @@ func _initialize() -> void:
 	check(catalog.errors.is_empty(), "Catalog valid: " + "\n".join(catalog.errors))
 	if not catalog.errors.is_empty(): quit(1); return
 	check(catalog.characters.size() == 5 and catalog.levels.size() == 3, "Authored scope is five characters and three stages")
+	check(catalog.enemies.size() == 4 and catalog.skills.size() == 5, "All authored enemies and skills registered")
+	check(catalog.skill_icons("scene_002").character_011.resource_path == "res://content/ui/skill_icons/icon_01.tres", "Formal skill icon comes from skill resource")
+	check(not catalog.characters.character_011.stats.skill.has("icon"), "Battle configuration excludes skill texture")
+	check(catalog.appearances("scene_002").character_011.get("skill_icon") == null, "Actor appearance has no skill icon property")
+	for name in ["characters", "enemies", "skills"]:
+		check(not FileAccess.file_exists(Catalog.ROOT + "/" + name + ".csv"), "No duplicate CSV source for " + name)
 	for id in catalog.levels:
 		check(catalog.diagnostics(id).is_empty(), "Stage diagnostics: " + "\n".join(catalog.diagnostics(id)))
 		var map = load(catalog.levels[id].map).instantiate()
 		check(catalog.map_errors(id, map).is_empty(), "Map valid: " + "\n".join(catalog.map_errors(id, map)))
-		var config: Dictionary = catalog.configuration(id, map)
+		var config: Dictionary = catalog.configuration(id, map, Fixture.operator_ids(id))
 		map.free()
 		var battle = Battle.new(config)
 		check(Fixture.replay(battle, id).is_empty(), id + " replay commands accepted")
@@ -51,41 +57,132 @@ func parser_validation(catalog: RefCounted) -> void:
 	check(rows.size() == 2 and rows[0].name == "中文,对白\n第二行", "CSV preserves quoted commas, Chinese and multiline text")
 	check(catalog.errors.size() == 1 and catalog.errors[0].contains(":4 [id]"), "Duplicate ID points to physical line after multiline field")
 	catalog.errors.clear()
-	var row := {"_file": path, "_line": 9, "hp": "NaN", "appearance": "res://content/missing.tres"}
+	var row := {"_file": path, "_line": 9, "hp": "NaN", "texture": "res://content/missing.tres"}
 	catalog._number(row, "hp", 1)
-	catalog._resource(row, "appearance")
+	catalog._resource(row, "texture")
 	check(catalog.errors.size() == 2 and catalog.errors[0].contains(":9 [hp]"), "Invalid numbers and missing resources report field locations")
 	catalog.reload()
 
 func source_reload(catalog: RefCounted) -> void:
 	var base := "res://temp/chapter_one/edit_fixture"
-	DirAccess.make_dir_recursive_absolute(base)
-	for name in ["characters", "skills", "enemies", "levels", "waves", "backgrounds"]:
-		var file := FileAccess.open(base + "/" + name + ".csv", FileAccess.WRITE)
-		file.store_string(FileAccess.get_file_as_string(Catalog.ROOT + "/" + name + ".csv")); file.close()
-	var path := base + "/characters.csv"
-	var contents := FileAccess.get_file_as_string(path).replace("大星", "测试大星")
-	var file := FileAccess.open(path, FileAccess.WRITE); file.store_string(contents); file.close()
-	catalog.reload(base)
-	check(catalog.errors.is_empty() and catalog.levels.scene_002.roster.character_011.name == "测试大星", "Saved CSV edit changes battle name after reload")
+	copy_fixture(base)
+	var path := base + "/data/character_011.tres"
+	edit_resource(path, "stats:display_name", "测试大星，中文\n第二行")
+	catalog.reload(base, base + "/data")
+	check(catalog.errors.is_empty() and catalog.characters.character_011.stats.name == "测试大星，中文\n第二行", "Saved TRES edit changes Chinese multiline battle name after reload")
 	var story = catalog.story(catalog.levels.scene_002.before)
-	check(story.nodes.line_1.speaker == "测试大星", "Story speakers resolve updated display name by stable ID")
-	path = base + "/skills.csv"
-	contents = FileAccess.get_file_as_string(path).replace(",1.8,1,0", ",2.4,1,0")
-	file = FileAccess.open(path, FileAccess.WRITE); file.store_string(contents); file.close()
-	catalog.reload(base)
-	check(is_equal_approx(catalog.levels.scene_002.roster.character_011.skill.multiplier, 2.4), "Saved skill numeric edit reaches battle configuration after reload")
+	check(story.nodes.line_1.speaker == "测试大星，中文\n第二行", "Story speakers resolve updated display name by stable ID")
+	var previous: Dictionary = catalog.characters.character_011.stats.duplicate(true)
+	path = base + "/data/skill_001.tres"
+	edit_resource(path, "multiplier", 2.4)
+	edit_resource(path, "description", "测试技能，中文\n第二行")
+	catalog.reload(base, base + "/data")
+	check(is_equal_approx(catalog.characters.character_011.stats.skill.multiplier, 2.4), "Saved nested skill edit reaches battle configuration after reload")
+	check(catalog.skills.skill_001.description == "测试技能，中文\n第二行", "Skill resource preserves multiline Chinese description")
+	check(is_equal_approx(previous.skill.multiplier, 1.8), "Reload does not mutate a previously assembled battle configuration")
+	edit_resource(path, "icon", load("res://content/ui/skill_icons/icon_16.tres"))
+	catalog.reload(base, base + "/data")
+	check(catalog.skill_icons("scene_002").character_011.resource_path == "res://content/ui/skill_icons/icon_16.tres", "Saved skill icon edit reloads independently of actor appearance")
+	edit_resource(base + "/data/character_012.tres", "stats:skill_spec", fresh(path))
+	catalog.reload(base, base + "/data")
+	check(catalog.skill_icons("scene_002").character_012.resource_path == catalog.skill_icons("scene_002").character_011.resource_path, "Characters sharing a skill use the same skill icon")
+	edit_resource(base + "/data/enemy_001.tres", "stats:attack", 72.0)
+	catalog.reload(base, base + "/data")
+	check(catalog.levels.scene_002.enemies.enemy_001.attack == 72.0, "Saved enemy stat edit reaches authored waves after reload")
+	var appearances: Dictionary = catalog.appearances("scene_002")
+	edit_resource(base + "/data/character_011.tres", "appearance:height", 1.75)
+	catalog.reload(base, base + "/data")
+	check(catalog.appearances("scene_002").character_011 != appearances.character_011, "Reload also bypasses nested appearance cache")
+	check(is_equal_approx(catalog.appearances("scene_002").character_011.height, 1.75), "Saving character file reloads its embedded appearance")
 	path = base + "/waves.csv"
-	contents = FileAccess.get_file_as_string(path).replace(",main,", ",missing_route,")
-	file = FileAccess.open(path, FileAccess.WRITE); file.store_string(contents); file.close()
-	catalog.reload(base)
+	write_text(path, FileAccess.get_file_as_string(path).replace(",main,", ",missing_route,"))
+	catalog.reload(base, base + "/data")
 	var map = load(catalog.levels.scene_002.map).instantiate()
 	check("\n".join(catalog.map_errors("scene_002", map)).contains("[route]"), "Saved invalid wave route prevents battle with field diagnostic")
 	map.free()
 	var bad_story := base + "/bad.md"
-	file = FileAccess.open(bad_story, FileAccess.WRITE)
-	file.store_string("# 错误剧情\n---\nbackground: missing\nactors: character_011\nspeaker: character_099\n> 中文正文\n> 第二行\n")
-	file.close()
+	write_text(bad_story, "# 错误剧情\n---\nbackground: missing\nactors: character_011\nspeaker: character_099\n> 中文正文\n> 第二行\n")
 	catalog.errors.clear(); story = catalog.story(bad_story)
 	check(catalog.errors.size() == 2 and story.nodes.line_0.text == "中文正文\n第二行", "Markdown preserves multiline text and validates scene references")
+	resource_validation(catalog, base)
 	catalog.reload()
+
+func write_text(path: String, text: String) -> void:
+	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(text)
+	file.close()
+
+func fresh(path: String):
+	return ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
+
+func edit_resource(path: String, field: String, value) -> void:
+	var resource = fresh(path)
+	resource.set_indexed(NodePath(field), value)
+	check(ResourceSaver.save(resource, path) == OK, "Inspector-compatible resource save: " + field)
+
+func copy_fixture(base: String) -> void:
+	var paths := [Catalog.DATA + "/actors.tres"]
+	var library = fresh(paths[0])
+	for actor in library.characters + library.enemies:
+		paths.append(actor.resource_path)
+	for skill in library.skills: paths.append(skill.resource_path)
+	for path in paths:
+		var text := FileAccess.get_file_as_string(path)
+		for dependency in paths: text = text.replace(dependency, fixture_path(base, dependency))
+		write_text(fixture_path(base, path), text)
+	for name in ["levels", "waves", "backgrounds", "player_roster"]:
+		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(Catalog.ROOT + "/" + name + ".csv"))
+
+func fixture_path(base: String, path: String) -> String:
+	return path.replace(Catalog.DATA, base + "/data")
+
+func resource_validation(catalog: RefCounted, base: String) -> void:
+	copy_fixture(base)
+	var path := base + "/data/skill_001.tres"
+	edit_resource(path, "icon", null)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("icon:"), "Missing skill icon blocks content with field diagnostic")
+	copy_fixture(base)
+	edit_resource(path, "cost_gain", -1.0)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.diagnostics("scene_002")).contains("skill_001.tres [skill] cost_gain"), "Negative skill field blocks stages with resource path and field")
+	edit_resource(path, "cost_gain", 0.0)
+	edit_resource(path, "required", NAN)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("required"), "Non-finite skill value rejected")
+	copy_fixture(base)
+	path = base + "/data/character_011.tres"
+	edit_resource(path, "stats:max_hp", INF)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("max_hp"), "Non-finite actor value rejected")
+	copy_fixture(base)
+	path = base + "/data/actors.tres"
+	var library = fresh(path)
+	library.characters.append(library.characters[0])
+	ResourceSaver.save(library, path)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[content_id]"), "Duplicate registered actor ID rejected")
+	copy_fixture(base)
+	library = fresh(path)
+	library.skills.append(library.skills[0])
+	ResourceSaver.save(library, path)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[content_id]"), "Duplicate registered skill ID rejected")
+	copy_fixture(base)
+	library = fresh(path)
+	library.skills.remove_at(0)
+	ResourceSaver.save(library, path)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[skill_spec]"), "Unregistered skill reference rejected")
+	copy_fixture(base)
+	edit_resource(base + "/data/character_011.tres", "appearance", null)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[appearance]"), "Missing appearance blocks stages")
+	copy_fixture(base)
+	edit_resource(base + "/data/enemy_001.tres", "stats", null)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[stats]"), "Missing enemy stats rejected")
+	ResourceSaver.save(Resource.new(), path)
+	catalog.reload(base, base + "/data")
+	check("\n".join(catalog.errors).contains("[library]"), "Wrong resource type rejected")

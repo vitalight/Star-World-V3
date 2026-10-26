@@ -35,6 +35,7 @@ var result_button: Button
 var result_victory := false
 var roster: Dictionary
 var catalog: Dictionary
+var skill_icons: Dictionary = {}
 var selected_roster := ""
 var selected_unit := -1
 var info_panel: PanelContainer
@@ -442,7 +443,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		skill_button.disabled = not ready or state.phase != "running"
 		var appearance = catalog[selected.roster_id if deployed_selection else chosen_roster]
 		operator_portrait.texture = appearance.portrait
-		skill_button.icon = appearance.skill_icon if appearance.skill_icon else appearance.portrait
+		skill_button.icon = skill_icons.get(selected.roster_id if deployed_selection else chosen_roster, appearance.portrait)
 		skill_portrait.texture = skill_button.icon
 		if selected.skill.enabled:
 			skill_description.text = "%s提升至 %.0f%%，持续 %.1f 秒。" % ["治疗量" if selected.role == "healer" else "攻击力", selected.skill.multiplier * 100.0, selected.skill.duration]

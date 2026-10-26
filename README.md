@@ -9,7 +9,7 @@
 
 项目默认入口为 `game/player/player_mode.tscn`：主界面 → 第一章三关 → 战前剧情 → 战斗 → 战后剧情与解锁。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。
 
-第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人和波次通过 CSV 编辑，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择六段正式剧情并重新加载。
+第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人通过 Godot Inspector 编辑 `.tres`，关卡与波次继续使用 CSV，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择六段正式剧情并重新加载。
 
 Game Test 已接入完整战斗：从首页进入后可部署干员、开始防守、释放技能、撤退和重开；F3 打开内嵌调试窗。地图使用 TileMapLayer 编辑并生成 3D 战场，路线和波次均可在编辑器配置。操作、编辑与验证说明见 [Game Test](devtools/game_test/README.md)。
 
@@ -30,13 +30,15 @@ StarWorldV3/
 │   │   ├── waves/
 │   │   └── tests/
 │   ├── actor_view/             # 通用角色展示与动画播放
+│   ├── content_definitions/    # Inspector 内容编辑入口与资源索引
 │   ├── effects/                # 通用特效播放
 │   ├── battlefield_view/       # 地图展示
 │   └── battle_hud/             # 战斗 UI 展示及操作意图
 ├── content/                    # 具体内容实例与专属资源
-│   ├── characters/             # 角色数值、外观、专属贴图
-│   ├── enemies/                # 敌人数值和外观
-│   ├── campaign/               # 正式章节 CSV 内容表
+│   ├── characters/             # 角色贴图及原样例外观
+│   ├── enemies/                # 敌人贴图及原样例外观
+│   ├── data/                   # 角色／敌人／技能 .tres 与注册索引
+│   ├── campaign/               # 正式章节关卡／波次／背景表
 │   └── scenes/                 # 地图、路线、剧情与场景外观
 ├── devtools/                   # 开发工具及人工验证入口
 │   ├── hub/                    # 开发者首页，独立启动
@@ -48,7 +50,7 @@ StarWorldV3/
 │   ├── player/                 # 默认玩家入口与菜单、关卡流程
 │   ├── battle/                 # 战斗场景和生命周期
 │   ├── adapters/               # 状态、事件与表现之间的适配
-│   ├── content/                # 表格／剧情加载与校验
+│   ├── content/                # 资源／表格／剧情加载与校验
 │   └── tests/                  # 跨模块集成验证
 ├── docs/                       # 架构与评审记录
 ├── temp/                       # 临时数据，不纳入 Git

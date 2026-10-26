@@ -1,0 +1,18 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_07.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+content_id = "skill_007"
+display_name = "坚城"
+description = "防御力提升至 250%，持续 8.0 秒。"
+recovery = "hit"
+required = 8.0
+initial_sp = 4.0
+duration = 8.0
+multiplier = 1.0
+defense_multiplier = 2.5
+icon = ExtResource("icon")

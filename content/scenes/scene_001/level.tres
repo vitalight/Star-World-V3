@@ -1,16 +1,11 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://d24nvswxcsphf"]
 
-[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_rncsy"]
-[ext_resource type="Resource" path="res://content/enemies/character_008/stats.tres" id="2_axjvc"]
-[ext_resource type="Resource" path="res://content/enemies/character_009/stats.tres" id="3_lgxwh"]
-[ext_resource type="Resource" path="res://content/enemies/character_010/stats.tres" id="4_8vhv1"]
-[ext_resource type="Resource" path="res://content/characters/character_001/stats.tres" id="5_mrhpa"]
-[ext_resource type="Resource" path="res://content/characters/character_003/stats.tres" id="6_m3hh0"]
-[ext_resource type="Resource" path="res://content/characters/character_004/stats.tres" id="7_1ovhn"]
-[ext_resource type="Resource" path="res://content/characters/character_005/stats.tres" id="8_p7i2t"]
-[ext_resource type="Resource" path="res://content/characters/character_006/stats.tres" id="9_g8tgc"]
-[ext_resource type="Script" path="res://features/battle/level_spec.gd" id="10_vp7ah"]
-[ext_resource type="Script" path="res://features/battle/wave_spec.gd" id="11_ry8xh"]
+[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="1_rncsy"]
+[ext_resource type="Resource" path="res://content/data/enemy_008.tres" id="2_axjvc"]
+[ext_resource type="Resource" path="res://content/data/enemy_009.tres" id="3_lgxwh"]
+[ext_resource type="Resource" path="res://content/data/enemy_010.tres" id="4_8vhv1"]
+[ext_resource type="Script" uid="uid://c73fgrffdaqm5" path="res://features/battle/level_spec.gd" id="10_vp7ah"]
+[ext_resource type="Script" uid="uid://ch2as8e63g5me" path="res://features/battle/wave_spec.gd" id="11_ry8xh"]
 
 [sub_resource type="Resource" id="Resource_r5rgg"]
 script = ExtResource("11_ry8xh")
@@ -38,14 +33,6 @@ number = 3
 
 [resource]
 script = ExtResource("10_vp7ah")
-route_warning_duration = 2.0
-roster = Dictionary[String, ExtResource("1_rncsy")]({
-"caster": ExtResource("8_p7i2t"),
-"guard": ExtResource("5_mrhpa"),
-"medic": ExtResource("9_g8tgc"),
-"sniper": ExtResource("7_1ovhn"),
-"tank": ExtResource("6_m3hh0")
-})
 enemies = Dictionary[String, ExtResource("1_rncsy")]({
 "drone": ExtResource("4_8vhv1"),
 "rifle": ExtResource("3_lgxwh"),

@@ -4,6 +4,7 @@ const Presentation = preload("res://game/adapters/battle_presentation.gd")
 const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
 const HUD = preload("res://features/battle_hud/playable_hud.gd")
 const MAP = preload("res://content/scenes/scene_001/field.tscn")
+@export var operator_roster: Resource = preload("res://content/data/test_roster.tres")
 var viewport: SubViewport
 var world: Node3D
 var field: Node3D
@@ -14,6 +15,7 @@ var presentation: RefCounted
 var mock_state: Dictionary
 var configuration: Dictionary
 var catalog := {}
+var skill_icons := {}
 var actors: Array[Node3D] = []
 var preview_enemies: Array = []
 var next_attack := 2.4
@@ -48,11 +50,12 @@ func _ready() -> void:
 	camera = StageView.create_camera(world)
 	var source = field.map_source.instantiate()
 	configuration = source.configuration()
+	configuration.roster = operator_roster.configuration()
+	catalog = operator_roster.appearances()
+	skill_icons = operator_roster.skill_icons()
 	StageView.fit_camera(camera, source.bounds, Vector2(viewport.size))
 	markers = Node3D.new(); world.add_child(markers)
 	StageView.route_markers(markers, configuration.routes, field)
-	for key in source.level.roster:
-		catalog[key] = load("res://content/characters/%s/appearance.tres" % source.level.roster[key].content_id)
 	for key in source.level.enemies:
 		catalog[key] = load("res://content/enemies/%s/appearance.tres" % source.level.enemies[key].content_id)
 	source.free()
@@ -65,6 +68,7 @@ func _ready() -> void:
 	hud = HUD.new()
 	hud.roster = configuration.roster
 	hud.catalog = catalog
+	hud.skill_icons = skill_icons
 	layer.add_child(hud)
 	hud.pause_requested.connect(func(): paused = not paused; sync_playback())
 	hud.speed_requested.connect(func(): speed = 2.0 if speed == 1.0 else 1.0; sync_playback())

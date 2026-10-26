@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_03.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+content_id = "skill_003"
+display_name = "精准连射"
+description = "攻击间隔缩短至55%，持续10秒。"
+recovery = "attack"
+required = 8
+initial_sp = 4
+duration = 10
+multiplier = 1
+interval_multiplier = 0.55
+cost_gain = 0
+icon = ExtResource("icon")

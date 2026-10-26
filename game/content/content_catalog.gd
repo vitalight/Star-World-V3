@@ -1,7 +1,9 @@
 extends RefCounted
 ## Source files are authoritative. Builds battle dictionaries and StoryScript resources.
 const StoryScript = preload("res://features/story/story_script.gd")
+const Library = preload("res://features/content_definitions/actor_library.gd")
 const ROOT := "res://content/campaign"
+const DATA := "res://content/data"
 var errors := PackedStringArray()
 var characters := {}
 var skills := {}
@@ -9,47 +11,29 @@ var enemies := {}
 var levels := {}
 var waves: Array = []
 var backgrounds := {}
+var starting_operators: Array[String] = []
+var recruits := {}
+var departures := {}
+var returns := {}
 var _level_errors := {}
+var _appearances := {}
+var _skill_icons := {}
 
-func reload(base := ROOT) -> PackedStringArray:
+func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 	errors.clear(); characters.clear(); skills.clear(); enemies.clear(); levels.clear(); waves.clear(); backgrounds.clear(); _level_errors.clear()
-	for row in _table(base + "/skills.csv", "id,name,description,recovery,required,initial_sp,duration,multiplier,interval_multiplier,cost_gain"):
-		var skill := {"enabled": true, "name": row.name, "description": row.description, "recovery": row.recovery}
-		for field in ["required", "duration", "multiplier", "interval_multiplier"]: skill[field] = _number(row, field, 0.000001)
-		for field in ["initial_sp", "cost_gain"]: skill[field] = _number(row, field, 0)
-		_enum(row, "recovery", ["auto", "attack", "hit"])
-		if skill.initial_sp > skill.required: _error(row, "initial_sp", "不能大于 required")
-		skills[row.id] = skill
-	for row in _table(base + "/characters.csv", "id,name,identity,class,appearance,role,max_hp,attack,defense,resistance,interval,windup,cost,redeploy_time,block,range,skill"):
-		var unit := _actor(row)
-		unit.merge({"name": row.name, "content_id": row.id, "role": row.role, "cost": _number(row, "cost", 0),
-			"redeploy_time": _number(row, "redeploy_time", 0), "block": int(_number(row, "block", 0, true)),
-			"range": _range(row), "anti_air": row.role == "ranged", "skill": skills.get(row.skill, {})})
-		_enum(row, "role", ["melee", "ranged", "healer"])
-		if not skills.has(row.skill): _error(row, "skill", "未知技能 " + row.skill)
-		_resource(row, "appearance")
-		characters[row.id] = {"stats": unit, "appearance": row.appearance, "identity": row.identity, "class": row["class"]}
-	for row in _table(base + "/enemies.csv", "id,name,appearance,max_hp,attack,defense,resistance,interval,windup,speed,ranged,range,leak_damage"):
-		var enemy := _actor(row)
-		enemy.merge({"name": row.name, "content_id": row.id, "speed": _number(row, "speed", 0), "ranged": row.ranged == "true",
-			"range": _number(row, "range", 0), "leak_damage": int(_number(row, "leak_damage", 1, true))})
-		_enum(row, "ranged", ["true", "false"])
-		_resource(row, "appearance")
-		enemies[row.id] = {"stats": enemy, "appearance": row.appearance}
+	_appearances.clear()
+	_skill_icons.clear()
+	starting_operators.clear(); recruits.clear(); departures.clear(); returns.clear()
+	_load_actors(data_base + "/actors.tres")
 	for row in _table(base + "/backgrounds.csv", "id,texture"):
 		_resource(row, "texture")
 		backgrounds[row.id] = row.texture
-	for row in _table(base + "/levels.csv", "id,name,description,map,roster,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after"):
+	for row in _table(base + "/levels.csv", "id,name,description,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after"):
 		var level := {"id": row.id, "name": row.name, "description": row.description, "map": row.map,
-			"before": row.before, "after": row.after, "roster": {}, "enemies": {}, "waves": [], "route_warning_duration": 2.0}
+			"before": row.before, "after": row.after, "enemies": {}, "waves": [], "route_warning_duration": 2.0}
 		for field in ["life", "deploy_limit"]: level[field] = int(_number(row, field, 1, true))
 		for field in ["initial_cost", "cost_cap", "cost_regen", "defend_duration"]: level[field] = _number(row, field, 0)
 		if level.initial_cost > level.cost_cap: _error(row, "initial_cost", "不能大于 cost_cap")
-		for id in row.roster.split("|", false):
-			if not characters.has(id): _error(row, "roster", "未知角色 " + id)
-			elif level.roster.has(id): _error(row, "roster", "重复角色 " + id)
-			else: level.roster[id] = characters[id].stats.duplicate(true)
-		if level.roster.is_empty(): _error(row, "roster", "至少一个角色")
 		_resource(row, "map")
 		levels[row.id] = level
 		_level_errors[row.id] = PackedStringArray()
@@ -58,6 +42,19 @@ func reload(base := ROOT) -> PackedStringArray:
 			story(row[field])
 			for index in range(start, errors.size()): _level_errors[row.id].append(errors[index])
 			errors.resize(start)
+	for row in _table(base + "/player_roster.csv", "id,join_after,leave_after,return_after"):
+		if not characters.has(row.id):
+			_error(row, "id", "未知干员 " + row.id); continue
+		if row.join_after.is_empty(): starting_operators.append(row.id)
+		for entry in [["join_after", recruits], ["leave_after", departures], ["return_after", returns]]:
+			var field: String = entry[0]
+			var events: Dictionary = entry[1]
+			if row[field].is_empty(): continue
+			if not levels.has(row[field]): _error(row, field, "未知剧情完成时点 " + row[field])
+			else:
+				if not events.has(row[field]): events[row[field]] = []
+				events[row[field]].append(row.id)
+	if starting_operators.is_empty(): errors.append(base + "/player_roster.csv:1 [id] 初始干员不能为空")
 	for row in _table(base + "/waves.csv", "id,level,time,count,interval,enemy,route,number"):
 		var wave := {"time": _number(row, "time", 0), "count": int(_number(row, "count", 1, true)),
 			"interval": _number(row, "interval", 0.000001), "enemy": row.enemy, "route": row.route, "number": int(_number(row, "number", 1, true))}
@@ -71,14 +68,72 @@ func reload(base := ROOT) -> PackedStringArray:
 		if levels[id].waves.is_empty(): _level_errors[id].append("%s/levels.csv:1 [waves] %s 没有波次" % [base, id])
 	return errors.duplicate()
 
+func _load_actors(path: String) -> void:
+	if not ResourceLoader.exists(path):
+		errors.append(path + " [library] 资源不存在"); return
+	# Ignore dependencies too: saved stat, skill and appearance edits must reload.
+	var library = ResourceLoader.load(path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
+	if not library is Library:
+		errors.append(path + " [library] 必须为 ActorLibrary"); return
+	for skill in library.skills:
+		if skill == null:
+			errors.append(path + " [skills] 技能资源为空"); continue
+		if not _accept_id(skill.content_id, "skill", skill.resource_path, skills): continue
+		for message in skill.errors(): errors.append(skill.resource_path + " [skill] " + message)
+		skills[skill.content_id] = skill.configuration()
+	var skill_paths := {}
+	for skill in library.skills:
+		if skill: skill_paths[skill.content_id] = skill.resource_path
+	for actor in library.characters: _register_actor(actor, false, path, skill_paths)
+	for actor in library.enemies: _register_actor(actor, true, path, skill_paths)
+	if characters.is_empty() or enemies.is_empty() or skills.is_empty():
+		errors.append(path + " [library] 角色、敌人和技能不能为空")
+
+func _accept_id(id: String, prefix: String, path: String, collection: Dictionary) -> bool:
+	if path.is_empty() or path.contains("::"):
+		errors.append(path + " [resource] 必须保存为独立资源"); return false
+	var pattern := RegEx.new()
+	pattern.compile("^%s_[0-9]{3,}$" % prefix)
+	if pattern.search(id) == null or collection.has(id):
+		errors.append(path + " [content_id] ID 格式错误或重复: " + id); return false
+	return true
+
+func _register_actor(actor, enemy: bool, path: String, skill_paths: Dictionary) -> void:
+	if actor == null:
+		errors.append(path + " [actors] 角色定义为空"); return
+	path = actor.resource_path
+	if actor.stats == null:
+		errors.append(path + " [stats] 数值资源为空"); return
+	var stats = actor.stats
+	var collection: Dictionary = enemies if enemy else characters
+	if not _accept_id(stats.content_id, "enemy" if enemy else "character", path, collection): return
+	for message in stats.errors(): errors.append(stats.resource_path + " [stats] " + message)
+	if not enemy:
+		var skill = stats.skill_spec
+		if skill == null or not skills.has(skill.content_id) or skill_paths.get(skill.content_id) != skill.resource_path:
+			errors.append(stats.resource_path + " [skill_spec] 必须引用 actors.tres 中注册的独立技能资源")
+		elif skill.get("icon") != null:
+			_skill_icons[stats.content_id] = skill.icon
+	var appearance = actor.appearance
+	if appearance == null or appearance.poses.size() != 4 or appearance.poses.has(null) or appearance.portrait == null:
+		errors.append(path + " [appearance] 外观需要四种姿态及头像"); return
+	if not appearance.resource_path.begins_with("res://content/") and not appearance.resource_path.begins_with(path + "::"):
+		errors.append(path + " [appearance] 必须引用正式 content 资源")
+	var config: Dictionary = stats.configuration(enemy)
+	config.content_id = stats.content_id
+	collection[stats.content_id] = {"stats": config, "appearance": appearance.resource_path,
+		"identity": actor.identity, "class": actor.profession}
+	_appearances[stats.content_id] = appearance
+
 func diagnostics(id: String) -> PackedStringArray:
 	var result := errors.duplicate()
 	result.append_array(_level_errors.get(id, PackedStringArray()))
 	if not levels.has(id): result.append("levels.csv:1 [id] 未知关卡 " + id)
 	return result
 
-func configuration(id: String, map: Node) -> Dictionary:
+func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionary:
 	var result: Dictionary = levels[id].duplicate(true)
+	result.roster = operator_configuration(operator_ids if not operator_ids.is_empty() else starting_operators)
 	result.terrain = {}
 	var cells: Dictionary = map.cells()
 	for cell in cells:
@@ -95,16 +150,37 @@ func map_errors(id: String, map: Node) -> PackedStringArray:
 			result.append("%s:%s [route] 未知路线 %s" % [row._file, row._line, row.route])
 	return result
 
-func appearances(id: String) -> Dictionary:
+func operator_configuration(operator_ids: Array) -> Dictionary:
 	var result := {}
-	for key in levels[id].roster: result[key] = load(characters[key].appearance)
-	for key in levels[id].enemies: result[key] = load(enemies[key].appearance)
+	var ordered := operator_ids.duplicate()
+	ordered.sort_custom(func(a, b): return str(a).naturalnocasecmp_to(str(b)) < 0)
+	for key in ordered: result[key] = characters[key].stats.duplicate(true)
+	return result
+
+func operator_errors(operator_ids: Array) -> PackedStringArray:
+	var result := PackedStringArray()
+	if operator_ids.is_empty(): result.append("Player: 干员列表不能为空")
+	for key in operator_ids:
+		if not characters.has(key): result.append("Player: 未知干员 " + str(key))
+	if operator_ids.size() != _unique_count(PackedStringArray(operator_ids)): result.append("Player: 干员列表存在重复 ID")
+	return result
+
+func appearances(id: String, operator_ids: Array = []) -> Dictionary:
+	var result := {}
+	for key in (starting_operators if operator_ids.is_empty() else operator_ids): result[key] = _appearances[key]
+	for key in levels[id].enemies: result[key] = _appearances[key]
 	return result
 
 func story_textures() -> Dictionary:
 	var result := {"backgrounds": {}, "actors": {}}
 	for id in backgrounds: result.backgrounds[id] = load(backgrounds[id])
-	for id in characters: result.actors[id] = load(characters[id].appearance).poses[0]
+	for id in characters: result.actors[id] = _appearances[id].poses[0]
+	return result
+
+func skill_icons(_id: String, operator_ids: Array = []) -> Dictionary:
+	var result := {}
+	for key in (starting_operators if operator_ids.is_empty() else operator_ids):
+		if _skill_icons.has(key): result[key] = _skill_icons[key]
 	return result
 
 func story(path: String) -> Resource:
@@ -197,41 +273,18 @@ func _unique_count(values: PackedStringArray) -> int:
 	for value in values: seen[value] = true
 	return seen.size()
 
-func _actor(row: Dictionary) -> Dictionary:
-	var result := {"damage_type": "physical"}
-	for field in ["max_hp", "interval"]: result[field] = _number(row, field, 0.000001)
-	for field in ["attack", "defense", "resistance", "windup"]: result[field] = _number(row, field, 0)
-	if result.resistance > 95: _error(row, "resistance", "必须在 0 至 95 之间")
-	if result.windup > result.interval: _error(row, "windup", "不能大于 interval")
-	return result
-
-func _range(row: Dictionary) -> Array:
-	var result: Array = []
-	for cell in row.range.split("|", false):
-		var xy: PackedStringArray = cell.split(":")
-		if xy.size() != 2 or not xy[0].is_valid_int() or not xy[1].is_valid_int(): _error(row, "range", "使用 x:y|x:y 格式")
-		else: result.append(Vector2i(int(xy[0]), int(xy[1])))
-	if result.is_empty(): _error(row, "range", "攻击范围不能为空")
-	return result
-
 func _number(row: Dictionary, field: String, minimum: float, integer := false) -> float:
 	var value: String = row[field]
 	if not value.is_valid_float() or not is_finite(value.to_float()) or value.to_float() < minimum or (integer and not value.is_valid_int()):
 		_error(row, field, "必须为%s且不小于 %s" % ["整数" if integer else "有限数值", minimum]); return minimum
 	return value.to_float()
 
-func _enum(row: Dictionary, field: String, allowed: Array) -> void:
-	if not row[field] in allowed: _error(row, field, "可用值 " + "/".join(allowed))
-
 func _resource(row: Dictionary, field: String) -> void:
 	var path: String = row[field]
 	if not path.begins_with("res://content/") or not ResourceLoader.exists(path):
 		_error(row, field, "正式资源不存在 " + path); return
 	var resource = load(path)
-	if field == "appearance":
-		if resource == null or resource.get("poses") == null or resource.poses.size() != 4 or resource.get("portrait") == null:
-			_error(row, field, "外观需要四种姿态及头像")
-	elif field == "map":
+	if field == "map":
 		if not resource is PackedScene: _error(row, field, "必须为地图场景")
 		else:
 			var map = resource.instantiate()

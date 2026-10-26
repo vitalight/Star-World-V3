@@ -1,7 +1,8 @@
 extends RefCounted
 ## Source order is explicit; raw inputs are previewed without creating content IDs.
 const CHARACTER_ATLASES = [
-	"hero-atlas-01.png", "hero-atlas-02.png",
+	"hero-atlas-101.png", "hero-atlas-102.png", "hero-atlas-103.png",
+	"hero-atlas-104.png", "hero-atlas-105.png",
 	"enemy-atlas-01.png", "enemy-atlas-02.png",
 ]
 const EFFECT_ATLASES = ["effect-atlas-01.png", "effect-atlas-02.png"]
@@ -18,7 +19,8 @@ static func characters() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for filename in CHARACTER_ATLASES:
 		var atlas := load("res://Human/StarterContent/character/" + filename) as Texture2D
-		for row in 4:
+		# Heroes preview the selected first row; enemy sheets retain all variants.
+		for row in (1 if filename.begins_with("hero-") else 4):
 			var poses: Array[Texture2D] = []
 			for column in 4:
 				poses.append(slice(atlas, row, column))

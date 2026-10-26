@@ -1,6 +1,0 @@
-﻿id,name,identity,class,appearance,role,max_hp,attack,defense,resistance,interval,windup,cost,redeploy_time,block,range,skill
-character_011,大星,主角,近卫,res://content/characters/character_011/appearance.tres,melee,1600,110,45,5,1,0.2,12,20,2,0:0|1:0,skill_001
-character_012,小黄,宠物猫,特种,res://content/characters/character_012/appearance.tres,melee,850,85,25,5,0.7,0.15,5,5,1,0:0|1:0,skill_002
-character_013,阿五,节点管控局队长,狙击,res://content/characters/character_013/appearance.tres,ranged,850,100,20,5,1.1,0.2,14,20,0,0:-1|0:0|0:1|1:-1|1:0|1:1|2:-1|2:0|2:1|3:-1|3:0|3:1,skill_003
-character_014,胡胡,节点管控局副队长,先锋,res://content/characters/character_014/appearance.tres,melee,1200,80,35,5,0.9,0.2,8,12,2,0:0|1:0,skill_004
-character_015,月月,医院医生,医疗,res://content/characters/character_015/appearance.tres,healer,850,90,20,10,1.4,0.2,14,20,0,-1:-2|-1:-1|-1:0|-1:1|-1:2|0:-2|0:-1|0:0|0:1|0:2|1:-2|1:-1|1:0|1:1|1:2|2:-2|2:-1|2:0|2:1|2:2,skill_005

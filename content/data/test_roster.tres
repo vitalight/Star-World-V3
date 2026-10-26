@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/actor_roster.gd" id="script"]
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
+[ext_resource type="Resource" path="res://content/data/character_001.tres" id="guard"]
+[ext_resource type="Resource" path="res://content/data/character_003.tres" id="tank"]
+[ext_resource type="Resource" path="res://content/data/character_004.tres" id="sniper"]
+[ext_resource type="Resource" path="res://content/data/character_005.tres" id="caster"]
+[ext_resource type="Resource" path="res://content/data/character_006.tres" id="medic"]
+
+[resource]
+script = ExtResource("script")
+actors = Dictionary[String, ExtResource("actor_type")]({
+"guard": ExtResource("guard"),
+"tank": ExtResource("tank"),
+"sniper": ExtResource("sniper"),
+"caster": ExtResource("caster"),
+"medic": ExtResource("medic")
+})

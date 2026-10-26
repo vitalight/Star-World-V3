@@ -43,7 +43,7 @@ game/adapters 将战斗事件与状态转成表现更新，并将用户操作意
 
 ## 数据与资源归属
 
-features 定义可复用的数据结构和行为；content 提供具体实例。例如，未来的单位配置类型位于 features/battle/units/，角色实例位于 content/characters/character_001/。
+features 定义可复用的数据结构和行为；content 提供具体实例。例如，单位数值类型位于 features/battle，正式角色配置位于 content/data/character_011.tres，角色素材位于 content/characters/character_011/。
 
 ### 内容 ID
 
@@ -56,12 +56,12 @@ features 定义可复用的数据结构和行为；content 提供具体实例。
 | 地形 | `terrain_001` |
 
 同一类型内编号唯一，按类型独立编号。ID 分配后保持稳定，显示名称可以单独修改；删除的 ID 不分配给其他内容。
-具体内容目录使用对应 ID 命名。此规则用于内容实体，不要求开发工具场景、通用模块场景或每个资源文件都分配内容 ID。
+具体素材目录使用对应 ID 命名；正式角色／敌人／技能配置集中在 content/data，以 character_NNN.tres、enemy_NNN.tres、skill_NNN.tres 命名。此规则用于内容实体，不要求开发工具场景、通用模块场景或每个资源文件都分配内容 ID。
 Human/StarterContent 中的外部输入保留原始名称，整理为正式内容时分配 ID。
 
 ### 资源归属
 
-一个角色目录可以包含 stats.tres、view.tscn、textures/。stats.tres 只描述战斗所需数据，不引用外观场景、贴图和动画。
+正式角色／敌人配置各使用 content/data 中的一个 `.tres` 文件，包含 stats 数值与 appearance 外观子资源，贴图引用原素材目录。stats 描述战斗数据并引用独立 skill_NNN.tres，不直接保存角色外观场景、贴图和动画。scene_001 的可部署角色同样各用一个 ActorDefinition 文件，内嵌 stats 和 appearance；关卡不引用出战角色。玩家持有已获得干员及暂离状态，game 组装战斗时注入当前可出战干员的数值、外观与技能图标；重打旧关沿用当前玩家队伍。开发工作区通过独立的 test_roster.tres 注入样例玩家列表，保持内容 ID。敌人开发样例暂保留 UnitSpec 格式。技能编辑资源 SkillDefinition 继承纯规则 BattleSkillSpec，并拥有 icon；configuration() 向 battle 导出时只保留规则数据，game 将图标单独注入 HUD。技能图标不属于 ActorAppearance。
 game 负责根据内容标识关联数值和外观，纯规则测试仅加载战斗数据。
 通用展示行为放在 features/actor_view，具体角色的外观配置和专属资源放在 content。
 
@@ -85,7 +85,7 @@ Story Test 通过 `features/story` 的公共接口运行样例；正式剧情接
 
 scene_001 的 TileMapLayer 是地形唯一数据源。features/battlefield_view/editable_map.gd 通过关卡资源的 configuration / errors 协议导出战斗配置及编辑器诊断；关卡、单位与波次资源类型由 features/battle 定义。3D 地形生成器只消费格子外观和高度，不计算部署合法性。角色外观由 features/actor_view 定义资源类型，game 按内容 ID 将数值与外观关联。
 
-正式第一章使用 `content/campaign` 的 CSV 和各 scene 目录的 Markdown，`game/content/content_catalog.gd` 校验并转换成同一 Battle 字典协议与 StoryScript。这些源文件是正式数值和对白的唯一来源，不维护同步的 stats/level Resource 副本；scene_001 的 Inspector 资源继续作为开发样例。正式地图设置 external_level，只导出几何，关卡／波次语义由 catalog 校验。地形与 Path2D 仍只来自 TileMap 场景。通用可编辑地形显示位于 features/battlefield_view/editable_field.gd，具体图集、配色、地图由 game/content 外部注入。内容编辑与扩展方式见 content/campaign/README.md。
+正式第一章的角色／敌人使用 content/data/character_NNN.tres、enemy_NNN.tres，每个文件包含 stats 数值与 appearance 外观子资源，关联原素材目录中的贴图；技能使用同一 data 目录下的 skill_NNN.tres。features/content_definitions 定义编辑入口与显式资源索引，依赖 battle 的数值类型和 actor_view 的外观类型；这两个 feature 不反向依赖它。content/data/actors.tres 注册正式角色、敌人与技能，关卡／波次／背景继续使用 CSV，scene 目录的 Markdown 保存对白。game/content/content_catalog.gd 校验并转换成同一 Battle 字典协议与 StoryScript。资源和对应表格是各自内容的唯一来源，不维护 CSV／Resource 数值副本；scene_001 的 Inspector 资源继续作为开发样例。正式地图设置 external_level，只导出几何，关卡／波次语义由 catalog 校验。地形与 Path2D 仍只来自 TileMap 场景。通用可编辑地形显示位于 features/battlefield_view/editable_field.gd，具体图集、配色、地图由 game/content 外部注入。内容编辑与扩展方式见 content/campaign/README.md。
 
 ## 验证与评审
 

@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://d0l5hrfcdf85s"]
 
-[ext_resource type="Script" path="res://game/player/player_mode.gd" id="1"]
+[ext_resource type="Script" uid="uid://b270lr6n1yyac" path="res://game/player/player_mode.gd" id="1"]
 
-[node name="PlayerMode" type="Control"]
+[node name="PlayerMode" type="Control" unique_id=1250785110]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

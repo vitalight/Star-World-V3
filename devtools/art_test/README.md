@@ -13,9 +13,9 @@
 
 ## 素材来源与切片
 
-浏览目录在 `asset_catalog.gd`，开发预览直接引用 Human/StarterContent：角色 hero-atlas-01、hero-atlas-02、enemy-atlas-01、enemy-atlas-02；特效 effect-atlas-01、effect-atlas-02。每张按 4 × 4 网格切片，按实际图片尺寸除以四计算浮点区域（当前为 313.5 × 313.5），不重新采样或覆盖原图，也不为原始素材浏览批量分配正式内容 ID。
+浏览目录在 `asset_catalog.gd`，开发预览直接引用 Human/StarterContent：角色 hero-atlas-101～105 各展示第一行，enemy-atlas-01、enemy-atlas-02 展示所有行；特效 effect-atlas-01、effect-atlas-02。每张按 4 × 4 网格读取区域，不重新采样或覆盖原图，也不为原始素材浏览批量分配正式内容 ID。Character 和 Animation 页共用此目录。
 
-Battle 引用正式 content：关卡编队中的 character_001、003～006，敌人 character_008～010，以及 effect_001、terrain_001 和 scene_001。原有 ID 保持稳定；character_008～character_010 的敌方资源存放于 `content/enemies/`，其余沿用原目录。来源登记见 `content/characters/README.md` 和 `content/enemies/README.md`；新增姿态图只提取所用切片，不复制整张图集。scene_001 现在为 3D 地图；旧 2D battlefield_view 与 actor_view 入口保留。
+Battle 与 Game Test 共用 scene_001：开发样例各自的 content/data/character_001、003～006.tres 内嵌 stats 与 appearance；队伍来自独立的 content/data/test_roster.tres，由入口注入，关卡不引用角色。角色 appearance 依次引用正式角色 character_011～015 目录中的整张图集，全部使用第一行，头像使用第一列；样例战斗数值和职业图标保持原配置。敌人 character_008～010，以及 effect_001、terrain_001 保持原资源。原有 ID 保持稳定；character_008～character_010 的敌方资源存放于 `content/enemies/`。来源登记见 `content/characters/README.md` 和 `content/enemies/README.md`。scene_001 现在为 3D 地图；旧 2D battlefield_view 与 actor_view 入口保留。
 
 ## Battle 展示控制
 

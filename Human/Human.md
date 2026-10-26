@@ -40,7 +40,7 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
     - [ ] 干员技能树（消耗金币）
 
 
-填充内容
-D:\_Zyen\2_Codes\StarWorldV3\Human\GameContent.md
-
-正式资产
+第一章 正式资产
+- 角色
+- 剧情
+- 地图

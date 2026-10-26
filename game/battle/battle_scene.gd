@@ -10,6 +10,8 @@ const Field = preload("res://features/battlefield_view/editable_field.gd")
 const Catalog = preload("res://game/content/content_catalog.gd")
 @export var map_source: PackedScene = preload("res://content/scenes/scene_001/map.tscn")
 @export var campaign_level := ""
+@export var operator_ids: Array[String] = []
+@export var operator_roster: Resource = preload("res://content/data/test_roster.tres")
 var battle: RefCounted
 var map_data: Node2D
 var field: Node3D
@@ -34,6 +36,7 @@ var show_grid := false
 var show_routes := false
 var show_ranges := true
 var appearances := {}
+var skill_icons := {}
 var overlay_signature := ""
 var auto_start_left := 0.0
 
@@ -60,6 +63,8 @@ func reload_level() -> void:
 		catalog = Catalog.new()
 		catalog.reload()
 		validation_errors = catalog.diagnostics(campaign_level)
+		if operator_ids.is_empty(): operator_ids.assign(catalog.starting_operators)
+		validation_errors.append_array(catalog.operator_errors(operator_ids))
 		if not validation_errors.is_empty():
 			_show_error("关卡配置错误\n" + "\n".join(validation_errors)); return
 		map_source = load(catalog.levels[campaign_level].map)
@@ -67,11 +72,17 @@ func reload_level() -> void:
 	map_data.hide()
 	add_child(map_data)
 	validation_errors = catalog.map_errors(campaign_level, map_data) if catalog else map_data.errors()
+	if catalog == null:
+		if operator_roster and not operator_roster.resource_path.is_empty():
+			operator_roster = ResourceLoader.load(operator_roster.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
+		if operator_roster == null: validation_errors.append("Player: 未指定干员列表")
+		else: validation_errors.append_array(operator_roster.errors())
 	world = Node3D.new(); add_child(world)
 	if not validation_errors.is_empty():
 		_show_error("关卡配置错误\n" + "\n".join(validation_errors))
 		return
-	configuration = catalog.configuration(campaign_level, map_data) if catalog else map_data.configuration()
+	configuration = catalog.configuration(campaign_level, map_data, operator_ids) if catalog else map_data.configuration()
+	if catalog == null: configuration.roster = operator_roster.configuration()
 	battle = Battle.new(configuration)
 	configuration = battle.configuration()
 	reset_auto_start()
@@ -81,16 +92,20 @@ func reload_level() -> void:
 	field.configure(map_data.cells(), map_data.bounds)
 	world.add_child(field)
 	appearances.clear()
-	for collection in ([] if catalog else [map_data.level.roster, map_data.level.enemies]):
+	skill_icons.clear()
+	if catalog == null:
+		appearances = operator_roster.appearances()
+		skill_icons = operator_roster.skill_icons()
+	for collection in ([] if catalog else [map_data.level.enemies]):
 		for key in collection:
 			var unit = collection[key]
-			var folder := "enemies" if map_data.level.enemies.has(key) else "characters"
-			var path := "res://content/%s/%s/appearance.tres" % [folder, unit.content_id]
+			var path := "res://content/enemies/%s/appearance.tres" % unit.content_id
 			var appearance = load(path) if ResourceLoader.exists(path) else null
 			if appearance == null or appearance.poses.size() < 4:
 				validation_errors.append("Appearance %s: 缺少四种姿态资源 %s" % [key, path])
 			else: appearances[key] = appearance
-	if catalog: appearances = catalog.appearances(campaign_level)
+	if catalog: appearances = catalog.appearances(campaign_level, operator_ids)
+	if catalog: skill_icons = catalog.skill_icons(campaign_level, operator_ids)
 	if not validation_errors.is_empty():
 		battle = null
 		_show_error("\n".join(validation_errors))
@@ -104,6 +119,7 @@ func reload_level() -> void:
 	hud.developer_tools_enabled = true
 	hud.roster = configuration.roster
 	hud.catalog = appearances
+	hud.skill_icons = skill_icons
 	layer.add_child(hud)
 	hud.pause_requested.connect(toggle_pause)
 	hud.speed_requested.connect(func(): set_speed(speed * 2.0 if speed < 4.0 else 1.0))

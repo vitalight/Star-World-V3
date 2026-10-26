@@ -1,0 +1,46 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
+
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_82f63"]
+
+[ext_resource type="Resource" path="res://content/data/skill_007.tres" id="skill"]
+
+
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="view_2_n8f7b"]
+
+
+[ext_resource type="Texture2D" path="res://content/ui/class_icons/atlas.png" id="view_class_atlas"]
+
+[ext_resource type="Texture2D" path="res://content/characters/character_012/atlas.png" id="view_hero_atlas"]
+
+
+[sub_resource type="AtlasTexture" id="view_ClassIcon"]
+atlas = ExtResource("view_class_atlas")
+region = Rect2(0.0, 313.5, 313.5, 313.5)
+filter_clip = true
+
+
+[sub_resource type="Resource" id="Stats"]
+script = ExtResource("1_82f63")
+content_id = "character_003"
+display_name = "重装"
+max_hp = 1600.0
+attack = 35.0
+defense = 18.0
+block = 3
+
+skill_spec = ExtResource("skill")
+
+[sub_resource type="Resource" id="Appearance"]
+script = ExtResource("view_2_n8f7b")
+atlas = ExtResource("view_hero_atlas")
+atlas_row = 1
+
+
+class_icon = SubResource("view_ClassIcon")
+
+[resource]
+script = ExtResource("actor_type")
+stats = SubResource("Stats")
+appearance = SubResource("Appearance")

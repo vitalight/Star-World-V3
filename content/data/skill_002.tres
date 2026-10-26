@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_02.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+content_id = "skill_002"
+display_name = "猫猫突袭"
+description = "攻击提升至220%，持续5秒。"
+recovery = "auto"
+required = 10
+initial_sp = 10
+duration = 5
+multiplier = 2.2
+interval_multiplier = 1
+cost_gain = 0
+icon = ExtResource("icon")

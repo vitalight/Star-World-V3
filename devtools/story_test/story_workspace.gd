@@ -6,8 +6,8 @@ const SAMPLE = preload("res://devtools/story_test/sample_story.tres")
 const BACKGROUNDS = {
 	"winter": preload("res://Human/StarterContent/story/story-01.png"),
 	"garden": preload("res://Human/StarterContent/story/story-02.png")}
-const SCOUT = preload("res://content/characters/character_001/appearance.tres")
-const GUARD = preload("res://content/characters/character_003/appearance.tres")
+const SCOUT = preload("res://content/data/character_001.tres")
+const GUARD = preload("res://content/data/character_003.tres")
 const ACCENT = Color("dfc49b")
 var session = Session.new()
 var stage: Control
@@ -31,7 +31,7 @@ var source_catalog = preload("res://game/content/content_catalog.gd").new()
 func _ready() -> void:
 	theme = UI.make_theme(ACCENT)
 	stage = StoryView.new()
-	stage.configure(BACKGROUNDS, {"scout": SCOUT.poses[0], "guard": GUARD.poses[0]})
+	stage.configure(BACKGROUNDS, {"scout": SCOUT.appearance.poses[0], "guard": GUARD.appearance.poses[0]})
 	add_child(stage)
 	stage.advance_requested.connect(_advance)
 	stage.choice_requested.connect(_choose)
@@ -93,7 +93,7 @@ func _load_source(index: int) -> void:
 	var script: Resource = SAMPLE
 	var errors := PackedStringArray()
 	if source.is_empty():
-		stage.configure(BACKGROUNDS, {"scout": SCOUT.poses[0], "guard": GUARD.poses[0]})
+		stage.configure(BACKGROUNDS, {"scout": SCOUT.appearance.poses[0], "guard": GUARD.appearance.poses[0]})
 	else:
 		source_catalog.reload()
 		errors = source_catalog.diagnostics(source[0])

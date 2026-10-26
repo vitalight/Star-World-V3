@@ -1,0 +1,17 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_10.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+content_id = "skill_009"
+display_name = "聚能爆破"
+description = "法术攻击力提升至 220%，持续 6.0 秒。"
+recovery = "auto"
+required = 12.0
+initial_sp = 6.0
+duration = 6.0
+multiplier = 2.2
+icon = ExtResource("icon")

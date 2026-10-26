@@ -37,6 +37,7 @@ func _ready() -> void:
 
 func _load_progress() -> void:
 	progress.load_progress(save_path, catalog.levels.keys())
+	progress.configure_operators(catalog.starting_operators, catalog.recruits, catalog.characters.keys(), catalog.departures, catalog.returns)
 	has_progress = progress.started or not progress.pending_after.is_empty()
 	completed = progress.completed.size() == catalog.levels.size() and not catalog.levels.is_empty()
 
@@ -137,11 +138,11 @@ func show_levels() -> void:
 	var description := _text(detail, level.description, Rect2(28, 375, 490, 95), 23, Color("b9d9e4"))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text(detail, "出战干员", Rect2(28, 505, 450, 32), 22, Color("a7c3d1"))
-	var roster: Array = level.roster.keys()
+	var roster: Array = progress.available_operators()
 	for i in roster.size():
-		var appearance = load(catalog.characters[roster[i]].appearance)
+		var appearance = catalog.appearances(progress.selected, roster)[roster[i]]
 		_image(detail, Rect2(28 + i * 99, 550, 86, 83), appearance.portrait)
-		_text(detail, level.roster[roster[i]].name, Rect2(28 + i * 99, 633, 86, 28), 18).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_text(detail, catalog.characters[roster[i]].stats.name, Rect2(28 + i * 99, 633, 86, 28), 18).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var action := _button(detail, "开始行动   ›", Rect2(25, 689, 505, 65), begin_action, true)
 	action.name = "StartAction"
 	var issues: PackedStringArray = catalog.diagnostics(progress.selected)
@@ -206,7 +207,7 @@ func finish_story() -> void:
 		progress.selected = story_level
 		start_battle()
 	else:
-		progress.finish_story(catalog.levels.keys())
+		progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
 		_save_progress()
 		show_levels()
 
@@ -238,6 +239,7 @@ func start_battle() -> void:
 	result_recorded = false
 	battle_scene = BattleScene.instantiate()
 	battle_scene.campaign_level = progress.selected
+	battle_scene.operator_ids.assign(progress.available_operators())
 	battle_scene.exit_requested.connect(func(): show_levels.call_deferred())
 	battle_scene.continue_requested.connect(func(): _leave_result.call_deferred())
 	battle_scene.observed.connect(_observe_battle)

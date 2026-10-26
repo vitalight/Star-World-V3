@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_06.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+content_id = "skill_004"
+display_name = "紧急调度"
+description = "立即获得12点部署费用，持续1秒。"
+recovery = "auto"
+required = 18
+initial_sp = 12
+duration = 1
+multiplier = 1
+interval_multiplier = 1
+cost_gain = 12
+icon = ExtResource("icon")

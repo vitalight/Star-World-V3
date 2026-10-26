@@ -1,0 +1,25 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/actor_library.gd" id="script"]
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="skill_type"]
+[ext_resource type="Resource" path="res://content/data/skill_001.tres" id="skill_001"]
+[ext_resource type="Resource" path="res://content/data/skill_002.tres" id="skill_002"]
+[ext_resource type="Resource" path="res://content/data/skill_003.tres" id="skill_003"]
+[ext_resource type="Resource" path="res://content/data/skill_004.tres" id="skill_004"]
+[ext_resource type="Resource" path="res://content/data/skill_005.tres" id="skill_005"]
+[ext_resource type="Resource" path="res://content/data/character_011.tres" id="character_011"]
+[ext_resource type="Resource" path="res://content/data/character_012.tres" id="character_012"]
+[ext_resource type="Resource" path="res://content/data/character_013.tres" id="character_013"]
+[ext_resource type="Resource" path="res://content/data/character_014.tres" id="character_014"]
+[ext_resource type="Resource" path="res://content/data/character_015.tres" id="character_015"]
+[ext_resource type="Resource" path="res://content/data/enemy_001.tres" id="enemy_001"]
+[ext_resource type="Resource" path="res://content/data/enemy_002.tres" id="enemy_002"]
+[ext_resource type="Resource" path="res://content/data/enemy_003.tres" id="enemy_003"]
+[ext_resource type="Resource" path="res://content/data/enemy_004.tres" id="enemy_004"]
+
+[resource]
+script = ExtResource("script")
+skills = Array[ExtResource("skill_type")]([ExtResource("skill_001"), ExtResource("skill_002"), ExtResource("skill_003"), ExtResource("skill_004"), ExtResource("skill_005")])
+characters = Array[ExtResource("actor_type")]([ExtResource("character_011"), ExtResource("character_012"), ExtResource("character_013"), ExtResource("character_014"), ExtResource("character_015")])
+enemies = Array[ExtResource("actor_type")]([ExtResource("enemy_001"), ExtResource("enemy_002"), ExtResource("enemy_003"), ExtResource("enemy_004")])

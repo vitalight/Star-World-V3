@@ -1,4 +1,4 @@
-﻿id,name,description,map,roster,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after
-scene_002,1-1 家中异常,守住家门，留意后方突然出现的裂隙。,res://content/scenes/scene_002/map.tscn,character_011|character_012,5,20,99,1,2,0,res://content/scenes/scene_002/before.md,res://content/scenes/scene_002/after.md
-scene_003,1-2 路边救援,守住两条街道，清除围困医生的异常。,res://content/scenes/scene_003/map.tscn,character_011|character_013|character_014,5,34,99,1,3,0,res://content/scenes/scene_003/before.md,res://content/scenes/scene_003/after.md
-scene_004,1-3 东方明珠主节点,守住防线，完成主节点修复。,res://content/scenes/scene_004/map.tscn,character_011|character_013|character_014|character_015,5,48,99,0.75,4,210,res://content/scenes/scene_004/before.md,res://content/scenes/scene_004/after.md
+id,name,description,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after
+scene_002,1-1 家中异常,守住家门，留意后方突然出现的裂隙。,res://content/scenes/scene_002/map.tscn,5,20,99,1,2,0,res://content/scenes/scene_002/before.md,res://content/scenes/scene_002/after.md
+scene_003,1-2 路边救援,守住两条街道，清除围困医生的异常。,res://content/scenes/scene_003/map.tscn,5,34,99,1,3,0,res://content/scenes/scene_003/before.md,res://content/scenes/scene_003/after.md
+scene_004,1-3 东方明珠主节点,守住防线，完成主节点修复。,res://content/scenes/scene_004/map.tscn,5,48,99,0.75,4,210,res://content/scenes/scene_004/before.md,res://content/scenes/scene_004/after.md
