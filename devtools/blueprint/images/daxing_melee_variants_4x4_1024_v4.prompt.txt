@@ -1,0 +1,153 @@
+Create a single **1024x1024 character sprite atlas** on a **fully transparent background**.
+
+The final image must be a clean **4x4 grid**, containing **16 full-body character sprites** in total.
+
+## Grid Rules
+
+- Each **row represents one unique costume design candidate for the SAME protagonist Da Xing (大星)**
+- There are **4 different design candidates total, all the same male protagonist**
+- Each row contains **4 poses of the same character**
+- Keep character scale, proportions, costume, weapon, hairstyle, and color palette fully consistent within each row
+- Leave comfortable padding between cells
+- No text labels
+- No UI
+- No environment
+- No decorative background
+- Transparent background only
+
+For every row, the four columns must be:
+
+1. **idle_front_left**
+2. **idle_back_left**
+3. **attack_front_left**
+4. **attack_back_left**
+
+### Direction Definition
+
+**left** means the character is facing toward the left side of the image.
+
+**front_left**:
+front three-quarter view, while facing left.
+
+**back_left**:
+back three-quarter view, while facing left.
+
+All 16 sprites must face left.
+
+## Art Style
+
+Polished high-quality **2D anime game character sprite art**.
+
+Visual direction:
+
+- Arknights-inspired operator character design
+- LaTale-inspired cute fantasy RPG character proportions
+- slightly chibi / compact body proportions
+- approximately 4–5 heads tall
+- stylish anime face
+- expressive eyes
+- clean readable silhouette
+- fantasy-tech clothing
+- layered costume design
+- clear occupational identity
+- colorful but controlled palette
+- detailed accessories
+- crisp linework
+- clean cel shading
+- soft secondary rendering
+- high-quality mobile / PC game asset
+- production-ready game sprite
+- strong readability at smaller scale
+
+Avoid overly realistic anatomy.
+
+Avoid extremely large heads or super-deformed 2-head-tall proportions.
+
+The result should feel like:
+
+**Arknights character design + LaTale character charm**
+
+with cleaner, more readable silhouettes suitable for gameplay.
+
+## Pose Requirements
+
+### idle_front_left
+
+- relaxed combat-ready idle stance
+- full body visible
+- front-left three-quarter view
+- weapon clearly visible
+- neutral or confident expression
+- character facing left
+
+### idle_back_left
+
+- same idle stance concept
+- back-left three-quarter view
+- character still facing left
+- clearly show hairstyle, back of costume, cape, backpack, weapon holster, or accessories
+- full body visible
+
+### attack_front_left
+
+- dynamic combat pose
+- front-left three-quarter view
+- strong readable action silhouette
+- weapon actively attacking
+- hair, cape, ribbons, or clothing reacting to movement
+- moderate attack VFX allowed
+- character identity must remain clear
+
+### attack_back_left
+
+- dynamic combat pose
+- back-left three-quarter view
+- character facing left
+- clearly show rear costume details
+- weapon actively attacking
+- motion effects consistent with attack_front_left
+
+## Character Rows
+
+### Shared identity — Da Xing (大星)
+Same young adult male melee protagonist in all sixteen sprites. Short neat BLACK hair, naturally fluffy crown, elongated masculine face with defined angular jaw and sculpted facial planes, relaxed confident brows, warm composed sunny expression, athletic muscular arms. Fresh, steady, sunny reliable personality. Human ears. Preserve this identity from the attached image, but ADOPT THIS TEMPLATE'S NEW 4–5 HEADS TALL proportions rather than the reference's 3-head proportions. Not a huge-head superdeformed chibi. Four bold concept candidates for choosing the final design.
+
+### Row 1 — Solar Trailblazer
+Burnt orange, ivory, black. Bold asymmetrical cropped one-shoulder sunburst poncho, opposite athletic arm exposed, black sleeveless inner shirt, thick ivory braided rope with sun medallion, cream fitted adventurer trousers, orange calf wraps and substantial black-cream boots. One large brass forearm guard. Compact broad steel short sword with sun-disk pommel. Triangular heroic silhouette. Compact rising diagonal sword cut aimed left, elbow bent.
+
+### Row 2 — Sky Corsair
+Cobalt blue, coral red, white. Sleeveless cropped blue open jacket with large sculptural white collar, compact coral bow scarf behind shoulder, black fitted inner shirt, broad high-waisted blue balloon breeches tapering to ivory wrapped calves, asymmetric cuffed boots, single brass cross-strap and compass belt charm. Compact curved saber with circular knuckle guard. Buoyant adventurous silhouette. Dynamic twisting close-range leftward saber cut with bent elbow.
+
+### Row 3 — Jade Storm Martial Hero
+Emerald green, pale jade, charcoal. Asymmetrical sleeveless martial wrap tunic, muscular arm exposed and jade shoulder plate on opposite side, wide black obi with large ivory knot, short fan-shaped layered waist panels, charcoal martial trousers gathered at shins, jade armored boots, ivory forearm wraps. Compact broad leaf-shaped dao sword. Broad grounded martial silhouette. Bent-knee low twisting diagonal sword cut toward left.
+
+### Row 4 — Violet Starforge Adventurer
+Violet, fuchsia, pale silver. Cropped white angular fantasy-tech jacket, one crystalline violet shoulder plate, black sleeveless inner shirt, short star-cut split violet waist panels, graphite fitted trousers, asymmetrical white-violet boots, silver gauntlet, small geometric star clasp. Compact solid faceted steel sword with violet crystal inset. Sharp asymmetrical silhouette. Forceful compact diagonal overhead chop toward left with bent elbow.
+
+No large attack VFX for any row: strong action comes from poses and physical blades. No detached arcs, particles, floating objects, dust or shadows.
+
+## Technical Constraints
+
+- exactly **4 columns × 4 rows**
+- exactly **16 sprites**
+- one character per row
+- consistent character design within each row
+- full body visible in every cell
+- no body parts cropped
+- no overlapping between cells
+- consistent sprite size
+- consistent baseline / ground height
+- consistent camera perspective
+- transparent PNG-style background
+- no shadows extending excessively outside the character cell
+- no text
+- no grid lines
+- no borders
+- no logos
+- no watermark
+
+The final result should look like a professional **2D game character atlas / sprite sheet**, ready to be sliced into 16 individual sprites.
+
+## Extra mandatory spacing restriction — user priority
+Canvas exactly 1024x1024, equal 256x256 cells. Make sprites noticeably SMALLER INSIDE THEIR CELLS than the attached reference. Every sprite's entire visible content (hair, body, boots, sword tip, cape, ribbons, ornaments) MUST fit inside a centered rectangle from x=40 through x=215 and y=40 through y=215 within its cell. Thus each side has at least 40px of COMPLETELY EMPTY alpha-transparent margin, and neighboring sprites have at least 80px clear space between them horizontally AND vertically. The full atlas should visibly breathe with broad blank gutters. Do NOT fill cells with giant figures. Keep all body scales consistent; body height about 160px with head-to-body ratio 1:4 to 1:5. Keep blade compact, bend elbow, angle sword diagonally and use foreshortening. A sword must never reach into a preceding cell, gutter, or neighbor. Nothing overlaps. Full body and whole blade visible, nothing cropped. NO visible guides, labels or margin boxes. Actual transparent pixels, no checkerboard painting, no colored background, no magenta. Prefer strong silhouettes and large readable shapes over tiny dense filigree.
+

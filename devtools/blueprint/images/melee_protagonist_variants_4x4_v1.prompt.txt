@@ -1,0 +1,19 @@
+Create a polished game character concept sprite sheet using the attached reference ONLY for the character rendering style: Arknights-like tactical chibi anime battlefield units, approximately 3 heads tall, compact full-body proportions, detailed layered clothing, clean sharp silhouettes, dark fine outlines, rich cel shading with subtle painterly finish. Do not reproduce the battlefield, UI, or any existing character.
+
+EXACT LAYOUT: one square image, precisely 4 columns x 4 rows, 16 separate full-body drawings, equally sized invisible cells, generous spacing. This is a concept comparison sheet, NOT a sequential animation. Each ROW is one outfit design version of the SAME original male melee protagonist. Across ALL 16 drawings preserve exactly the same face, short BLACK hair, physique, age and identity. Each row preserves exactly the same costume and sword across its four poses.
+COLUMN 1: idle_front_left — relaxed battle-ready standing, three-quarter FRONT view, head, chest and feet oriented toward SCREEN LEFT.
+COLUMN 2: idle_back_left — standing, three-quarter BACK view, showing the back of jacket and head, face directed toward SCREEN LEFT.
+COLUMN 3: attack_front_left — decisive one-handed sword attack aimed toward SCREEN LEFT, three-quarter FRONT view.
+COLUMN 4: attack_back_left — decisive sword attack aimed toward SCREEN LEFT, three-quarter BACK view, back of torso clearly visible.
+All sixteen figures face SCREEN LEFT, including both back views. No right-facing figures. Front-left shows front chest; back-left shows back shoulder blades.
+
+IDENTITY: young adult man, short neatly trimmed black hair with a slightly naturally fluffy crown; elongated angular masculine face, strong jaw and sculpted facial planes, relaxed confident eyebrows and eyes, dimensional features; visibly athletic muscular arms and broad shoulders. Fresh, calm, sunny, dependable protagonist energy, restrained warm confidence. Use the sturdy swordsman bearing associated with Zoro as loose personality inspiration only, but design an ORIGINAL black-haired hero, no green hair, no copied costume, no three swords, no sword in mouth. Human ears, no animal features. Large enough face to read masculine structure despite chibi proportions.
+
+Four coherent costume versions:
+ROW 1: approachable frontline adventurer: open cropped ivory jacket, fitted charcoal sleeveless undershirt, muted teal waist sash, dark utility trousers, sturdy brown boots, forearm wraps, one practical steel sword.
+ROW 2: agile urban swordsman: short slate-blue sleeveless tactical jacket, off-white fitted inner shirt, orange small trim accents, black tapered cargo trousers, reinforced boots, fingerless gloves, one straight sword.
+ROW 3: lightly armored vanguard: dark fitted sleeveless top, asymmetrical light steel shoulder armor, warm tan utility belts, deep olive trousers, armored forearm guard, short ivory cloth waist panel, one broad steel sword.
+ROW 4: sunny expedition captain: cropped cream-and-muted-red field jacket with rolled sleeves exposing muscular forearms, dark navy inner shirt, leather cross-body strap and belt, charcoal trousers, robust boots, one elegant single-edged sword.
+Avoid bulky helmets, face coverings, oversized cloaks, dark villain styling.
+
+Every cell shows the entire head-to-boot body and entire sword, identical body scale, feet on the same relative baseline, centered within its own cell, no cropping, no overlap or crossing cell edges. Attacks are compact readable strong poses; no slash arcs, magic, particles, detached effects or background objects. Flat perfectly uniform solid #FF00FF magenta background for later chroma key. No floor, no cast shadow, no grid lines, no borders, no text, no labels, no watermark. Prioritize exact 4x4 structure, correct left-facing front/back views, same identity and consistent style.
