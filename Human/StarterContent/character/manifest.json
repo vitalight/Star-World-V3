@@ -1,0 +1,2774 @@
+{
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-01.png",
+      "key": "hero-atlas-01",
+      "kind": "hero",
+      "name": null,
+      "rows": [
+        "大星",
+        "小黄",
+        "阿五",
+        "胡胡"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-7ae4f81b-8f87-45ed-a1c2-43e57b872db9.png",
+      "source_sha256": "bec107766d6155e8211f6454b0baeac196ba3d17edd3ea8f12cbbdcc556bb0b7",
+      "sha256": "578354f95b16280384e1f10d1132fe766ae3edb1e4c5edb4bbea186fc3ff56e5",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            338
+          ],
+          "trim": [
+            6,
+            57,
+            312,
+            336
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            609,
+            338
+          ],
+          "trim": [
+            58,
+            46,
+            296,
+            336
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            609,
+            0,
+            950,
+            338
+          ],
+          "trim": [
+            2,
+            57,
+            340,
+            335
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            950,
+            0,
+            1254,
+            338
+          ],
+          "trim": [
+            18,
+            66,
+            297,
+            335
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            338,
+            313,
+            645
+          ],
+          "trim": [
+            32,
+            70,
+            302,
+            295
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            338,
+            627,
+            645
+          ],
+          "trim": [
+            60,
+            70,
+            305,
+            294
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            338,
+            940,
+            645
+          ],
+          "trim": [
+            14,
+            87,
+            290,
+            306
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            940,
+            338,
+            1254,
+            645
+          ],
+          "trim": [
+            40,
+            58,
+            299,
+            291
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            645,
+            313,
+            949
+          ],
+          "trim": [
+            4,
+            20,
+            309,
+            303
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            313,
+            645,
+            627,
+            949
+          ],
+          "trim": [
+            8,
+            16,
+            308,
+            298
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            645,
+            974,
+            949
+          ],
+          "trim": [
+            3,
+            27,
+            347,
+            290
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            974,
+            645,
+            1254,
+            949
+          ],
+          "trim": [
+            0,
+            21,
+            280,
+            289
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            949,
+            313,
+            1254
+          ],
+          "trim": [
+            2,
+            0,
+            311,
+            292
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            313,
+            949,
+            623,
+            1254
+          ],
+          "trim": [
+            0,
+            2,
+            310,
+            288
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            623,
+            949,
+            955,
+            1254
+          ],
+          "trim": [
+            0,
+            36,
+            332,
+            284
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            955,
+            949,
+            1254,
+            1254
+          ],
+          "trim": [
+            0,
+            6,
+            299,
+            291
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-02.png",
+      "key": "hero-atlas-02",
+      "kind": "hero",
+      "name": null,
+      "rows": [
+        "月月",
+        "Tiger",
+        "Sugar",
+        "前哥"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-a66628ad-0f69-40ea-92bf-6c60476d122f.png",
+      "source_sha256": "075b206fc3dc1ba3202aa3e3569574418aec9a25844fd6df1eb4d893e05fb5d2",
+      "sha256": "5200105b7e236df0c4c909882b0644a4c5731d855df2271458ca281e5e474e8a",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            340
+          ],
+          "trim": [
+            44,
+            43,
+            302,
+            337
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            627,
+            340
+          ],
+          "trim": [
+            62,
+            46,
+            272,
+            337
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            627,
+            0,
+            940,
+            340
+          ],
+          "trim": [
+            50,
+            49,
+            308,
+            338
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            940,
+            0,
+            1254,
+            340
+          ],
+          "trim": [
+            69,
+            60,
+            307,
+            336
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            340,
+            313,
+            636
+          ],
+          "trim": [
+            20,
+            13,
+            308,
+            295
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            340,
+            627,
+            636
+          ],
+          "trim": [
+            19,
+            18,
+            300,
+            294
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            340,
+            960,
+            636
+          ],
+          "trim": [
+            35,
+            29,
+            332,
+            295
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            960,
+            340,
+            1254,
+            636
+          ],
+          "trim": [
+            41,
+            30,
+            289,
+            293
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            636,
+            325,
+            934
+          ],
+          "trim": [
+            1,
+            10,
+            325,
+            297
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            325,
+            636,
+            622,
+            934
+          ],
+          "trim": [
+            0,
+            7,
+            297,
+            293
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            622,
+            636,
+            956,
+            934
+          ],
+          "trim": [
+            0,
+            26,
+            334,
+            297
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            956,
+            636,
+            1254,
+            934
+          ],
+          "trim": [
+            0,
+            27,
+            297,
+            295
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            934,
+            338,
+            1254
+          ],
+          "trim": [
+            1,
+            0,
+            337,
+            305
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            338,
+            934,
+            627,
+            1254
+          ],
+          "trim": [
+            12,
+            4,
+            279,
+            300
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            627,
+            934,
+            970,
+            1254
+          ],
+          "trim": [
+            19,
+            4,
+            342,
+            301
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            970,
+            934,
+            1254,
+            1254
+          ],
+          "trim": [
+            28,
+            8,
+            284,
+            300
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-03.png",
+      "key": "hero-atlas-03",
+      "kind": "hero",
+      "name": null,
+      "rows": [
+        "冰冰",
+        "浮白",
+        "EE"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-7430a8fb-5df7-406d-94e3-5c3f869ac317.png",
+      "source_sha256": "cd0808d1090e7baa1a45ed25a87e941022108f1663abedfb7ffe961215984a8a",
+      "sha256": "af7a3cd415463a1450153cfe749bb18e0b656713dde2b90a7958328451f8d15e",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            350
+          ],
+          "trim": [
+            32,
+            43,
+            303,
+            349
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            625,
+            350
+          ],
+          "trim": [
+            22,
+            40,
+            292,
+            347
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            625,
+            0,
+            940,
+            350
+          ],
+          "trim": [
+            2,
+            48,
+            311,
+            348
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            940,
+            0,
+            1254,
+            350
+          ],
+          "trim": [
+            28,
+            56,
+            309,
+            347
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            350,
+            313,
+            678
+          ],
+          "trim": [
+            25,
+            27,
+            309,
+            326
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            350,
+            619,
+            678
+          ],
+          "trim": [
+            14,
+            31,
+            306,
+            325
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            619,
+            350,
+            953,
+            678
+          ],
+          "trim": [
+            1,
+            35,
+            333,
+            326
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            953,
+            350,
+            1254,
+            678
+          ],
+          "trim": [
+            2,
+            31,
+            296,
+            326
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            678,
+            313,
+            981
+          ],
+          "trim": [
+            41,
+            20,
+            309,
+            302
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            313,
+            678,
+            627,
+            981
+          ],
+          "trim": [
+            31,
+            18,
+            304,
+            302
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            678,
+            961,
+            981
+          ],
+          "trim": [
+            13,
+            20,
+            333,
+            302
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            961,
+            678,
+            1254,
+            981
+          ],
+          "trim": [
+            19,
+            21,
+            289,
+            302
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": true
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/enemy-atlas-01.png",
+      "key": "enemy-atlas-01",
+      "kind": "enemy",
+      "name": null,
+      "rows": [
+        "异常碎影",
+        "裂隙疾犬",
+        "节点投射者",
+        "裂甲卫士"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-c29b1fa1-e7a4-4803-9907-b3ee10ef22b6.png",
+      "source_sha256": "ae051ac986a0ecbabbb7a770241794ee7e1f4ec0f775224c1df231663e0c7bc2",
+      "sha256": "a711e1d5e6f2ef8e36b0064f458dd8ef6b40f16a5a5408ae7c53623ac7639620",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            313
+          ],
+          "trim": [
+            49,
+            47,
+            287,
+            297
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            624,
+            313
+          ],
+          "trim": [
+            53,
+            40,
+            265,
+            299
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            624,
+            0,
+            940,
+            313
+          ],
+          "trim": [
+            2,
+            56,
+            298,
+            290
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            940,
+            0,
+            1254,
+            313
+          ],
+          "trim": [
+            33,
+            46,
+            279,
+            298
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            313,
+            319,
+            604
+          ],
+          "trim": [
+            46,
+            16,
+            318,
+            271
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            319,
+            313,
+            627,
+            604
+          ],
+          "trim": [
+            47,
+            16,
+            285,
+            268
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            313,
+            941,
+            604
+          ],
+          "trim": [
+            15,
+            18,
+            313,
+            263
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            941,
+            313,
+            1254,
+            604
+          ],
+          "trim": [
+            31,
+            18,
+            288,
+            273
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            604,
+            315,
+            918
+          ],
+          "trim": [
+            55,
+            6,
+            314,
+            314
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            315,
+            604,
+            613,
+            918
+          ],
+          "trim": [
+            27,
+            6,
+            293,
+            314
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            613,
+            604,
+            940,
+            918
+          ],
+          "trim": [
+            2,
+            24,
+            319,
+            314
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            940,
+            604,
+            1254,
+            918
+          ],
+          "trim": [
+            41,
+            3,
+            287,
+            305
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            918,
+            326,
+            1254
+          ],
+          "trim": [
+            21,
+            0,
+            325,
+            298
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            326,
+            918,
+            622,
+            1254
+          ],
+          "trim": [
+            10,
+            0,
+            282,
+            292
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            622,
+            918,
+            940,
+            1254
+          ],
+          "trim": [
+            2,
+            0,
+            311,
+            299
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            940,
+            918,
+            1254,
+            1254
+          ],
+          "trim": [
+            24,
+            0,
+            302,
+            297
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/enemy-atlas-02.png",
+      "key": "enemy-atlas-02",
+      "kind": "enemy",
+      "name": null,
+      "rows": [
+        "潮蚀蟹群",
+        "潜潮猎手",
+        "风暴引潮者",
+        "深渊缚核者"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-73aee9c7-67e9-4a41-8dc0-06a8df52e463.png",
+      "source_sha256": "0bfb5b39522f70b3de62a473543418819d25f6ea5609520c10ebaaecea8e0d1a",
+      "sha256": "bd20be9257fcb7b4b61f43c249ceeced1dec5c1be2e6e708b18faa6911a318d5",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            322
+          ],
+          "trim": [
+            35,
+            81,
+            304,
+            321
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            627,
+            322
+          ],
+          "trim": [
+            40,
+            86,
+            290,
+            319
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            627,
+            0,
+            940,
+            322
+          ],
+          "trim": [
+            19,
+            96,
+            297,
+            317
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            940,
+            0,
+            1254,
+            322
+          ],
+          "trim": [
+            21,
+            77,
+            286,
+            320
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            322,
+            334,
+            627
+          ],
+          "trim": [
+            35,
+            50,
+            333,
+            288
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            334,
+            322,
+            627,
+            627
+          ],
+          "trim": [
+            7,
+            34,
+            287,
+            293
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            322,
+            942,
+            627
+          ],
+          "trim": [
+            14,
+            47,
+            314,
+            285
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            942,
+            322,
+            1254,
+            627
+          ],
+          "trim": [
+            13,
+            24,
+            296,
+            285
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            627,
+            318,
+            916
+          ],
+          "trim": [
+            26,
+            2,
+            317,
+            280
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            318,
+            627,
+            622,
+            916
+          ],
+          "trim": [
+            13,
+            3,
+            299,
+            280
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            622,
+            627,
+            941,
+            916
+          ],
+          "trim": [
+            2,
+            7,
+            318,
+            284
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            941,
+            627,
+            1254,
+            916
+          ],
+          "trim": [
+            13,
+            7,
+            292,
+            288
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            916,
+            318,
+            1254
+          ],
+          "trim": [
+            22,
+            1,
+            317,
+            301
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            318,
+            916,
+            622,
+            1254
+          ],
+          "trim": [
+            12,
+            4,
+            304,
+            303
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            622,
+            916,
+            945,
+            1254
+          ],
+          "trim": [
+            0,
+            20,
+            322,
+            300
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            945,
+            916,
+            1254,
+            1254
+          ],
+          "trim": [
+            9,
+            14,
+            290,
+            301
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/enemy-atlas-03.png",
+      "key": "enemy-atlas-03",
+      "kind": "enemy",
+      "name": null,
+      "rows": [
+        "岩脊重兽",
+        "霜核祭司",
+        "流沙疾蝎",
+        "遗迹重装守卫"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-d3a703fa-f1d3-49dc-94b8-d0eb2a40b212.png",
+      "source_sha256": "58cf0f2f2650a452354165f516b4ceb80b402822e22c55b54c5b3efae056eb89",
+      "sha256": "75745b6652e80da5d4739cdbadae02d85a148d7854204a8e28e2839b36721fd2",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            330,
+            313
+          ],
+          "trim": [
+            27,
+            62,
+            329,
+            302
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            330,
+            0,
+            623,
+            313
+          ],
+          "trim": [
+            18,
+            47,
+            285,
+            289
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            623,
+            0,
+            950,
+            313
+          ],
+          "trim": [
+            2,
+            74,
+            326,
+            308
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            950,
+            0,
+            1254,
+            313
+          ],
+          "trim": [
+            23,
+            69,
+            295,
+            298
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            313,
+            329,
+            626
+          ],
+          "trim": [
+            36,
+            16,
+            328,
+            309
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            329,
+            313,
+            623,
+            626
+          ],
+          "trim": [
+            54,
+            16,
+            291,
+            312
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            623,
+            313,
+            940,
+            626
+          ],
+          "trim": [
+            2,
+            23,
+            314,
+            308
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            940,
+            313,
+            1254,
+            626
+          ],
+          "trim": [
+            17,
+            25,
+            309,
+            310
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            626,
+            320,
+            899
+          ],
+          "trim": [
+            33,
+            6,
+            319,
+            252
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            320,
+            626,
+            627,
+            899
+          ],
+          "trim": [
+            29,
+            8,
+            292,
+            255
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            626,
+            955,
+            899
+          ],
+          "trim": [
+            20,
+            3,
+            327,
+            257
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            955,
+            626,
+            1254,
+            899
+          ],
+          "trim": [
+            25,
+            1,
+            285,
+            256
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            899,
+            315,
+            1254
+          ],
+          "trim": [
+            12,
+            3,
+            314,
+            305
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            315,
+            899,
+            623,
+            1254
+          ],
+          "trim": [
+            35,
+            8,
+            298,
+            309
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            623,
+            899,
+            954,
+            1254
+          ],
+          "trim": [
+            2,
+            20,
+            330,
+            305
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            954,
+            899,
+            1254,
+            1254
+          ],
+          "trim": [
+            16,
+            2,
+            288,
+            315
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/enemy-atlas-04.png",
+      "key": "enemy-atlas-04",
+      "kind": "enemy",
+      "name": null,
+      "rows": [
+        "蚀核禁卫",
+        "裂隙织路者",
+        "异常唤群者",
+        "蚀核主宰"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-2f9a5ddb-331f-4209-bac6-d5d7b09ed42b.png",
+      "source_sha256": "241e2c393940c1191fe4837ff50f6083631da4cecb4d587e52cdc2fadd20a19a",
+      "sha256": "b800d80129ceb8f238436ce66226f6c4a318f5ba44bb0723864f9f52786ae9ff",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            329,
+            320
+          ],
+          "trim": [
+            13,
+            47,
+            328,
+            318
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            329,
+            0,
+            609,
+            320
+          ],
+          "trim": [
+            16,
+            48,
+            280,
+            318
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            609,
+            0,
+            943,
+            320
+          ],
+          "trim": [
+            0,
+            67,
+            333,
+            319
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            943,
+            0,
+            1254,
+            320
+          ],
+          "trim": [
+            32,
+            40,
+            299,
+            314
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            320,
+            333,
+            628
+          ],
+          "trim": [
+            23,
+            10,
+            332,
+            300
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            333,
+            320,
+            607,
+            628
+          ],
+          "trim": [
+            43,
+            4,
+            261,
+            307
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            607,
+            320,
+            963,
+            628
+          ],
+          "trim": [
+            2,
+            11,
+            356,
+            307
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            963,
+            320,
+            1254,
+            628
+          ],
+          "trim": [
+            0,
+            12,
+            288,
+            306
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            628,
+            318,
+            906
+          ],
+          "trim": [
+            34,
+            5,
+            317,
+            278
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            318,
+            628,
+            623,
+            906
+          ],
+          "trim": [
+            29,
+            5,
+            296,
+            278
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            623,
+            628,
+            956,
+            906
+          ],
+          "trim": [
+            2,
+            17,
+            332,
+            278
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            956,
+            628,
+            1254,
+            906
+          ],
+          "trim": [
+            15,
+            15,
+            275,
+            278
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            906,
+            339,
+            1254
+          ],
+          "trim": [
+            14,
+            0,
+            338,
+            325
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            339,
+            906,
+            639,
+            1254
+          ],
+          "trim": [
+            4,
+            0,
+            300,
+            325
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            639,
+            906,
+            951,
+            1254
+          ],
+          "trim": [
+            0,
+            11,
+            312,
+            321
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            951,
+            906,
+            1254,
+            1254
+          ],
+          "trim": [
+            0,
+            0,
+            297,
+            326
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-03-v2.png",
+      "key": "hero-atlas-03-v2",
+      "kind": "hero",
+      "rows": [
+        "冰冰",
+        "浮白",
+        "EE",
+        "？？"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-3f82f67f-49c1-4f86-beb9-c64b87acc6a3.png",
+      "source_sha256": "ee251c28889ef743539e3eadac29c91aee925c6d545c8e1d975a2e6d7ce3cb14",
+      "sha256": "58723b67800176f111ac5de5ca08b689c41dfa8df9b9d7ed807183c2e2edde6f",
+      "columns": [
+        "idle_front_left",
+        "idle_back_left",
+        "attack_front_left",
+        "attack_back_left"
+      ],
+      "reference_image": "D:/_Zyen/2_Codes/StarWorldV3/Human/StarterContent/character/game-content-20261026/hero-atlas-03.png",
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            322
+          ],
+          "trim": [
+            32,
+            22,
+            301,
+            319
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            627,
+            322
+          ],
+          "trim": [
+            26,
+            18,
+            298,
+            320
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            627,
+            0,
+            946,
+            322
+          ],
+          "trim": [
+            6,
+            25,
+            318,
+            320
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            946,
+            0,
+            1254,
+            322
+          ],
+          "trim": [
+            17,
+            28,
+            290,
+            320
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            322,
+            313,
+            633
+          ],
+          "trim": [
+            24,
+            19,
+            302,
+            310
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            322,
+            623,
+            633
+          ],
+          "trim": [
+            27,
+            20,
+            301,
+            309
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            623,
+            322,
+            955,
+            633
+          ],
+          "trim": [
+            2,
+            22,
+            332,
+            310
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            955,
+            322,
+            1254,
+            633
+          ],
+          "trim": [
+            1,
+            23,
+            288,
+            310
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            633,
+            313,
+            940
+          ],
+          "trim": [
+            36,
+            11,
+            310,
+            302
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            313,
+            633,
+            627,
+            940
+          ],
+          "trim": [
+            30,
+            10,
+            298,
+            303
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            633,
+            942,
+            940
+          ],
+          "trim": [
+            10,
+            10,
+            314,
+            303
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            942,
+            633,
+            1254,
+            940
+          ],
+          "trim": [
+            24,
+            11,
+            298,
+            303
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            940,
+            313,
+            1254
+          ],
+          "trim": [
+            30,
+            4,
+            311,
+            293
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            313,
+            940,
+            627,
+            1254
+          ],
+          "trim": [
+            36,
+            2,
+            302,
+            291
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            627,
+            940,
+            941,
+            1254
+          ],
+          "trim": [
+            9,
+            5,
+            313,
+            293
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            941,
+            940,
+            1254,
+            1254
+          ],
+          "trim": [
+            27,
+            4,
+            301,
+            291
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-01-v2.png",
+      "key": "hero-atlas-01-v2",
+      "kind": "hero",
+      "rows": [
+        "大星",
+        "小黄",
+        "阿五",
+        "胡胡"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-0b6e88c0-3ad2-46f3-a541-bbe95db6b6d4.png",
+      "source_sha256": "f4dbad730de63a3658be01063c0e5a8bf3de29cea61ef7e46b5fbab45126f059",
+      "sha256": "e7907c5d20549c5621f8cc579bfa343ff653a554f861431215223adc9e5a84e3",
+      "reference_images": [
+        "D:/_Zyen/2_Codes/StarWorldV3/Human/StarterContent/character/game-content-20261026/hero-atlas-03-v2.png",
+        "D:/_Zyen/2_Codes/StarWorldV3/Human/StarterContent/character/game-content-20261026/hero-atlas-01.png"
+      ],
+      "columns": [
+        "idle_front_left",
+        "idle_back_left",
+        "attack_front_left",
+        "attack_back_left"
+      ],
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            325
+          ],
+          "trim": [
+            21,
+            44,
+            310,
+            322
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            627,
+            325
+          ],
+          "trim": [
+            72,
+            44,
+            303,
+            322
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            627,
+            0,
+            941,
+            325
+          ],
+          "trim": [
+            51,
+            49,
+            312,
+            323
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            941,
+            0,
+            1254,
+            325
+          ],
+          "trim": [
+            40,
+            50,
+            295,
+            323
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            325,
+            313,
+            627
+          ],
+          "trim": [
+            27,
+            57,
+            298,
+            291
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            325,
+            627,
+            627
+          ],
+          "trim": [
+            58,
+            67,
+            298,
+            291
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            325,
+            940,
+            627
+          ],
+          "trim": [
+            38,
+            65,
+            310,
+            296
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            940,
+            325,
+            1254,
+            627
+          ],
+          "trim": [
+            50,
+            75,
+            292,
+            298
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            627,
+            313,
+            940
+          ],
+          "trim": [
+            48,
+            22,
+            297,
+            311
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            313,
+            627,
+            627,
+            940
+          ],
+          "trim": [
+            41,
+            25,
+            299,
+            310
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            627,
+            944,
+            940
+          ],
+          "trim": [
+            38,
+            40,
+            316,
+            310
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            944,
+            627,
+            1254,
+            940
+          ],
+          "trim": [
+            47,
+            38,
+            293,
+            310
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            940,
+            313,
+            1254
+          ],
+          "trim": [
+            35,
+            11,
+            306,
+            301
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            313,
+            940,
+            627,
+            1254
+          ],
+          "trim": [
+            41,
+            17,
+            304,
+            299
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            627,
+            940,
+            949,
+            1254
+          ],
+          "trim": [
+            31,
+            30,
+            321,
+            300
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            949,
+            940,
+            1254,
+            1254
+          ],
+          "trim": [
+            22,
+            24,
+            283,
+            300
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    },
+    {
+      "file": "Human/StarterContent/character/game-content-20261026/hero-atlas-02-v2.png",
+      "key": "hero-atlas-02-v2",
+      "kind": "hero",
+      "rows": [
+        "月月",
+        "Tiger",
+        "Sugar",
+        "前哥"
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "source_file": "C:\\Users\\vital\\.codex\\generated_images\\01a175c7-36fa-7102-8b3b-8e6b583d9d47\\exec-29a979ab-d741-4f89-a840-af1efddb7a59.png",
+      "source_sha256": "8564288ce668cc06d0d63055917b4c42c27d7569391c73203defdbb5b6e62200",
+      "sha256": "fc13a1cac5da8c336cc10c210e0a115f16b89c926b82822dd2f231825910bbc8",
+      "reference_images": [
+        "D:/_Zyen/2_Codes/StarWorldV3/Human/StarterContent/character/game-content-20261026/hero-atlas-03-v2.png",
+        "D:/_Zyen/2_Codes/StarWorldV3/Human/StarterContent/character/game-content-20261026/hero-atlas-02.png"
+      ],
+      "columns": [
+        "idle_front_left",
+        "idle_back_left",
+        "attack_front_left",
+        "attack_back_left"
+      ],
+      "source_crops": [
+        {
+          "row": 1,
+          "column": 1,
+          "source_region": [
+            0,
+            0,
+            313,
+            319
+          ],
+          "trim": [
+            49,
+            30,
+            282,
+            318
+          ]
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "source_region": [
+            313,
+            0,
+            627,
+            319
+          ],
+          "trim": [
+            62,
+            30,
+            272,
+            316
+          ]
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "source_region": [
+            627,
+            0,
+            940,
+            319
+          ],
+          "trim": [
+            43,
+            30,
+            271,
+            315
+          ]
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "source_region": [
+            940,
+            0,
+            1254,
+            319
+          ],
+          "trim": [
+            46,
+            33,
+            282,
+            317
+          ]
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "source_region": [
+            0,
+            319,
+            313,
+            627
+          ],
+          "trim": [
+            39,
+            28,
+            306,
+            307
+          ]
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "source_region": [
+            313,
+            319,
+            627,
+            627
+          ],
+          "trim": [
+            39,
+            30,
+            296,
+            307
+          ]
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "source_region": [
+            627,
+            319,
+            940,
+            627
+          ],
+          "trim": [
+            31,
+            33,
+            303,
+            307
+          ]
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "source_region": [
+            940,
+            319,
+            1254,
+            627
+          ],
+          "trim": [
+            47,
+            38,
+            292,
+            307
+          ]
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "source_region": [
+            0,
+            627,
+            313,
+            937
+          ],
+          "trim": [
+            33,
+            18,
+            301,
+            294
+          ]
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "source_region": [
+            313,
+            627,
+            627,
+            937
+          ],
+          "trim": [
+            35,
+            19,
+            295,
+            293
+          ]
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "source_region": [
+            627,
+            627,
+            940,
+            937
+          ],
+          "trim": [
+            32,
+            23,
+            303,
+            294
+          ]
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "source_region": [
+            940,
+            627,
+            1254,
+            937
+          ],
+          "trim": [
+            48,
+            24,
+            296,
+            294
+          ]
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "source_region": [
+            0,
+            937,
+            313,
+            1254
+          ],
+          "trim": [
+            18,
+            2,
+            312,
+            289
+          ]
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "source_region": [
+            313,
+            937,
+            627,
+            1254
+          ],
+          "trim": [
+            41,
+            6,
+            294,
+            290
+          ]
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "source_region": [
+            627,
+            937,
+            946,
+            1254
+          ],
+          "trim": [
+            24,
+            14,
+            318,
+            290
+          ]
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "source_region": [
+            946,
+            937,
+            1254,
+            1254
+          ],
+          "trim": [
+            53,
+            15,
+            289,
+            290
+          ]
+        }
+      ],
+      "transparent_gutter_min_px": 20,
+      "gutter_violations": 0,
+      "blank_last_row": false
+    }
+  ]
+}
