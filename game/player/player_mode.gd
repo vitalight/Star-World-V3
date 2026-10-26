@@ -8,8 +8,12 @@ const Catalog = preload("res://game/content/content_catalog.gd")
 const Progress = preload("res://game/player/campaign_progress.gd")
 const Session = preload("res://features/story/story_session.gd")
 const StoryView = preload("res://features/story/story_view.gd")
+const AudioDirector = preload("res://features/audio/audio_director.gd")
+const AudioSettings = preload("res://features/audio/audio_settings.gd")
+const Cues = preload("res://content/audio/cues.tres")
 const DESIGN_SIZE := Vector2(1672, 941)
 @export var save_path := "user://player_progress.cfg"
+@export var audio_settings_path := "user://audio_settings.cfg"
 var page := ""
 var menu: Control
 var canvas: Control
@@ -19,6 +23,8 @@ var completed := false
 var save_notice := ""
 var catalog = Catalog.new()
 var progress = Progress.new()
+var audio: Node
+var audio_settings
 var session = Session.new()
 var story_view: Control
 var story_kind := ""
@@ -32,8 +38,23 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	catalog.reload()
 	_load_progress()
+	_setup_audio()
 	resized.connect(_fit_menu)
 	show_main()
+
+func _setup_audio() -> void:
+	audio_settings = AudioSettings.new()
+	audio_settings.load_settings(audio_settings_path)
+	audio = AudioDirector.new()
+	audio.set_library(Cues)
+	audio.apply_settings(audio_settings)
+	add_child(audio)
+
+func _play_music(id: String) -> void:
+	if audio: audio.play_music(id)
+
+func _play_ui(id: String) -> void:
+	if audio: audio.play_sfx(id)
 
 func _load_progress() -> void:
 	progress.load_progress(save_path, catalog.levels.keys())
@@ -96,16 +117,52 @@ func _fit_menu() -> void:
 
 func show_main() -> void:
 	_menu_page("main", 0.0)
+	_play_music("music_main")
 	_image(canvas, Rect2(74, 50, 170, 230), _region(Rect2(675, 685, 215, 235)))
 	_button(canvas, "开始游戏", Rect2(85, 307, 450, 78), resume_game, true)
 	var resume := _button(canvas, "读取存档", Rect2(85, 420, 450, 78), resume_game)
 	resume.disabled = not has_progress
 	_button(canvas, "退出游戏", Rect2(85, 533, 450, 78), func(): get_tree().quit())
+	_button(canvas, "设置", Rect2(1370, 50, 220, 70), show_settings)
 	_image(canvas, Rect2(57, 659, 350, 35), _region(Rect2(35, 780, 275, 40)))
 	if not has_progress: _text(canvas, "暂无存档", Rect2(90, 621, 430, 30), 19, Color("8fa8b7"))
 
+func show_settings() -> void:
+	_menu_page("settings", 0.67)
+	_play_music("music_main")
+	_button(canvas, "‹", Rect2(30, 28, 90, 62), show_main)
+	_text(canvas, "设置", Rect2(145, 27, 820, 75), 42)
+	_line(Vector2(50, 187), Vector2(1520, 187))
+	_slider_row("背景音乐", 300, audio_settings.music_volume, _set_music_volume)
+	_slider_row("音效", 430, audio_settings.sfx_volume, _set_sfx_volume)
+	_button(canvas, "返回", Rect2(85, 640, 450, 78), show_main)
+
+func _slider_row(label: String, y: float, value: float, setter: Callable) -> void:
+	_text(canvas, label, Rect2(100, y, 300, 46), 28)
+	var slider := HSlider.new()
+	slider.min_value = 0.0; slider.max_value = 1.0; slider.step = 0.01
+	slider.value = value
+	slider.position = Vector2(400, y + 8); slider.size = Vector2(600, 32)
+	slider.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	canvas.add_child(slider)
+	var readout := _text(canvas, "%d%%" % roundi(value * 100.0), Rect2(1030, y, 120, 46), 26, Color("b9d9e4"))
+	slider.value_changed.connect(func(changed: float):
+		setter.call(changed)
+		readout.text = "%d%%" % roundi(changed * 100.0))
+
+func _set_music_volume(value: float) -> void:
+	audio_settings.music_volume = value
+	audio.apply_settings(audio_settings)
+	audio_settings.save(audio_settings_path)
+
+func _set_sfx_volume(value: float) -> void:
+	audio_settings.sfx_volume = value
+	audio.apply_settings(audio_settings)
+	audio_settings.save(audio_settings_path)
+
 func show_levels() -> void:
 	_menu_page("levels", 0.67)
+	_play_music("music_main")
 	_button(canvas, "‹", Rect2(30, 28, 90, 62), show_main)
 	_text(canvas, "第一章 · 上海", Rect2(145, 27, 820, 75), 42)
 	_text(canvas, "寻找失踪的小黄", Rect2(50, 128, 900, 48), 28, Color("b9d9e4"))
@@ -170,6 +227,7 @@ func show_story(id: String, kind: String) -> void:
 	if not catalog.diagnostics(id).is_empty(): show_levels(); return
 	_clear_page()
 	page = "story"
+	_play_music("music_main")
 	story_level = id; story_kind = kind
 	menu = Control.new()
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -180,6 +238,7 @@ func show_story(id: String, kind: String) -> void:
 	menu.add_child(story_view)
 	story_view.advance_requested.connect(advance_story)
 	story_view.choice_requested.connect(func(_index: int): pass)
+	story_view.ui_sound_requested.connect(_play_ui)
 	var story = catalog.story(catalog.levels[id][kind])
 	var issues: PackedStringArray = session.load_story(story)
 	if not issues.is_empty():
@@ -193,6 +252,7 @@ func show_story(id: String, kind: String) -> void:
 		var button := Button.new(); button.text = entry[0]
 		button.custom_minimum_size = Vector2(120, 44)
 		button.add_theme_font_size_override("font_size", 20)
+		button.pressed.connect(func(): _play_ui("sfx_ui_click"))
 		button.pressed.connect(entry[1]); toolbar.add_child(button)
 
 func advance_story() -> void:
@@ -236,8 +296,10 @@ func start_battle() -> void:
 	_save_progress()
 	_clear_page()
 	page = "battle"
+	_play_music("music_battle")
 	result_recorded = false
 	battle_scene = BattleScene.instantiate()
+	battle_scene.audio = audio
 	battle_scene.campaign_level = progress.selected
 	battle_scene.operator_ids.assign(progress.available_operators())
 	battle_scene.exit_requested.connect(func(): show_levels.call_deferred())
@@ -286,7 +348,7 @@ func _observe_battle(state: Dictionary, _events: Array) -> void:
 	if tutorial and state.phase in ["victory", "defeat"]: tutorial.hide()
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and page == "levels":
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and page in ["levels", "settings"]:
 		show_main()
 		get_viewport().set_input_as_handled()
 	elif page == "story" and event.is_action_pressed("ui_accept") and not event.is_echo():
@@ -336,6 +398,7 @@ func _button(parent: Node, value: String, rect: Rect2, action: Callable, primary
 	focus.set_border_width_all(2)
 	button.add_theme_stylebox_override("focus", focus)
 	button.add_theme_color_override("font_disabled_color", Color("65747d"))
+	button.pressed.connect(func(): _play_ui("sfx_ui_click"))
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button

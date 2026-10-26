@@ -21,6 +21,6 @@
 
 验证：`& $env:GODOT_PATH --headless --path . --script res://features/story/tests/story_test.gd`
 
-`story_view.gd` 是独立 Control，不创建会话。调用方用 `configure(backgrounds, actors)` 传入 ID → Texture2D 映射，再调用 `show_snapshot(snapshot)`。它按比例铺满背景、显示单人居中/双人左右的透明角色、降低非说话角色亮度，并绘制底部黑色渐变、说话人、可滚动对白和选择按钮。`advance_requested` / `choice_requested(index)` 只表达输入意图，由调用方决定能否推进。贴图不会拉伸，不读取任何固定 content 路径。
+`story_view.gd` 是独立 Control，不创建会话。调用方用 `configure(backgrounds, actors)` 传入 ID → Texture2D 映射，再调用 `show_snapshot(snapshot)`。它按比例铺满背景、显示单人居中/双人左右的透明角色、降低非说话角色亮度，并绘制底部黑色渐变、说话人、可滚动对白和选择按钮。`advance_requested` / `choice_requested(index)` 只表达输入意图，由调用方决定能否推进。`ui_sound_requested(id)` 在按钮按下和点击推进时发出，由调用方决定是否播放，视图自身不持有音频节点。贴图不会拉伸，不读取任何固定 content 路径。
 
-暂不支持条件分支、变量、存档、脚本事件、打字机、音频或转场动画。自动播放、跳过和记录弹层属于 Story Test 控制，不是会话隐含行为。
+暂不支持条件分支、变量、存档、脚本事件、打字机或转场动画。音频播放由调用方接入，模块只发出 UI 音效意图。自动播放、跳过和记录弹层属于 Story Test 控制，不是会话隐含行为。

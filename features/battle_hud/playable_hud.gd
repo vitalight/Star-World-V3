@@ -10,6 +10,7 @@ signal skill_requested
 signal menu_requested
 signal debug_victory_requested
 signal continue_requested
+signal ui_sound_requested(id: String)
 var developer_tools_enabled := false
 var dragged_roster := ""
 var pressed_roster := ""
@@ -134,7 +135,9 @@ func _ready() -> void:
 		card.accessibility_name = roster[key].name
 		card.add_theme_stylebox_override("normal", _panel())
 		card.pressed.connect(func():
-			if not suppress_card_click: roster_selected.emit(key))
+			if suppress_card_click: return
+			ui_sound_requested.emit("sfx_ui_click")
+			roster_selected.emit(key))
 		card.gui_input.connect(func(event): _card_input(key, event))
 		bottom.add_child(card)
 		var portrait := TextureRect.new()
@@ -386,7 +389,10 @@ func _label(parent: Node, value: String, font_size: int) -> Label:
 	return label
 
 func _button(parent: Node, value: String, callback: Callable) -> Button:
-	var button := action(value, Rect2(), callback, parent)
+	var clicked := func():
+		ui_sound_requested.emit("sfx_ui_click")
+		callback.call()
+	var button := action(value, Rect2(), clicked, parent)
 	button.custom_minimum_size = Vector2(62, 42)
 	button.add_theme_font_size_override("font_size", 19)
 	return button

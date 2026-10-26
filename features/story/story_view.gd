@@ -2,6 +2,7 @@ extends Control
 ## Presentation only. The caller supplies textures and a story-session snapshot.
 signal advance_requested
 signal choice_requested(index: int)
+signal ui_sound_requested(id: String)
 const INK = Color("f4f1eb")
 const ACCENT = Color("dfc49b")
 var background: TextureRect
@@ -137,6 +138,7 @@ func _button(text: String, parent: Node) -> Button:
 	hover.border_color = ACCENT
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("pressed", hover)
+	button.pressed.connect(func(): ui_sound_requested.emit("sfx_ui_click"))
 	parent.add_child(button)
 	return button
 
@@ -171,5 +173,6 @@ func _layout() -> void:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		ui_sound_requested.emit("sfx_ui_click")
 		advance_requested.emit()
 		accept_event()

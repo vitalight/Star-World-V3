@@ -5,6 +5,7 @@ signal continue_requested
 const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
 const Battle = preload("res://features/battle/battle.gd")
 const Presentation = preload("res://game/adapters/battle_presentation.gd")
+const BattleAudio = preload("res://game/adapters/battle_audio.gd")
 const Hud = preload("res://features/battle_hud/playable_hud.gd")
 const Field = preload("res://features/battlefield_view/editable_field.gd")
 const Catalog = preload("res://game/content/content_catalog.gd")
@@ -18,6 +19,8 @@ var field: Node3D
 var camera: Camera3D
 var hud: Control
 var presentation: RefCounted
+var audio: Node
+var battle_audio: RefCounted
 var world: Node3D
 var markers: Node3D
 var overlays: Node3D
@@ -51,7 +54,7 @@ func reload_level() -> void:
 	if world: world.free()
 	if map_data: map_data.free()
 	if hud: hud.get_parent().free()
-	presentation = null; battle = null; hud = null
+	presentation = null; battle = null; hud = null; battle_audio = BattleAudio.new(audio) if audio else null
 	field = null; markers = null; overlays = null
 	last_state = {}; configuration = {}
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99); speed = 1.0
@@ -134,6 +137,7 @@ func reload_level() -> void:
 	hud.retreat_requested.connect(func(): command("retreat", [selected_unit]))
 	hud.skill_requested.connect(func(): command("activate_skill", [selected_unit]))
 	hud.debug_victory_requested.connect(debug_victory)
+	if audio: hud.ui_sound_requested.connect(func(id: String): audio.play_sfx(id))
 	hud.continue_requested.connect(func():
 		if not continue_requested.get_connections().is_empty(): continue_requested.emit()
 		elif not exit_requested.get_connections().is_empty(): exit_requested.emit()
@@ -191,6 +195,8 @@ func refresh(visual_delta := 0.0) -> void:
 	last_state = battle.snapshot()
 	var events: Array = battle.take_events()
 	presentation.sync(last_state, events, visual_delta)
+	if audio and battle_audio == null: battle_audio = BattleAudio.new(audio)
+	if battle_audio: battle_audio.sync(last_state, events)
 	if selected_unit != -1 and battle.find_unit(selected_unit).is_empty(): selected_unit = -1
 	if last_state.phase in ["victory", "defeat"]:
 		selected_roster = ""; candidate = Vector2i(-99, -99)
@@ -486,6 +492,7 @@ func _line(at: Vector3, dimensions: Vector3, color: Color, parent: Node3D) -> vo
 func _exit_tree() -> void:
 	if presentation: presentation.clear()
 	battle = null
+	battle_audio = null
 
 func reason_text(reason: String) -> String:
 	return {"wrong_terrain": "地形不适合该干员", "occupied": "地块已占用", "insufficient_cost": "费用不足",

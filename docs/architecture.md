@@ -58,6 +58,7 @@ features 定义可复用的数据结构和行为；content 提供具体实例。
 同一类型内编号唯一，按类型独立编号。ID 分配后保持稳定，显示名称可以单独修改；删除的 ID 不分配给其他内容。
 具体素材目录使用对应 ID 命名；正式角色／敌人／技能配置集中在 content/data，以 character_NNN.tres、enemy_NNN.tres、skill_NNN.tres 命名。此规则用于内容实体，不要求开发工具场景、通用模块场景或每个资源文件都分配内容 ID。
 Human/StarterContent 中的外部输入保留原始名称，整理为正式内容时分配 ID。
+音频 cue 不适用实体 ID 规则：代码引用的 cue 使用 `music_*`／`sfx_*` 语义键，按用途命名，替换素材不改代码。
 
 ### 资源归属
 
@@ -66,8 +67,13 @@ game 负责根据内容标识关联数值和外观，纯规则测试仅加载战
 通用展示行为放在 features/actor_view，具体角色的外观配置和专属资源放在 content。
 
 已有原始图集存放于 Human/StarterContent，保留其 character、effects、texture 子目录。外部输入与正式内容分开管理：原件留在此处，经过切片、配置或其他加工后用于游戏的资源归入 content 对应目录。
+角色与敌人图集的画风、姿态顺序、透明间隔、生成交付及验收要求见 [角色与敌人图集生成规范](character_art_generation.md)。
 原始需求和参考图留在 Human；生成的评审概念图放在 devtools/blueprint/images。
 数据驱动主要用于属性、单位、关卡和波次，复杂行为仍用代码实现。
+
+## 音频
+
+`features/audio` 定义 cue 资源类型、cue 库校验、音量设置与播放节点，不读取具体内容路径；`content/audio/cues.tres` 提供显式资源清单与素材。`game/player` 创建并持有常驻的 `AudioDirector`，页面切换时切换音乐；`game/adapters/battle_audio.gd` 把战斗事件映射为音效，战斗模拟与命令逻辑不出现音频调用。`battle_hud` 与 `story` 只发出 `ui_sound_requested(id)` 意图信号，由 game 决定是否播放。`Music`／`SFX` 总线由播放节点幂等创建，不依赖项目级音频布局；cue 的 `stream` 可以为空，此时静默，素材后补不改代码。
 
 ## 四个开发工作区
 
@@ -90,6 +96,7 @@ scene_001 的 TileMapLayer 是地形唯一数据源。features/battlefield_view/
 ## 验证与评审
 
 模块专属自动测试放在 features/<module>/tests/；跨模块集成测试放在 game/tests/；devtools 负责人工验证，不能代替自动测试。
+音频规则测试位于 features/audio/tests，加载真实 cue 清单与玩家流程的集成测试位于 game/tests/audio_integration_test.gd。
 测试从模块公共接口验证可观察行为，避免绑定内部节点结构。
 
 流程：独立开发 → 对应工作区验证 → 记录 review → 在 game 连接模块 → Game Test 回归。

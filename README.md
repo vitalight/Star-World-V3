@@ -7,7 +7,7 @@
 
 双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 一键导入资源并启动开发者首页。
 
-项目默认入口为 `game/player/player_mode.tscn`：主界面 → 第一章三关 → 战前剧情 → 战斗 → 战后剧情与解锁。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。
+项目默认入口为 `game/player/player_mode.tscn`：主界面 → 第一章三关 → 战前剧情 → 战斗 → 战后剧情与解锁。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。背景音乐与音效由 [音频内容](content/audio/README.md) 的 cue 清单驱动，主菜单右上角可调 BGM／音效音量。
 
 第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人通过 Godot Inspector 编辑 `.tres`，关卡与波次继续使用 CSV，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择六段正式剧情并重新加载。
 
@@ -33,12 +33,14 @@ StarWorldV3/
 │   ├── content_definitions/    # Inspector 内容编辑入口与资源索引
 │   ├── effects/                # 通用特效播放
 │   ├── battlefield_view/       # 地图展示
-│   └── battle_hud/             # 战斗 UI 展示及操作意图
+│   ├── battle_hud/             # 战斗 UI 展示及操作意图
+│   └── audio/                  # 音乐与音效播放、音量设置
 ├── content/                    # 具体内容实例与专属资源
 │   ├── characters/             # 角色贴图及原样例外观
 │   ├── enemies/                # 敌人贴图及原样例外观
 │   ├── data/                   # 角色／敌人／技能 .tres 与注册索引
 │   ├── campaign/               # 正式章节关卡／波次／背景表
+│   ├── audio/                  # 音乐、音效与 cue 清单
 │   └── scenes/                 # 地图、路线、剧情与场景外观
 ├── devtools/                   # 开发工具及人工验证入口
 │   ├── hub/                    # 开发者首页，独立启动
