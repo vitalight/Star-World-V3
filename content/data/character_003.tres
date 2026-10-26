@@ -12,7 +12,7 @@
 
 [ext_resource type="Texture2D" path="res://content/ui/class_icons/atlas.png" id="view_class_atlas"]
 
-[ext_resource type="Texture2D" path="res://content/characters/character_012/atlas.png" id="view_hero_atlas"]
+[ext_resource type="Texture2D" path="res://content/characters/character_011/atlas.png" id="view_hero_atlas"]
 
 
 [sub_resource type="AtlasTexture" id="view_ClassIcon"]
@@ -35,7 +35,7 @@ skill_spec = ExtResource("skill")
 [sub_resource type="Resource" id="Appearance"]
 script = ExtResource("view_2_n8f7b")
 atlas = ExtResource("view_hero_atlas")
-atlas_row = 1
+atlas_row = 2
 
 
 class_icon = SubResource("view_ClassIcon")

@@ -45,7 +45,7 @@ func run() -> void:
 		var a = art.presentation.actors[id]
 		var b = game.presentation.actors[id]
 		check(a.position.is_equal_approx(b.position), "Matching actor grounding and flight height")
-		check(a.sprite.texture == b.sprite.texture and a.sprite.flip_h == b.sprite.flip_h and a.height == b.height, "Matching enemy/operator appearance and facing")
+		check(a.sprite.texture.get_size() == b.sprite.texture.get_size() and a.sprite.texture.get_image().get_data() == b.sprite.texture.get_image().get_data() and a.sprite.flip_h == b.sprite.flip_h and a.height == b.height, "Matching enemy/operator appearance and facing")
 		check(a.health_image.get_data() == b.health_image.get_data(), "Matching HP, SP and duration bars")
 	for key in art.hud.cards:
 		check(art.hud.cards[key].button.visible == game.hud.cards[key].button.visible, "Same deployed-card visibility")

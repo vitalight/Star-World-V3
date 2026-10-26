@@ -1,16 +1,14 @@
 # 敌方外观登记
 
-敌方资源按职责存放于 `content/enemies/<内容 ID>/`。character_008～character_010 从 characters 迁入，保留既有内容 ID，不重新编号。
+第一章共享 `enemy_001/atlas.png`，来自 `Human/StarterContent/character/enemy-atlas-101.png`。4×4 图集每格 256×256，四列分别为正／背面移动、正／背面攻击。移动列是单幅姿态。
 
-| 内容 ID | Human/StarterContent/character 来源 | 行（从 1 起） |
-| --- | --- | --- |
-| character_008 | enemy-atlas-01.png | 2 |
-| character_009 | enemy-atlas-01.png | 3 |
-| character_010 | enemy-atlas-01.png | 4 |
+| 配置 | 现有职责 | 行（从 1 起） | 美术身份 |
+| --- | --- | --- | --- |
+| content/data/enemy_001.tres | 基础近战 | 1 | 异常碎影 |
+| content/data/enemy_002.tres | 疾行近战 | 2 | 裂隙疾犬 |
+| content/data/enemy_003.tres | 重甲近战 | 4 | 裂甲卫士 |
+| content/data/enemy_004.tres | 远程 | 3 | 节点投射者 |
 
-pose.png 为对应行的正面待机切片，portrait.tres 引用同目录贴图。切片边界取原图尺寸的四分之一并四舍五入到像素，保留原有透明背景和杂色边缘；不包含战斗数值。
+保留现有 ID、显示名、数值、波次和战斗机制。每个正式配置内嵌 appearance，直接引用图集并设置 atlas_row，头像随第一列生成。
 
-Game Test 集成另增 pose_0～pose_3.png 及 appearance.tres，分别为对应行的正／背面待机／攻击姿态，使用相同切片规则。content/data/enemy_008～010.tres 为独立样例战斗数据；character_008、009、010 分别绑定突击兵、远程兵、飞行敌人，飞行以游戏中的悬浮高度表现。原有 pose.png 与 portrait.tres 仍保留供 Art Test 使用。
-# 第一章敌人
-
-enemy_001～004 使用稳定敌人 ID 及独立 appearance 目录，分别复用 character_008／009／010／009 的四姿态。配置位于 content/data/enemy_NNN.tres，包含 stats 数值与 appearance 外观子资源；贴图仍引用原素材目录，在 content/data/actors.tres 注册；外观来源不决定是否远程／飞行。旧 character_008～010 样例资源保持原样。
+scene_001 历史样例 character_008／009／010 的 appearance.tres 和 portrait.tres 保留，依次使用第 2／3／4 行；飞行仍由样例规则与悬浮高度表现。旧独立 pose 切片已删除，正式与开发入口共享新图集。

@@ -84,3 +84,7 @@ $env:APPDATA = Join-Path $PWD 'temp/chapter_one/user'
 首次运行前创建 `temp/chapter_one` 和 `temp/.gdignore`。最后一项使用真实窗口输入验证并保存截图。三关参考部署与技能命令在 `game/tests/chapter_fixture.gd`；它只在测试中使用，不控制正式游戏。
 
 `.tres` 通过资源索引显式关联，随资源一起导出；`export_presets.cfg` 另显式包含 CSV／MD。生成验证 PCK 时，把 `TEMP` 和 `TMP` 指向 `temp/chapter_one/export_tmp`，再运行 `--headless --export-pack "Windows Desktop" temp/chapter_one/chapter.pck`。编辑内容后需重新导出。完整章节目标时长15—25分钟；已验证的战斗回放约3分11秒、3分23秒和3分30秒，阅读及部署时间因人而异。
+
+## 第一章正式背景
+
+`background_001～003` 依次绑定 scene_002～004 的 `background.png`，来源为 `Human/StarterContent/story/chapter01/` 的 home_anomaly_v1、roadside_rescue_v2、oriental_pearl_node_v2 PNG。旧占位 background.svg 已移除；剧情背景 ID 与对白引用保持稳定。

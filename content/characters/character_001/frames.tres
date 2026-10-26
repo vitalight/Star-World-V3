@@ -1,22 +1,22 @@
 [gd_resource type="SpriteFrames" load_steps=6 format=3]
 
-[ext_resource type="Texture2D" path="res://content/characters/character_001/atlas.png" id="1"]
+[ext_resource type="Texture2D" path="res://content/characters/character_011/atlas.png" id="1"]
 
 [sub_resource type="AtlasTexture" id="Pose0"]
 atlas = ExtResource("1")
-region = Rect2(0, 0, 313.5, 313.5)
+region = Rect2(0, 0, 256, 256)
 
 [sub_resource type="AtlasTexture" id="Pose1"]
 atlas = ExtResource("1")
-region = Rect2(313.5, 0, 313.5, 313.5)
+region = Rect2(256, 0, 256, 256)
 
 [sub_resource type="AtlasTexture" id="Pose2"]
 atlas = ExtResource("1")
-region = Rect2(627, 0, 313.5, 313.5)
+region = Rect2(512, 0, 256, 256)
 
 [sub_resource type="AtlasTexture" id="Pose3"]
 atlas = ExtResource("1")
-region = Rect2(940.5, 0, 313.5, 313.5)
+region = Rect2(768, 0, 256, 256)
 
 [resource]
 animations = [
