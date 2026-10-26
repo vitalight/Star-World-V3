@@ -2,12 +2,6 @@ extends Control
 const UI = preload("res://devtools/ui/workspace_style.gd")
 const Session = preload("res://features/story/story_session.gd")
 const StoryView = preload("res://features/story/story_view.gd")
-const SAMPLE = preload("res://devtools/story_test/sample_story.tres")
-const BACKGROUNDS = {
-	"winter": preload("res://Human/StarterContent/story/story-01.png"),
-	"garden": preload("res://Human/StarterContent/story/story-02.png")}
-const SCOUT = preload("res://content/data/character_001.tres")
-const GUARD = preload("res://content/data/character_003.tres")
 const ACCENT = Color("dfc49b")
 var session = Session.new()
 var stage: Control
@@ -31,7 +25,6 @@ var source_catalog = preload("res://game/content/content_catalog.gd").new()
 func _ready() -> void:
 	theme = UI.make_theme(ACCENT)
 	stage = StoryView.new()
-	stage.configure(BACKGROUNDS, {"scout": SCOUT.appearance.poses[0], "guard": GUARD.appearance.poses[0]})
 	add_child(stage)
 	stage.advance_requested.connect(_advance)
 	stage.choice_requested.connect(_choose)
@@ -53,12 +46,11 @@ func _ready() -> void:
 	_button(toolbar, "重播剧情", _restart)
 	_button(toolbar, "调试", _show_overlay.bind(true))
 	source_picker = OptionButton.new()
-	source_picker.add_item("开发样例")
-	source_picker.set_item_metadata(0, [])
 	source_catalog.reload()
 	for id in source_catalog.levels:
 		for kind in ["before", "after"]:
-			source_picker.add_item(source_catalog.levels[id].name + (" · 战前" if kind == "before" else " · 战后"))
+			if source_catalog.levels[id][kind].is_empty(): continue
+			source_picker.add_item(source_catalog.levels[id].name + (" · 剧情" if kind == "before" else " · 章末尾声"))
 			source_picker.set_item_metadata(source_picker.item_count - 1, [id, kind])
 	source_picker.item_selected.connect(_load_source)
 	toolbar.add_child(source_picker)
@@ -66,13 +58,12 @@ func _ready() -> void:
 	_build_overlay()
 	resized.connect(_layout)
 	_layout()
-	var errors: PackedStringArray = session.load_story(SAMPLE)
-	if not errors.is_empty():
-		status.text = "剧情配置错误：\n" + "\n".join(errors)
+	if source_picker.item_count == 0:
+		status.text = "没有可预览的正式剧情\n" + "\n".join(source_catalog.errors)
 		modal.show()
 		continue_button.disabled = true
 		return
-	_refresh()
+	_load_source(0)
 
 func _button(parent: Node, text: String, action: Callable) -> Button:
 	var button := Button.new()
@@ -90,18 +81,13 @@ func _load_source(index: int) -> void:
 	_set_auto(false)
 	modal.hide()
 	var source: Array = source_picker.get_item_metadata(index)
-	var script: Resource = SAMPLE
-	var errors := PackedStringArray()
-	if source.is_empty():
-		stage.configure(BACKGROUNDS, {"scout": SCOUT.appearance.poses[0], "guard": GUARD.appearance.poses[0]})
-	else:
-		source_catalog.reload()
-		errors = source_catalog.diagnostics(source[0])
-		if errors.is_empty():
-			var textures: Dictionary = source_catalog.story_textures()
-			stage.configure(textures.backgrounds, textures.actors)
-			script = source_catalog.story(source_catalog.levels[source[0]][source[1]])
-	if errors.is_empty(): errors = session.load_story(script)
+	source_catalog.reload()
+	var errors: PackedStringArray = source_catalog.diagnostics(source[0])
+	if errors.is_empty():
+		var textures: Dictionary = source_catalog.story_textures()
+		stage.configure(textures.backgrounds, textures.actors)
+		var script: Resource = source_catalog.story(source_catalog.levels[source[0]][source[1]])
+		errors = session.load_story(script)
 	if not errors.is_empty():
 		status.text = "剧情配置错误：\n" + "\n".join(errors)
 		modal.show(); return
@@ -207,7 +193,7 @@ func _refresh() -> void:
 		state.get("background", "无"), ", ".join(state.get("actors", []))]
 	var lines := PackedStringArray()
 	for item in state.history:
-		lines.append("%s：%s" % [item.speaker, item.text])
+		lines.append(item.text if item.speaker.is_empty() or item.speaker == "旁白" else "%s：%s" % [item.speaker, item.text])
 		if item.has("selected"):
 			lines.append("  → " + item.selected)
 	history.text = "\n\n".join(lines)

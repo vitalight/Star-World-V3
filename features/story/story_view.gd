@@ -56,6 +56,11 @@ func show_snapshot(state: Dictionary) -> void:
 	if not is_node_ready() or state.is_empty():
 		return
 	background.texture = _backgrounds.get(state.get("background", ""))
+	if background.texture != null and state.get("framing", "wide") == "left_close":
+		var close := AtlasTexture.new()
+		close.atlas = background.texture
+		close.region = Rect2(Vector2.ZERO, background.texture.get_size() * Vector2(0.6, 1.0))
+		background.texture = close
 	var visible_actors: Array = state.get("actors", [])
 	for index in actor_views.size():
 		var actor: TextureRect = actor_views[index]
@@ -65,7 +70,8 @@ func show_snapshot(state: Dictionary) -> void:
 			actor.texture = _actors.get(key)
 			var active: String = state.get("speaker_actor", "")
 			actor.modulate = Color.WHITE if active.is_empty() or active == key else Color(0.53, 0.57, 0.64)
-	speaker.text = state.get("speaker", "旁白")
+	speaker.text = state.get("speaker", "")
+	speaker.visible = not speaker.text.is_empty() and speaker.text != "旁白"
 	dialogue.text = state.get("text", "")
 	_dialogue_scroll.scroll_vertical = 0
 	continue_button.visible = state.get("type") == "line"

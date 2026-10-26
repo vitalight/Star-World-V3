@@ -34,6 +34,8 @@ func errors() -> PackedStringArray:
 	return result
 
 func _check_presentation(node: Dictionary, id: String, result: PackedStringArray) -> void:
+	if node.get("framing", "wide") not in ["wide", "left_close"]:
+		result.append("%s：framing 必须是 wide 或 left_close" % id)
 	if not node.get("background", "") is String or not node.get("speaker_actor", "") is String:
 		result.append("%s：background / speaker_actor 必须是字符串" % id)
 	var actors = node.get("actors", [])

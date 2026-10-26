@@ -90,7 +90,9 @@ func run() -> void:
 	check(player.page == "levels", "Battle menu returns to chapter")
 	for id in ["scene_002", "scene_003", "scene_004"]:
 		check(player.progress.selected == id, "Selected next stage: " + id)
-		await click("开始行动   ›"); await click("跳过剧情")
+		if player.page == "levels": await click("开始行动   ›")
+		check(player.page == "story" and player.story_level == id and player.story_kind == "before", "One merged introduction per stage")
+		await click("跳过剧情")
 		game = player.battle_scene; game.set_process(false)
 		check(game.campaign_level == id, "Scene receives selected stage")
 		for args in Fixture.deployments(id):
@@ -111,17 +113,16 @@ func run() -> void:
 			await dispose(); await spawn()
 			check(player.progress.pending_after == id, "Pending story survives restart")
 			await click("读取存档")
-			check(player.page == "story" and player.story_kind == "after", "Resume continues post-battle story")
+			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_003", "Resume enters next merged story")
 		else:
 			await click("继续")
 		await capture("after_" + id)
-		if id == "scene_003":
-			for step in 20:
-				if player.page != "story": break
-				player.advance_story()
-			await settle()
-		else: await click("跳过剧情")
-		check(player.progress.completed.has(id) and player.progress.pending_after.is_empty(), "Reading and skipping both commit progress")
+		if id == "scene_004":
+			check(player.story_kind == "after", "Final victory enters chapter epilogue")
+			await click("跳过剧情")
+		else:
+			check(player.story_kind == "before" and player.story_level == player.progress.selected, "Victory flows directly into next stage story")
+		check(player.progress.completed.has(id) and player.progress.pending_after.is_empty(), "Victory transition commits progress")
 	check(player.completed and player.progress.completed.size() == 3, "Chapter completes after all stories")
 	await capture("chapter_complete")
 	await dispose(); await spawn()

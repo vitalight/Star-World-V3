@@ -9,7 +9,7 @@ func run() -> void:
 	await spawn(DEBUG_SAVE)
 	await click("开始游戏")
 	for id in ["scene_002", "scene_003", "scene_004"]:
-		await click("开始行动   ›")
+		if player.page == "levels": await click("开始行动   ›")
 		await click("跳过剧情")
 		var game = player.battle_scene
 		game.set_process(false)
@@ -34,10 +34,10 @@ func run() -> void:
 			await dispose()
 			await spawn(DEBUG_SAVE)
 			await click("读取存档")
-			check(player.page == "story" and player.story_kind == "after", "Developer victory resumes post-battle story across restart")
+			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_003", "Developer victory resumes next merged story across restart")
 		else: await click("继续")
-		await click("跳过剧情")
-		check(player.progress.completed.has(id), "Developer win unlocks progress through normal story completion")
+		if id == "scene_004": await click("跳过剧情")
+		check(player.progress.completed.has(id), "Developer win commits progress through normal continuation")
 	check(player.completed, "Developer skips can complete the chapter")
 	await dispose()
 	print("DEVELOPER VICTORY: %d checks, %d failures" % [checks, failures])

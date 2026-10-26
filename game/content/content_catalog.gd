@@ -38,6 +38,7 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 		levels[row.id] = level
 		_level_errors[row.id] = PackedStringArray()
 		for field in ["before", "after"]:
+			if field == "after" and row[field].is_empty(): continue
 			var start := errors.size()
 			story(row[field])
 			for index in range(start, errors.size()): _level_errors[row.id].append(errors[index])
@@ -131,9 +132,13 @@ func diagnostics(id: String) -> PackedStringArray:
 	if not levels.has(id): result.append("levels.csv:1 [id] 未知关卡 " + id)
 	return result
 
+func battle_operator_ids(id: String, operator_ids: Array = []) -> Array:
+	if id == "scene_002": return ["character_011", "character_012"]
+	return starting_operators.duplicate() if operator_ids.is_empty() else operator_ids.duplicate()
+
 func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionary:
 	var result: Dictionary = levels[id].duplicate(true)
-	result.roster = operator_configuration(operator_ids if not operator_ids.is_empty() else starting_operators)
+	result.roster = operator_configuration(battle_operator_ids(id, operator_ids))
 	result.terrain = {}
 	var cells: Dictionary = map.cells()
 	for cell in cells:
@@ -167,7 +172,7 @@ func operator_errors(operator_ids: Array) -> PackedStringArray:
 
 func appearances(id: String, operator_ids: Array = []) -> Dictionary:
 	var result := {}
-	for key in (starting_operators if operator_ids.is_empty() else operator_ids): result[key] = _appearances[key]
+	for key in battle_operator_ids(id, operator_ids): result[key] = _appearances[key]
 	for key in levels[id].enemies: result[key] = _appearances[key]
 	return result
 
@@ -177,9 +182,9 @@ func story_textures() -> Dictionary:
 	for id in characters: result.actors[id] = _appearances[id].poses[0]
 	return result
 
-func skill_icons(_id: String, operator_ids: Array = []) -> Dictionary:
+func skill_icons(id: String, operator_ids: Array = []) -> Dictionary:
 	var result := {}
-	for key in (starting_operators if operator_ids.is_empty() else operator_ids):
+	for key in battle_operator_ids(id, operator_ids):
 		if _skill_icons.has(key): result[key] = _skill_icons[key]
 	return result
 
@@ -205,6 +210,7 @@ func story(path: String) -> Resource:
 			node = {"type": "line", "text": "", "actors": []}; at = offset + 1
 		elif not node.is_empty():
 			if line.begins_with("background: "): node.background = line.substr(12).strip_edges()
+			elif line.begins_with("framing: "): node.framing = line.substr(9).strip_edges()
 			elif line.begins_with("actors:"): node.actors = Array(line.substr(7).strip_edges().split("|", false))
 			elif line.begins_with("speaker: "): node.speaker_actor = line.substr(9).strip_edges()
 			elif line.begins_with("> "): node.text += ("\n" if not node.text.is_empty() else "") + line.substr(2)
@@ -216,6 +222,7 @@ func story(path: String) -> Resource:
 	return script
 
 func _add_line(script: Resource, node: Dictionary, index: int, path: String, at: int) -> void:
+	if node.get("framing", "wide") not in ["wide", "left_close"]: errors.append("%s:%d [framing] 未知背景取景" % [path, at])
 	if node.text.is_empty(): errors.append("%s:%d [text] 对白不能为空" % [path, at])
 	if not backgrounds.has(node.get("background", "")): errors.append("%s:%d [background] 未知背景" % [path, at])
 	if node.actors.size() > 2 or (node.actors.size() == 2 and node.actors[0] == node.actors[1]): errors.append("%s:%d [actors] 最多两名不重复角色" % [path, at])

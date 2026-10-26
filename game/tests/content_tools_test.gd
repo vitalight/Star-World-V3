@@ -43,15 +43,15 @@ func run() -> void:
 	workspace.queue_free(); await settle()
 	workspace = load("res://devtools/story_test/story_workspace.tscn").instantiate()
 	root.add_child(workspace); await settle()
-	check(workspace.source_picker.item_count == 7, "Story Test offers six chapter scenes and sample")
-	for index in range(1, 7):
+	check(workspace.source_picker.item_count == 4, "Story Test offers only three stage stories and chapter epilogue")
+	for index in range(4):
 		workspace.source_picker.select(index)
 		workspace._load_source(index)
 		check(not workspace.modal.visible and workspace.session.snapshot().type == "line", "Story Test loads chapter scene " + str(index))
 		if index == 2:
 			await settle(); await capture("story_test_chapter")
 	workspace._load_source(0)
-	check(workspace.session.snapshot().get("background") == "winter", "Story Test retains original sample")
+	check(workspace.source_picker.get_item_metadata(0) == ["scene_002", "before"] and workspace.session.snapshot().text.contains("突然停电"), "Story Test defaults to formal 1-1 opening")
 	workspace.queue_free(); await settle()
 	print("CONTENT TOOLS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

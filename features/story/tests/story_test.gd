@@ -70,5 +70,9 @@ func _initialize() -> void:
 	check(not story.errors().is_empty(), "Non-string background rejected")
 	story.nodes.intro.background = "winter"
 	check(story.errors().is_empty(), "Optional presentation fields validate")
+	story.nodes.intro.framing = "left_close"
+	check(story.errors().is_empty(), "Close framing validates")
+	story.nodes.intro.framing = "invalid"
+	check(not story.errors().is_empty(), "Unknown framing rejected")
 	print("Story rules: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

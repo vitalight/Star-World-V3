@@ -66,7 +66,7 @@ func reload_level() -> void:
 		catalog = Catalog.new()
 		catalog.reload()
 		validation_errors = catalog.diagnostics(campaign_level)
-		if operator_ids.is_empty(): operator_ids.assign(catalog.starting_operators)
+		operator_ids.assign(catalog.battle_operator_ids(campaign_level, operator_ids))
 		validation_errors.append_array(catalog.operator_errors(operator_ids))
 		if not validation_errors.is_empty():
 			_show_error("关卡配置错误\n" + "\n".join(validation_errors)); return

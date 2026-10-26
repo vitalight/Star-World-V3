@@ -7,9 +7,9 @@
 
 双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 一键导入资源并启动开发者首页。
 
-项目默认入口为 `game/player/player_mode.tscn`：主界面 → 第一章三关 → 战前剧情 → 战斗 → 战后剧情与解锁。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。背景音乐与音效由 [音频内容](content/audio/README.md) 的 cue 清单驱动，主菜单右上角可调 BGM／音效音量。
+项目默认入口为 `game/player/player_mode.tscn`：主界面 → 关卡剧情 → 战斗 → 下一关合并剧情，章末播放独立尾声。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。背景音乐与音效由 [音频内容](content/audio/README.md) 的 cue 清单驱动，主菜单右上角可调 BGM／音效音量。
 
-第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人通过 Godot Inspector 编辑 `.tres`，关卡与波次继续使用 CSV，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择六段正式剧情并重新加载。
+第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人通过 Godot Inspector 编辑 `.tres`，关卡与波次继续使用 CSV，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择三段关卡剧情与章末尾声并重新加载。
 
 Game Test 已接入完整战斗：从首页进入后可部署干员、开始防守、释放技能、撤退和重开；F3 打开内嵌调试窗。地图使用 TileMapLayer 编辑并生成 3D 战场，路线和波次均可在编辑器配置。操作、编辑与验证说明见 [Game Test](devtools/game_test/README.md)。
 

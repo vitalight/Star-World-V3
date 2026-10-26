@@ -69,7 +69,7 @@ func _save_progress() -> void:
 	completed = progress.completed.size() == catalog.levels.size() and not catalog.levels.is_empty()
 
 func resume_game() -> void:
-	if not progress.pending_after.is_empty(): show_story(progress.pending_after, "after")
+	if not progress.pending_after.is_empty(): _continue_campaign()
 	else: show_levels()
 
 func _clear_page() -> void:
@@ -195,7 +195,7 @@ func show_levels() -> void:
 	var description := _text(detail, level.description, Rect2(28, 375, 490, 95), 23, Color("b9d9e4"))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text(detail, "出战干员", Rect2(28, 505, 450, 32), 22, Color("a7c3d1"))
-	var roster: Array = progress.available_operators()
+	var roster: Array = catalog.battle_operator_ids(progress.selected, progress.available_operators())
 	for i in roster.size():
 		var appearance = catalog.appearances(progress.selected, roster)[roster[i]]
 		_image(detail, Rect2(28 + i * 99, 550, 86, 83), appearance.portrait)
@@ -216,7 +216,7 @@ func _select_level(id: String) -> void:
 
 func begin_action() -> void:
 	if not progress.pending_after.is_empty():
-		show_story(progress.pending_after, "after"); return
+		_continue_campaign(); return
 	if not progress.unlocked(progress.selected, catalog.levels.keys()): return
 	if not catalog.diagnostics(progress.selected).is_empty(): return
 	progress.started = true
@@ -334,7 +334,19 @@ func _show_tutorial() -> void:
 	battle_scene.hud.add_child(tutorial)
 
 func _leave_result() -> void:
-	if battle_scene and battle_scene.last_state.phase == "victory": show_story(progress.selected, "after")
+	if battle_scene and battle_scene.last_state.phase == "victory": _continue_campaign()
+	else: show_levels()
+
+func _continue_campaign() -> void:
+	var id: String = progress.pending_after
+	if id.is_empty(): show_levels(); return
+	if not catalog.diagnostics(id).is_empty(): show_levels(); return
+	if not catalog.levels[id].after.is_empty():
+		show_story(id, "after")
+		return
+	progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
+	_save_progress()
+	if progress.selected != id: show_story(progress.selected, "before")
 	else: show_levels()
 
 func _observe_battle(state: Dictionary, _events: Array) -> void:

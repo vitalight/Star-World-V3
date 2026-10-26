@@ -1,6 +1,6 @@
 # Story
 
-独立的同步对话图模块，负责节点推进、分支选择、本次播放记录和可复用演出视图。没有 devtools、具体内容或 battle 依赖。game/player 已组装第一章的战前／战后线性剧情；Markdown 解析位于 game/content，存档与解锁由 game/player 负责。
+独立的同步对话图模块，负责节点推进、分支选择、本次播放记录和可复用演出视图。没有 devtools、具体内容或 battle 依赖。game/player 已组装第一章的关卡线性剧情与章末尾声；Markdown 解析位于 game/content，存档与解锁由 game/player 负责。
 
 `story_script.gd` 定义 Resource：`title`、`start` 和以字符串 ID 为键的 `nodes`。节点均包含 `type`、`text` 和可选 `speaker`：
 
@@ -10,7 +10,7 @@
 
 `errors()` 检查起点、字段类型、选项和跳转目标。允许循环图，推进完全由调用方操作，没有自动执行循环。
 
-可选演出字段：`background` 为背景 ID；`actors` 为最多两个不重复的角色 ID 数组；`speaker_actor` 为其中正在说话的角色 ID。不提供这些字段仍可只运行文本；每个节点提供完整场景状态，不继承上个节点。`actors: []` 表示角色退场。
+可选演出字段：`background` 为背景 ID；`actors` 为最多两个不重复的角色 ID 数组；`speaker_actor` 为其中正在说话的角色 ID。不提供这些字段仍可只运行文本；每个节点提供完整场景状态，不继承上个节点。`actors: []` 表示角色退场。`framing` 可选 wide（默认全景）或 left_close（裁取背景左侧 60% 后放大填满画面），每段独立设置，不继承。
 
 `story_session.gd` 公共接口：
 

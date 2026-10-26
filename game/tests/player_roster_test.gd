@@ -37,14 +37,26 @@ func run() -> void:
  root.add_child(player)
  player.progress.selected = "scene_002"
  player.start_battle()
+ await process_frame
  var expected = ["character_011", "character_013", "character_014", "character_015"]
  check(player.progress.available_operators() == expected, "Reload retains current roster and cat absence")
- check(player.battle_scene.configuration.roster.keys() == expected, "Replay first stage uses current chapter-end squad")
- check(player.battle_scene.hud.cards.keys() == expected, "Deployment cards use same player roster in ID order")
- check(player.battle_scene.appearances.has("character_015") and player.battle_scene.skill_icons.has("character_015"), "Replay includes new recruit appearance and skill icon")
+ var opening_cast = ["character_011", "character_012"]
+ check(player.battle_scene.configuration.roster.keys() == opening_cast, "Replay 1-1 has only protagonist and cat")
+ check(player.battle_scene.hud.cards.keys() == opening_cast, "1-1 deployment cards contain only opening cast")
+ check(player.battle_scene.appearances.has("character_012") and not player.battle_scene.appearances.has("character_015"), "1-1 restores cat appearance and excludes later recruit")
+ check(player.battle_scene.skill_icons.keys() == opening_cast, "1-1 skill icons match opening cast")
  player.battle_scene.reset()
- check(player.battle_scene.configuration.roster.keys() == expected, "Retry retains player roster")
- player.free()
+ check(player.battle_scene.configuration.roster.keys() == opening_cast, "Retry retains opening cast")
+ player.battle_scene.reload_level()
+ await process_frame
+ check(player.battle_scene.configuration.roster.keys() == opening_cast, "Reload retains opening cast")
+ check(player.progress.available_operators() == expected, "Opening cast does not alter saved roster or cat absence")
+ player.progress.selected = "scene_003"
+ player.start_battle()
+ await process_frame
+ check(player.battle_scene.configuration.roster.keys() == expected, "Other stages retain current player roster")
+ player.queue_free()
+ await process_frame
  # Future return events restore availability without granting a duplicate operator.
  progress.completed.erase("scene_004")
  progress.pending_after = "scene_004"

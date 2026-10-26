@@ -62,7 +62,7 @@ Human/StarterContent 中的外部输入保留原始名称，整理为正式内�
 
 ### 资源归属
 
-正式角色／敌人配置各使用 content/data 中的一个 `.tres` 文件，包含 stats 数值与 appearance 外观子资源，贴图引用原素材目录。stats 描述战斗数据并引用独立 skill_NNN.tres，不直接保存角色外观场景、贴图和动画。scene_001 的可部署角色同样各用一个 ActorDefinition 文件，内嵌 stats 和 appearance；关卡不引用出战角色。玩家持有已获得干员及暂离状态，game 组装战斗时注入当前可出战干员的数值、外观与技能图标；重打旧关沿用当前玩家队伍。开发工作区通过独立的 test_roster.tres 注入样例玩家列表，保持内容 ID。敌人开发样例暂保留 UnitSpec 格式。技能编辑资源 SkillDefinition 继承纯规则 BattleSkillSpec，并拥有 icon；configuration() 向 battle 导出时只保留规则数据，game 将图标单独注入 HUD。技能图标不属于 ActorAppearance。
+正式角色／敌人配置各使用 content/data 中的一个 `.tres` 文件，包含 stats 数值与 appearance 外观子资源，贴图引用原素材目录。stats 描述战斗数据并引用独立 skill_NNN.tres，不直接保存角色外观场景、贴图和动画。scene_001 的可部署角色同样各用一个 ActorDefinition 文件，内嵌 stats 和 appearance；关卡不引用出战角色。玩家持有已获得干员及暂离状态，game 组装战斗时注入当前可出战干员的数值、外观与技能图标；1-1（scene_002）固定由大星、小黄出战，其余旧关重打沿用当前玩家队伍；固定出场不改变玩家存档中的持有与暂离状态。开发工作区通过独立的 test_roster.tres 注入样例玩家列表，保持内容 ID。敌人开发样例暂保留 UnitSpec 格式。技能编辑资源 SkillDefinition 继承纯规则 BattleSkillSpec，并拥有 icon；configuration() 向 battle 导出时只保留规则数据，game 将图标单独注入 HUD。技能图标不属于 ActorAppearance。
 game 负责根据内容标识关联数值和外观，纯规则测试仅加载战斗数据。
 通用展示行为放在 features/actor_view，具体角色的外观配置和专属资源放在 content。
 
@@ -85,7 +85,7 @@ game 负责根据内容标识关联数值和外观，纯规则测试仅加载战
 | Story Test | story 会话与演出 + 工作区专属剧情样例/外部素材 | 对话、分支、出入场、背景与重播 |
 
 战斗手动验证统一由 Game Test 提供；基础规则及固定命令场景位于 features/battle/tests，须能无界面执行，并与 Game Test 复用同一 battle 实现。Art Test 与 Game Test 必须复用同一表现实现。
-Story Test 通过 `features/story` 的公共接口运行样例；正式剧情接入 game 前仍需模块评审，样例不作为正式 content。
+Story Test 通过 game/content 加载正式关卡剧情和章末尾声，并使用 features/story 的公共接口预览；默认打开 1-1，不提供开发样例。
 临时测试数据、占位图形和调试控制放在所属 devtools 工作区，正式配置放在 content。
 战斗模块支持不加载角色场景、动画和 UI 的模拟推进。Game Test 已通过 game/battle 加载实际组装，编辑方式和接口见 devtools/game_test/README.md。
 

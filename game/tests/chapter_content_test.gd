@@ -39,6 +39,7 @@ func _initialize() -> void:
 		battle.reset(); battle.start(); battle.advance(300)
 		check(battle.snapshot().phase == "defeat", id + " undefended stage loses")
 		for kind in ["before", "after"]:
+			if catalog.levels[id][kind].is_empty(): continue
 			var story = catalog.story(catalog.levels[id][kind])
 			check(story.errors().is_empty() and story.nodes.size() >= 6, id + " " + kind + " valid dialogue")
 	if not "--packed" in OS.get_cmdline_user_args():

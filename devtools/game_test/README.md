@@ -138,4 +138,4 @@ Art Test 的 Battle 页以模拟快照使用同一表现适配器、角色资源
 
 共享actor_view_3d提供干员idle呼吸（周期2.4秒，上下幅度0.025世界单位）和敌人walk摆动（周期0.55秒，左右位移幅度0.012世界单位，绕脚下支点摆角约±2°）。干员沿镜头竖轴平移；敌人以轻微侧倾为主、少量横向位移为辅，旋转始终位于镜头平面内，保持billboard和原有尺寸；逻辑坐标、脚下罗盘与血条保持稳定。攻击姿态、敌人被阻挡及待部署预览不播放该平移。动画由advance_visual接收战斗时钟，暂停冻结、倍速同步，重开清空相位；Art Test的Battle页复用同一实现和预览时钟。
 
-Game Test 与 Art Test 的开发玩家干员列表位于 content/data/test_roster.tres，独立于地图和关卡；scene_001 不保存 roster 或角色引用。正式 Player Mode 从存档读取当前可出战干员并注入所选关卡，重打旧关保留当前队伍。
+Game Test 与 Art Test 的开发玩家干员列表位于 content/data/test_roster.tres，独立于地图和关卡；scene_001 不保存 roster 或角色引用。正式 Player Mode 从存档读取当前可出战干员并注入所选关卡，1-1（scene_002）固定由大星、小黄出战，其余旧关重打保留当前队伍。
