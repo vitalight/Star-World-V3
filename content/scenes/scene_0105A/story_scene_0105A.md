@@ -4,7 +4,7 @@
 background: background_003
 framing: wide
 actors: 
-speaker: narrator
+speaker:
 > 最后一只怪物倒下。
 
 ---
@@ -18,21 +18,21 @@ speaker: character_013
 background: background_003
 framing: wide
 actors: character_013
-speaker: narrator
+speaker:
 > 阿五开始维修节点。
 
 ---
 background: background_003
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 异常光环开始收缩。
 
 ---
 background: background_006
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 东方明珠灯光亮起。
 > 远处城市灯火逐片恢复。
 
@@ -75,7 +75,7 @@ speaker: character_013
 background: background_006
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 检测仪重新启动。
 > 屏幕出现稳定信号。
 
@@ -91,7 +91,7 @@ background: background_006
 framing: wide
 actors: character_011|character_013
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 在哪？！
 
 ---
@@ -134,7 +134,7 @@ speaker: character_013
 ---
 background: background_006
 framing: wide
-actors: character_011|character_014
+actors: character_011
 speaker: character_011
 > ……
 > 小黄。我一定会找回你的。
@@ -142,6 +142,6 @@ speaker: character_011
 ---
 background: background_006
 actors:
-speaker: narrator
+speaker:
 > 第一章结束
 > 下一目标：前往济州岛，寻找小黄。

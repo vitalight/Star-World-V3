@@ -3,7 +3,7 @@
 ---
 background: background_002
 framing: wide
-actors: character_011|character_015
+actors: character_015
 speaker: character_015
 > 呼……
 > 我差点以为今天要交代在这里了。
@@ -49,7 +49,7 @@ speaker: character_014
 ---
 background: background_002
 framing: wide
-actors: character_014|character_015
+actors: character_015|character_014
 speaker: character_015
 > ……坐好。
 > 我先给你们处理一下。
@@ -58,7 +58,7 @@ speaker: character_015
 background: background_002
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 应急治疗之后。
 
 ---
@@ -85,7 +85,7 @@ speaker: character_015
 ---
 background: background_002
 framing: wide
-actors: character_014|character_015
+actors: character_015|character_014
 speaker: character_014
 > 那太好了。欢迎加入临时加班小队。
 
@@ -93,7 +93,7 @@ speaker: character_014
 background: background_002
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 节点检测仪突然响起滴滴声。
 
 ---
@@ -101,7 +101,7 @@ background: background_002
 framing: wide
 actors: character_011|character_013
 speaker: character_013
-> 找到了。
+> 根节点找到了。
 
 ---
 background: background_002
@@ -121,8 +121,8 @@ speaker: character_013
 background: background_003
 framing: wide
 actors:
-speaker: narrator
-> 塔下悬浮着巨大的异常光环。
+speaker:
+> 东方明珠塔下，悬浮着巨大的异常光环。
 
 ---
 background: background_003
@@ -143,7 +143,7 @@ speaker: character_014
 background: background_003
 framing: wide
 actors: enemy_001|enemy_002
-speaker: narrator
+speaker:
 > 大量怪物从光环周围出现。
 
 ---

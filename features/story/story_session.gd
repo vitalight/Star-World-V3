@@ -32,6 +32,13 @@ func advance() -> bool:
 	_record()
 	return true
 
+func back() -> bool:
+	if _history.size() <= 1: return false
+	_history.pop_back()
+	_current = _history[-1].id
+	_history[-1].erase("selected")
+	return true
+
 func choose(index: int) -> bool:
 	if _current.is_empty() or _nodes[_current].type != "choice":
 		return false

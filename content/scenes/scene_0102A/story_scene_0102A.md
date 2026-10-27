@@ -11,8 +11,8 @@ speaker: character_011
 background: background_001
 framing: wide
 actors:
-speaker: narrator
-screen_shake: true
+speaker:
+anim_screen_shake: true
 > 空洞突然再次震动。
 
 ---
@@ -20,68 +20,61 @@ background: background_001
 framing: wide
 actors: character_011
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 又来？！
 
 ---
 background: background_001
 framing: wide
 actors: enemy_001
-speaker: narrator
-screen_shake: true
+speaker:
+anim_screen_shake: true
 > 一只怪物猛地从空洞中扑出。
 
 ---
 background: background_001
 framing: wide
-actors: enemy_001|character_012
-speaker: narrator
+actors: character_012|enemy_001
+speaker:
 > 小黄挡到大星面前。
 
 ---
 background: background_001
 framing: wide
-actors: enemy_001|character_012
+actors: character_012|enemy_001
 speaker: character_012
-actor_shake: character_012
+anim_actor_shake: character_012
 > 哈——！
-
----
-background: background_001
-framing: wide
-actors: character_011|character_012
-speaker: character_011
-actor_shake: character_011
-> 小黄，离远一点！
-
----
-background: background_001
-framing: wide
-actors: enemy_001|character_012
-speaker: narrator
-actor_exit_left: enemy_001|character_012
-> 小黄猛扑怪物。
-
----
-background: background_001
-framing: wide
-actors:
-speaker: narrator
-> 一猫一怪撞入空洞。
 
 ---
 background: background_001
 framing: wide
 actors: character_011
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
+> 小黄，离远一点！
+
+---
+background: background_001
+framing: wide
+actors: character_012|enemy_001
+speaker:
+anim_actor_exit_right: character_012|enemy_001
+> 小黄猛扑怪物，一起撞入空洞。
+
+---
+background: background_001
+framing: wide
+actors: character_011
+speaker: character_011
+anim_actor_shake: character_011
 > 小黄？！
 
 ---
 background: background_001
 framing: wide
 actors: character_011
-speaker: narrator
+speaker:
 > 大星急忙跟着冲向空洞。
 
 ---
@@ -89,7 +82,7 @@ background: background_001
 framing: wide
 actors: character_011
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 小黄！
 > 快出来！
 
@@ -97,7 +90,7 @@ actor_shake: character_011
 background: background_004
 framing: wide
 actors: character_011
-speaker: narrator
+speaker:
 > 空洞突然收缩消失。
 
 ---
@@ -112,7 +105,7 @@ speaker: character_011
 background: background_004
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 最怕空气突然安静。
 
 ---
@@ -120,15 +113,15 @@ background: background_004
 framing: wide
 actors: character_011
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 小黄！！
 
 ---
 background: background_004
 framing: wide
 actors:
-speaker: narrator
-screen_shake: true
+speaker:
+anim_screen_shake: true
 > 门外传来急促的脚步声。
 
 ---
@@ -156,7 +149,7 @@ speaker: character_013
 background: background_004
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 阿五、胡胡进入房间。
 
 ---
@@ -171,7 +164,7 @@ background: background_004
 framing: wide
 actors: character_011|character_013
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 快帮我找小黄！
 
 ---
@@ -186,7 +179,7 @@ background: background_004
 framing: wide
 actors: character_011|character_014
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 我家的猫，追着怪物进入洞中，然后就消失了！
 
 ---
@@ -222,5 +215,5 @@ speaker: character_013
 background: background_004
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 房间深处传来怪物叫声。

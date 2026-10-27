@@ -14,6 +14,7 @@ var history: Label
 var breadcrumb: Control
 var toolbar: HFlowContainer
 var auto_button: Button
+var back_button: Button
 var modal: Control
 var modal_panel: PanelContainer
 var modal_title: Label
@@ -41,6 +42,7 @@ func _ready() -> void:
 	add_child(toolbar)
 	auto_button = _button(toolbar, "自动 ▶", _toggle_auto)
 	auto_button.toggle_mode = true
+	back_button = _button(toolbar, "回退", _back)
 	_button(toolbar, "跳过 ▸", _skip)
 	_button(toolbar, "记录", _show_overlay.bind(false))
 	_button(toolbar, "重播剧情", _restart)
@@ -48,14 +50,12 @@ func _ready() -> void:
 	source_picker = OptionButton.new()
 	source_catalog.reload()
 	for id in source_catalog.levels:
-		for kind in ["before", "after"]:
-			if source_catalog.levels[id][kind].is_empty(): continue
-			var title: String = source_catalog.levels[id].name if kind == "before" else source_catalog.story(source_catalog.levels[id][kind]).title
-			source_picker.add_item(title + (" · 剧情" if kind == "before" else " · 章末尾声"))
-			source_picker.set_item_metadata(source_picker.item_count - 1, [id, kind])
+		if source_catalog.levels[id].type != "story": continue
+		source_picker.add_item(source_catalog.levels[id].name + " · 剧情")
+		source_picker.set_item_metadata(source_picker.item_count - 1, [id, "story"])
 	source_picker.item_selected.connect(_load_source)
 	toolbar.add_child(source_picker)
-	_button(toolbar, "重新加载", func(): _load_source(source_picker.selected))
+	_button(toolbar, "重新加载", func(): _load_source(source_picker.selected, true))
 	_build_overlay()
 	resized.connect(_layout)
 	_layout()
@@ -78,9 +78,10 @@ func _button(parent: Node, text: String, action: Callable) -> Button:
 	parent.add_child(button)
 	return button
 
-func _load_source(index: int) -> void:
+func _load_source(index: int, preserve_position := false) -> void:
 	_set_auto(false)
 	modal.hide()
+	var previous: Dictionary = session.snapshot() if preserve_position else {}
 	var source: Array = source_picker.get_item_metadata(index)
 	source_catalog.reload()
 	var errors: PackedStringArray = source_catalog.diagnostics(source[0])
@@ -89,10 +90,20 @@ func _load_source(index: int) -> void:
 		stage.configure(textures.backgrounds, textures.actors)
 		var script: Resource = source_catalog.story(source_catalog.levels[source[0]][source[1]])
 		errors = session.load_story(script)
+		if errors.is_empty() and not previous.is_empty():
+			_restore_position(script, previous.history.size() - 1, previous.get("finished", false))
 	if not errors.is_empty():
 		status.text = "剧情配置错误：\n" + "\n".join(errors)
 		modal.show(); return
 	_refresh()
+
+func _restore_position(script: Resource, index: int, was_finished: bool) -> void:
+	for step in maxi(index, 0):
+		var current: Dictionary = session.snapshot()
+		if current.get("type") != "line": break
+		var next_id: String = script.nodes[current.id].next
+		if not was_finished and script.nodes[next_id].type == "end": break
+		if not session.advance(): break
 
 func _build_overlay() -> void:
 	modal = Control.new()
@@ -133,6 +144,11 @@ func _advance() -> void:
 		return
 	if session.advance():
 		_refresh()
+
+func _back() -> void:
+	if modal.visible: return
+	_set_auto(false)
+	if session.back(): _refresh()
 
 func _choose(index: int) -> void:
 	if session.choose(index):
@@ -185,6 +201,7 @@ func _refresh() -> void:
 	var state: Dictionary = session.snapshot()
 	if state.is_empty():
 		return
+	back_button.disabled = state.history.size() <= 1
 	_elapsed = 0.0
 	if state.type != "line":
 		_set_auto(false)

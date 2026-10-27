@@ -37,7 +37,7 @@ func run() -> void:
 	await settle()
 	check(workspace.game.battle == null and not workspace.game.validation_errors.is_empty(), "Invalid content prevents battle creation")
 	check(root.get_visible_rect().encloses(workspace.game.hud.get_child(0).get_global_rect()), "Configuration diagnostics fit the viewport")
-	workspace.game.campaign_level = "scene_002"
+	workspace.game.campaign_level = "scene_0101B"
 	workspace.game.reload_level()
 	check(workspace.game.battle != null, "Fixing content can reload after a configuration failure")
 	workspace.queue_free(); await settle()
@@ -51,7 +51,7 @@ func run() -> void:
 		if index == 2:
 			await settle(); await capture("story_test_chapter")
 	workspace._load_source(0)
-	check(workspace.source_picker.get_item_metadata(0) == ["scene_002", "before"] and workspace.session.snapshot().text.contains("晚上七点"), "Story Test defaults to formal 1-1 opening")
+	check(workspace.source_picker.get_item_metadata(0) == ["scene_0101A", "story"] and workspace.session.snapshot().text.contains("晚上七点"), "Story Test defaults to formal 1-1 opening")
 	workspace.queue_free(); await settle()
 	print("CONTENT TOOLS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

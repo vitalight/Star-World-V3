@@ -8,13 +8,13 @@ func run() -> void:
 	if FileAccess.file_exists(DEBUG_SAVE): DirAccess.remove_absolute(DEBUG_SAVE)
 	await spawn(DEBUG_SAVE)
 	await click("开始游戏")
-	for id in ["scene_002", "scene_005", "scene_003", "scene_004"]:
+	for id in ["scene_0101B", "scene_0102B", "scene_0103B", "scene_0104B"]:
 		if player.page == "levels": await click("开始行动   ›")
 		await click("跳过剧情")
 		var game = player.battle_scene
 		game.set_process(false)
-		if id == "scene_002": await click("知道了")
-		if id == "scene_004":
+		if id == "scene_0101B": await click("知道了")
+		if id == "scene_0104B":
 			game.start()
 			await click("Ⅱ")
 			check(game.last_state.paused, "Final stage skip starts from a paused running battle")
@@ -30,13 +30,13 @@ func run() -> void:
 		check(player.progress.pending_after == id and not player.progress.completed.has(id), "Win persists pending story before unlock")
 		check(not game.debug_victory(), "Repeated terminal skip is ignored")
 		await capture("developer_victory_" + id)
-		if id == "scene_002":
+		if id == "scene_0101B":
 			await dispose()
 			await spawn(DEBUG_SAVE)
 			await click("读取存档")
-			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_005", "Developer victory resumes next merged story across restart")
+			check(player.page == "story" and player.story_kind == "story" and player.story_level == "scene_0102A", "Developer victory resumes next merged story across restart")
 		else: await click("继续")
-		if id == "scene_004": await click("跳过剧情")
+		if id == "scene_0104B": await click("跳过剧情")
 		check(player.progress.completed.has(id), "Developer win commits progress through normal continuation")
 	check(player.completed, "Developer skips can complete the chapter")
 	await dispose()

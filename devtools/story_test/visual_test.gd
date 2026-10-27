@@ -30,6 +30,11 @@ func click(control: Control) -> void:
 		await process_frame
 	await settle()
 
+func toolbar_button(text: String) -> Button:
+	for child in current_scene.toolbar.get_children():
+		if child is Button and child.text == text: return child
+	return null
+
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://temp/verification"))
 	if not FileAccess.file_exists("res://temp/.gdignore"):
@@ -39,16 +44,22 @@ func run() -> void:
 	await capture("story_opening")
 	await click(current_scene.continue_button)
 	check(current_scene.session.snapshot().id == "line_1", "Mouse advances to protagonist scene")
+	await click(toolbar_button("回退"))
+	check(current_scene.session.snapshot().id == "line_0", "Mouse returns to previous dialogue")
+	await click(current_scene.continue_button)
 	await capture("story_single")
 	await click(current_scene.continue_button)
 	await capture("story_portal")
 	await click(current_scene.continue_button)
+	for index in 20:
+		if current_scene.session.snapshot().actors == ["character_012"]: break
+		await click(current_scene.continue_button)
 	check(current_scene.session.snapshot().actors == ["character_012"], "Mouse reaches cat scene")
 	await capture("story_cat")
-	await click(current_scene.toolbar.get_child(1))
+	await click(toolbar_button("跳过 ▸"))
 	check(current_scene.session.snapshot().finished, "Mouse reaches ending")
 	await capture("story_end")
-	await click(current_scene.toolbar.get_child(3))
+	await click(toolbar_button("重播剧情"))
 	check(current_scene.session.snapshot().id == "line_0", "Toolbar replays formal story")
 	root.content_scale_size = Vector2i(800, 650)
 	root.size = Vector2i(800, 650)
@@ -59,7 +70,7 @@ func run() -> void:
 	await capture("story_portal_narrow")
 	for child in current_scene.toolbar.get_children():
 		check(Rect2(Vector2.ZERO, Vector2(root.size)).encloses(child.get_global_rect()), "Narrow toolbar remains in viewport")
-	await click(current_scene.toolbar.get_child(2))
+	await click(toolbar_button("记录"))
 	check(current_scene.modal.visible, "Toolbar opens history")
 	check(Rect2(Vector2.ZERO, Vector2(root.size)).encloses(current_scene.modal_panel.get_global_rect()), "History panel fits narrow viewport")
 	await capture("story_history_narrow")

@@ -28,21 +28,26 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 	for row in _table(base + "/backgrounds.csv", "id,texture"):
 		_resource(row, "texture")
 		backgrounds[row.id] = row.texture
-	for row in _table(base + "/levels.csv", "id,name,description,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after"):
-		var level := {"id": row.id, "name": row.name, "description": row.description, "map": row.map,
-			"before": row.before, "after": row.after, "enemies": {}, "waves": [], "route_warning_duration": 2.0}
-		for field in ["life", "deploy_limit"]: level[field] = int(_number(row, field, 1, true))
-		for field in ["initial_cost", "cost_cap", "cost_regen", "defend_duration"]: level[field] = _number(row, field, 0)
-		if level.initial_cost > level.cost_cap: _error(row, "initial_cost", "不能大于 cost_cap")
-		_resource(row, "map")
+	for row in _table(base + "/levels.csv", "id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration"):
+		var level := {"id": row.id, "name": row.name, "description": row.description, "type": row.type, "story": row.story, "map": row.map,
+			"enemies": {}, "waves": [], "route_warning_duration": 2.0}
 		levels[row.id] = level
 		_level_errors[row.id] = PackedStringArray()
-		for field in ["before", "after"]:
-			if field == "after" and row[field].is_empty(): continue
+		if row.type == "story":
+			for field in ["map", "life", "initial_cost", "cost_cap", "cost_regen", "deploy_limit", "defend_duration"]:
+				if not row[field].is_empty(): _error(row, field, "剧情关不能配置战斗内容")
+			if not row.story.begins_with("res://content/"): _error(row, "story", "剧情必须位于正式内容目录")
 			var start := errors.size()
-			story(row[field])
+			story(row.story)
 			for index in range(start, errors.size()): _level_errors[row.id].append(errors[index])
 			errors.resize(start)
+		elif row.type == "battle":
+			if not row.story.is_empty(): _error(row, "story", "战斗关不能配置剧情")
+			for field in ["life", "deploy_limit"]: level[field] = int(_number(row, field, 1, true))
+			for field in ["initial_cost", "cost_cap", "cost_regen", "defend_duration"]: level[field] = _number(row, field, 0)
+			if level.initial_cost > level.cost_cap: _error(row, "initial_cost", "不能大于 cost_cap")
+			_resource(row, "map")
+		else: _error(row, "type", "必须为 story 或 battle")
 	for row in _table(base + "/player_roster.csv", "id,join_after,leave_after,return_after"):
 		if not characters.has(row.id):
 			_error(row, "id", "未知干员 " + row.id); continue
@@ -60,13 +65,14 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 		var wave := {"time": _number(row, "time", 0), "count": int(_number(row, "count", 1, true)),
 			"interval": _number(row, "interval", 0.000001), "enemy": row.enemy, "route": row.route, "number": int(_number(row, "number", 1, true))}
 		if not levels.has(row.level): _error(row, "level", "未知关卡 " + row.level)
+		elif levels[row.level].type != "battle": _error(row, "level", "波次只能属于战斗关")
 		elif not enemies.has(row.enemy): _error(row, "enemy", "未知敌人 " + row.enemy)
 		else:
 			levels[row.level].waves.append(wave)
 			levels[row.level].enemies[row.enemy] = enemies[row.enemy].stats.duplicate(true)
 		waves.append(row)
 	for id in levels:
-		if levels[id].waves.is_empty(): _level_errors[id].append("%s/levels.csv:1 [waves] %s 没有波次" % [base, id])
+		if levels[id].type == "battle" and levels[id].waves.is_empty(): _level_errors[id].append("%s/levels.csv:1 [waves] %s 没有波次" % [base, id])
 	return errors.duplicate()
 
 func _load_actors(path: String) -> void:
@@ -133,7 +139,7 @@ func diagnostics(id: String) -> PackedStringArray:
 	return result
 
 func battle_operator_ids(id: String, operator_ids: Array = []) -> Array:
-	if id == "scene_002": return ["character_011", "character_012"]
+	if id == "scene_0101B": return ["character_011", "character_012"]
 	return starting_operators.duplicate() if operator_ids.is_empty() else operator_ids.duplicate()
 
 func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionary:
@@ -211,17 +217,17 @@ func story(path: String) -> Resource:
 		elif not node.is_empty():
 			if line.begins_with("background: "): node.background = line.substr(12).strip_edges()
 			elif line.begins_with("framing: "): node.framing = line.substr(9).strip_edges()
-			elif line.begins_with("screen_shake: "):
-				var value := line.substr(14).strip_edges()
-				if value not in ["true", "false"]: errors.append("%s:%d [screen_shake] 必须为 true 或 false" % [path, offset + 1])
-				node.screen_shake = value == "true"
-			elif line.begins_with("actor_shake:"): node.actor_shake = Array(line.substr(12).strip_edges().split("|", false))
-			elif line.begins_with("actor_flip:"): node.actor_flip = Array(line.substr(11).strip_edges().split("|", false))
-			elif line.begins_with("actor_mirrored:"): node.actor_mirrored = Array(line.substr(15).strip_edges().split("|", false))
-			elif line.begins_with("actor_exit_left:"): node.actor_exit_left = Array(line.substr(16).strip_edges().split("|", false))
-			elif line.begins_with("actor_exit_right:"): node.actor_exit_right = Array(line.substr(17).strip_edges().split("|", false))
+			elif line.begins_with("anim_screen_shake: "):
+				var value := line.get_slice(":", 1).strip_edges()
+				if value not in ["true", "false"]: errors.append("%s:%d [anim_screen_shake] 必须为 true 或 false" % [path, offset + 1])
+				node.anim_screen_shake = value == "true"
+			elif line.begins_with("anim_actor_shake:"): node.anim_actor_shake = Array(line.get_slice(":", 1).strip_edges().split("|", false))
+			elif line.begins_with("anim_actor_flip:"): node.anim_actor_flip = Array(line.get_slice(":", 1).strip_edges().split("|", false))
+			elif line.begins_with("actor_mirror:"): node.actor_mirror = Array(line.get_slice(":", 1).strip_edges().split("|", false))
+			elif line.begins_with("anim_actor_exit_left:"): node.anim_actor_exit_left = Array(line.get_slice(":", 1).strip_edges().split("|", false))
+			elif line.begins_with("anim_actor_exit_right:"): node.anim_actor_exit_right = Array(line.get_slice(":", 1).strip_edges().split("|", false))
 			elif line.begins_with("actors:"): node.actors = Array(line.substr(7).strip_edges().split("|", false))
-			elif line.begins_with("speaker: "): node.speaker_actor = line.substr(9).strip_edges()
+			elif line.begins_with("speaker:"): node.speaker_actor = line.substr(8).strip_edges()
 			elif line.begins_with("> "): node.text += ("\n" if not node.text.is_empty() else "") + line.substr(2)
 			elif not line.strip_edges().is_empty(): errors.append("%s:%d [syntax] 未知剧情标记" % [path, offset + 1])
 	if not node.is_empty():
@@ -237,15 +243,15 @@ func _add_line(script: Resource, node: Dictionary, index: int, path: String, at:
 	if node.actors.size() > 2 or (node.actors.size() == 2 and node.actors[0] == node.actors[1]): errors.append("%s:%d [actors] 最多两名不重复角色" % [path, at])
 	for actor in node.actors:
 		if not characters.has(actor) and not enemies.has(actor): errors.append("%s:%d [actors] 未知角色 %s" % [path, at, actor])
-	for field in ["actor_shake", "actor_flip", "actor_mirrored", "actor_exit_left", "actor_exit_right"]:
+	for field in ["anim_actor_shake", "anim_actor_flip", "actor_mirror", "anim_actor_exit_left", "anim_actor_exit_right"]:
 		for actor in node.get(field, []):
 			if not node.actors.has(actor): errors.append("%s:%d [%s] 效果目标必须出场 %s" % [path, at, field, actor])
 		if node.get(field, []).size() != _unique_count(PackedStringArray(node.get(field, []))):
 			errors.append("%s:%d [%s] 效果目标不能重复" % [path, at, field])
-	for actor in node.get("actor_exit_left", []):
-		if node.get("actor_exit_right", []).has(actor): errors.append("%s:%d [actor_exit_left/actor_exit_right] 同一角色不能同时向两侧离场 %s" % [path, at, actor])
+	for actor in node.get("anim_actor_exit_left", []):
+		if node.get("anim_actor_exit_right", []).has(actor): errors.append("%s:%d [anim_actor_exit_left/anim_actor_exit_right] 同一角色不能同时向两侧离场 %s" % [path, at, actor])
 	var speaker: String = node.get("speaker_actor", "")
-	if speaker != "narrator" and not node.actors.has(speaker): errors.append("%s:%d [speaker] 说话人必须出场" % [path, at])
+	if not speaker.is_empty() and speaker != "narrator" and not node.actors.has(speaker): errors.append("%s:%d [speaker] 说话人必须出场" % [path, at])
 	node.speaker = characters[speaker].stats.name if characters.has(speaker) else (enemies[speaker].stats.name if enemies.has(speaker) else "旁白")
 	node.speaker_actor = "" if speaker == "narrator" else speaker
 	node.next = "line_%d" % (index + 1)
@@ -267,7 +273,7 @@ func _table(path: String, columns: String) -> Array:
 	if not valid: return result
 	var ids := {}
 	var id_pattern := RegEx.new()
-	id_pattern.compile("^[a-z]+_[0-9]{3,}$")
+	id_pattern.compile("^[a-z]+_[0-9]{3,}$|^scene_[0-9]{4}[A-Z]$")
 	var line := 2
 	while file.get_position() < file.get_length():
 		var position := file.get_position()

@@ -5,9 +5,9 @@
 
 | 状态 | 剧情用途 | 原件与正式目标 |
 | --- | --- | --- |
-| 已生成并验收 | 1-2 空洞闭合后的家中，延续现有家中构图，窗外仍停电，右侧空洞完全关闭 | Human/StarterContent/story/chapter01/chapter01_02_home_closed_v1.png → content/scenes/scene_005/background.png |
-| 已生成并验收 | 1-3 驱车途中，从车内望向停电的上海街道，少量仪表光，无人无字 | Human/StarterContent/story/chapter01/chapter01_03_city_drive_v1.png → content/scenes/scene_003/city_drive.png |
-| 已生成并验收 | 1-5 灯火归来，保持现有东方明珠视角，节点彻底闭合，塔与城市重新亮起，地面无大片反光 | Human/StarterContent/story/chapter01/chapter01_05_city_restored_v1.png → content/scenes/scene_004/city_restored.png |
+| 已生成并验收 | 1-2 空洞闭合后的家中，延续现有家中构图，窗外仍停电，右侧空洞完全关闭 | Human/StarterContent/story/chapter01/chapter01_02_home_closed_v1.png → content/scenes/scene_0102A/background.png |
+| 已生成并验收 | 1-3 驱车途中，从车内望向停电的上海街道，少量仪表光，无人无字 | Human/StarterContent/story/chapter01/chapter01_03_city_drive_v1.png → content/scenes/scene_0103A/city_drive.png |
+| 已生成并验收 | 1-5 灯火归来，保持现有东方明珠视角，节点彻底闭合，塔与城市重新亮起，地面无大片反光 | Human/StarterContent/story/chapter01/chapter01_05_city_restored_v1.png → content/scenes/scene_0104A/city_restored.png |
 
 现有家中空洞、路边救援、东方明珠异常背景及五名角色外观复用。暂时未实现的连续动画（扑击、跌入空洞、节点收缩）用短动作叙述承接，不将角色烘焙进环境图。
 

@@ -13,16 +13,16 @@ func run() -> void:
 	if not catalog.errors.is_empty():
 		push_error("\n".join(catalog.errors)); quit(1); return
 	for id in catalog.levels:
+		if catalog.levels[id].type == "story":
+			var story = catalog.story(catalog.levels[id].story)
+			if not story.errors().is_empty(): failures += 1
+			continue
 		var game = BattleScene.instantiate()
 		game.campaign_level = id
 		game.set_process(false)
 		root.add_child(game)
 		if game.battle == null or not game.validation_errors.is_empty():
 			failures += 1; push_error(id + ": " + "\n".join(game.validation_errors))
-		for kind in ["before", "after"]:
-			if catalog.levels[id][kind].is_empty(): continue
-			var story = catalog.story(catalog.levels[id][kind])
-			if not story.errors().is_empty(): failures += 1
 		game.queue_free()
 		await process_frame
 	print("PACKED CONTENT: four battles, four stories and chapter epilogue, %d failures" % failures)

@@ -172,17 +172,18 @@ func show_levels() -> void:
 		issues.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		return
 	var ids: Array = catalog.levels.keys()
-	var stage_spacing := minf(315.0, 720.0 / maxf(1.0, ids.size() - 1))
 	for i in ids.size():
 		var id: String = ids[i]
 		if not progress.unlocked(id, ids): continue
-		var x := 90.0 + i * stage_spacing
-		var node := _button(canvas, "✓" if progress.completed.has(id) else "%02d" % (i + 1), Rect2(x, 360, 205, 110), _select_level.bind(id), id == progress.selected)
+		var x := 60.0 + (i % 5) * 195.0
+		var y := 245.0 + int(i / 5) * 220.0
+		var node := _button(canvas, "✓" if progress.completed.has(id) else str(catalog.levels[id].name).get_slice(" ", 0), Rect2(x, y, 170, 75), _select_level.bind(id), id == progress.selected)
 		node.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_text(canvas, catalog.levels[id].name, Rect2(x - 15, 505, 235, 65), 22 if ids.size() > 3 else 27).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_text(canvas, "已完成" if progress.completed.has(id) else "可行动", Rect2(x, 590, 205, 40), 23, Color("81ddea")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var label := _text(canvas, catalog.levels[id].name, Rect2(x - 5, y + 85, 180, 75), 19)
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_line(Vector2(30, 815), Vector2(1020, 815))
-	if completed: _text(canvas, "第一章完成 · 小黄的信号来自海洋", Rect2(80, 710, 940, 60), 28, Color("dfc49b"))
+	if completed: _text(canvas, "第一章完成 · 小黄的信号来自济州岛", Rect2(80, 710, 940, 60), 28, Color("dfc49b"))
 	var level: Dictionary = catalog.levels[progress.selected]
 	var detail := Panel.new()
 	detail.position = Vector2(1090, 112); detail.size = Vector2(553, 777)
@@ -191,16 +192,18 @@ func show_levels() -> void:
 	panel_style.border_color = Color("83afc3"); panel_style.set_border_width_all(1)
 	detail.add_theme_stylebox_override("panel", panel_style)
 	canvas.add_child(detail)
-	_add_preview(detail)
+	if level.type == "battle": _add_preview(detail)
+	else: _text(detail, "剧情关卡", Rect2(40, 125, 450, 60), 32, Color("b9d9e4"))
 	_text(detail, level.name, Rect2(27, 295, 500, 65), 30)
 	var description := _text(detail, level.description, Rect2(28, 375, 490, 95), 23, Color("b9d9e4"))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text(detail, "出战干员", Rect2(28, 505, 450, 32), 22, Color("a7c3d1"))
-	var roster: Array = catalog.battle_operator_ids(progress.selected, progress.available_operators())
-	for i in roster.size():
-		var appearance = catalog.appearances(progress.selected, roster)[roster[i]]
-		_image(detail, Rect2(28 + i * 99, 550, 86, 83), appearance.portrait)
-		_text(detail, catalog.characters[roster[i]].stats.name, Rect2(28 + i * 99, 633, 86, 28), 18).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if level.type == "battle":
+		_text(detail, "出战干员", Rect2(28, 505, 450, 32), 22, Color("a7c3d1"))
+		var roster: Array = catalog.battle_operator_ids(progress.selected, progress.available_operators())
+		for i in roster.size():
+			var appearance = catalog.appearances(progress.selected, roster)[roster[i]]
+			_image(detail, Rect2(28 + i * 99, 550, 86, 83), appearance.portrait)
+			_text(detail, catalog.characters[roster[i]].stats.name, Rect2(28 + i * 99, 633, 86, 28), 18).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var action := _button(detail, "开始行动   ›", Rect2(25, 689, 505, 65), begin_action, true)
 	action.name = "StartAction"
 	var issues: PackedStringArray = catalog.diagnostics(progress.selected)
@@ -222,7 +225,8 @@ func begin_action() -> void:
 	if not catalog.diagnostics(progress.selected).is_empty(): return
 	progress.started = true
 	_save_progress()
-	show_story(progress.selected, "before")
+	if catalog.levels[progress.selected].type == "story": show_story(progress.selected, "story")
+	else: start_battle()
 
 func show_story(id: String, kind: String) -> void:
 	if not catalog.diagnostics(id).is_empty(): show_levels(); return
@@ -264,13 +268,14 @@ func advance_story() -> void:
 
 func finish_story() -> void:
 	if page != "story": return
-	if story_kind == "before":
-		progress.selected = story_level
-		start_battle()
-	else:
-		progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
-		_save_progress()
+	if progress.completed.has(story_level):
 		show_levels()
+		return
+	progress.pending_after = story_level
+	progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
+	_save_progress()
+	if progress.selected != story_level and catalog.levels[progress.selected].type == "battle": start_battle()
+	else: show_levels()
 
 func _focus_action() -> void:
 	canvas.find_child("StartAction", true, false).grab_focus()
@@ -317,7 +322,7 @@ func start_battle() -> void:
 	return_button.add_theme_font_size_override("font_size", 22)
 	return_button.pressed.connect(_leave_result)
 	battle_scene.hud.end_panel.get_child(0).add_child(return_button)
-	if progress.selected == "scene_002" and not tutorial_seen: _show_tutorial()
+	if progress.selected == "scene_0101B" and not tutorial_seen: _show_tutorial()
 
 func _show_tutorial() -> void:
 	tutorial_seen = true
@@ -342,12 +347,9 @@ func _continue_campaign() -> void:
 	var id: String = progress.pending_after
 	if id.is_empty(): show_levels(); return
 	if not catalog.diagnostics(id).is_empty(): show_levels(); return
-	if not catalog.levels[id].after.is_empty():
-		show_story(id, "after")
-		return
 	progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
 	_save_progress()
-	if progress.selected != id: show_story(progress.selected, "before")
+	if progress.selected != id and catalog.levels[progress.selected].type == "story": show_story(progress.selected, "story")
 	else: show_levels()
 
 func _observe_battle(state: Dictionary, _events: Array) -> void:

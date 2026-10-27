@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ip85yq6wgxmi"
-path="res://.godot/imported/background.png-f36006c5c9c10046ee10a520a6045556.ctex"
+uid="uid://3v2wqlu640s"
+path="res://.godot/imported/city_drive.png-f097d861beb5b793172c92a3a130545c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://content/scenes/scene_005/background.png"
-dest_files=["res://.godot/imported/background.png-f36006c5c9c10046ee10a520a6045556.ctex"]
+source_file="res://content/scenes/scene_0103A/city_drive.png"
+dest_files=["res://.godot/imported/city_drive.png-f097d861beb5b793172c92a3a130545c.ctex"]
 
 [params]
 

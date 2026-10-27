@@ -15,17 +15,17 @@ func check(ok: bool, label: String) -> void:
 func run() -> void:
 	var story = ScriptData.new()
 	story.start = "line"
-	story.nodes = {"line": {"type": "line", "text": "!", "next": "end", "actors": ["one", "two"], "screen_shake": true, "actor_shake": ["one"]}, "end": {"type": "end", "text": ""}}
+	story.nodes = {"line": {"type": "line", "text": "!", "next": "end", "actors": ["one", "two"], "anim_screen_shake": true, "anim_actor_shake": ["one"]}, "end": {"type": "end", "text": ""}}
 	check(story.errors().is_empty(), "Screen and actor shakes can coexist")
 	for bad in ["missing", ""]:
-		story.nodes.line.actor_shake = [bad]
+		story.nodes.line.anim_actor_shake = [bad]
 		check(not story.errors().is_empty(), "Absent shake target rejected")
-	story.nodes.line.actor_shake = ["one", "one"]
+	story.nodes.line.anim_actor_shake = ["one", "one"]
 	check(not story.errors().is_empty(), "Duplicate shake target rejected")
-	story.nodes.line.actor_shake = "one"
+	story.nodes.line.anim_actor_shake = "one"
 	check(not story.errors().is_empty(), "Non-array shake rejected")
-	story.nodes.line.actor_shake = []
-	story.nodes.line.screen_shake = "true"
+	story.nodes.line.anim_actor_shake = []
+	story.nodes.line.anim_screen_shake = "true"
 	check(not story.errors().is_empty(), "Non-boolean screen shake rejected")
 	var texture := GradientTexture2D.new()
 	var view := View.new()
@@ -42,7 +42,7 @@ func run() -> void:
 		var dialogue_rest := view.dialogue.global_position
 		var button_rest := view.continue_button.global_position
 		var screen := quiet.duplicate(true)
-		screen.screen_shake = true
+		screen.anim_screen_shake = true
 		view.show_snapshot(screen)
 		view.set_process(false)
 		view._process(0.07)
@@ -51,10 +51,13 @@ func run() -> void:
 		check((view.actor_views[1].global_position - other_rest).distance_to(movement) < 0.001, "Screen shake moves both actors together within subpixel precision")
 		check(view.background.get_global_rect().encloses(view.get_global_rect()), "Overscan covers viewport during shake")
 		check(view.dialogue.global_position == dialogue_rest and view.continue_button.global_position == button_rest, "Dialogue and input stay still")
-		view._process(1.0)
+		view._process(view.SCREEN_SHAKE_DURATION - 0.0701)
+		check(absf(view.background.offset_left) < 0.01 and absf(view.background.offset_right) < 0.01, "Background overscan approaches zero continuously before shake ends")
+		check(view.background.get_global_rect().encloses(view.get_global_rect()), "Tapered overscan still covers viewport before shake ends")
+		view._process(0.0002)
 		check(view.background.global_position.is_equal_approx(background_rest) and view.actor_views[0].position == rest, "Screen shake settles exactly")
 		var actor := quiet.duplicate(true)
-		actor.actor_shake = ["one"]
+		actor.anim_actor_shake = ["one"]
 		view.show_snapshot(actor)
 		view.set_process(false)
 		view._process(0.07)
@@ -70,8 +73,8 @@ func run() -> void:
 		check(not view.is_processing() and view.background.global_position == background_rest, "Skip to ending cancels motion")
 	# Resize during motion must not accumulate the old layout offset.
 	var resizing := quiet.duplicate(true)
-	resizing.screen_shake = true
-	resizing.actor_shake = ["one"]
+	resizing.anim_screen_shake = true
+	resizing.anim_actor_shake = ["one"]
 	view.show_snapshot(resizing)
 	view.set_process(false)
 	view._process(0.08)

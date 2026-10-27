@@ -52,6 +52,7 @@ func _ready() -> void:
 	var catalog = preload("res://game/content/content_catalog.gd").new()
 	catalog.reload()
 	for id in catalog.levels:
+		if catalog.levels[id].type != "battle": continue
 		level_picker.add_item(catalog.levels[id].name)
 		level_picker.set_item_metadata(level_picker.item_count - 1, id)
 	level_picker.item_selected.connect(func(index: int):

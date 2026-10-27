@@ -1,6 +1,6 @@
 extends RefCounted
 ## Versioned chapter progress. Existing legacy sections survive writes.
-var selected := "scene_002"
+var selected := "scene_0101A"
 var completed: Array[String] = []
 var pending_after := ""
 var started := false
@@ -16,10 +16,10 @@ func load_progress(path: String, ids: Array) -> void:
 	operators.clear()
 	away_operators.clear(); _has_roster_state = false
 	if _file.load(path) != OK: return
-	if _file.get_value("campaign", "version", 0) not in [1, 2]: return
+	if _file.get_value("campaign", "version", 0) not in [1, 2, 3]: return
 	var saved_operators = _file.get_value("player", "operators", [])
 	if saved_operators is Array:
-		_has_roster_state = _file.get_value("campaign", "version", 0) == 2 and not saved_operators.is_empty()
+		_has_roster_state = _file.get_value("campaign", "version", 0) >= 2 and not saved_operators.is_empty()
 		for id in saved_operators:
 			if id is String and not operators.has(id): operators.append(id)
 	var saved_away = _file.get_value("player", "away", [])
@@ -27,22 +27,41 @@ func load_progress(path: String, ids: Array) -> void:
 		for id in saved_away:
 			if id is String and operators.has(id) and not away_operators.has(id): away_operators.append(id)
 	var saved = _file.get_value("campaign", "completed", [])
+	var selection = _file.get_value("campaign", "selected", selected)
+	var pending = _file.get_value("campaign", "pending_after", "")
+	if _file.get_value("campaign", "version", 0) < 3 and ids.has("scene_0101A"):
+		var old_ids := ["scene_002", "scene_005", "scene_003", "scene_004"]
+		if saved is not Array: saved = []
+		else: saved = saved.duplicate()
+		if (saved.has("scene_003") or pending == "scene_003") and not saved.has("scene_005"): saved.append("scene_005")
+		var migrated: Array = []
+		for i in old_ids.size():
+			var story_id: String = "scene_01%02dA" % (i + 1)
+			var battle_id: String = "scene_01%02dB" % (i + 1)
+			if saved.has(old_ids[i]):
+				migrated.append(story_id); migrated.append(battle_id)
+			elif pending == old_ids[i]:
+				migrated.append(story_id)
+				pending = battle_id
+				break
+			else: break
+		if saved.has("scene_004"): migrated.append("scene_0105A")
+		var pending_index := old_ids.find(pending)
+		if pending_index >= 0: pending = "scene_01%02dB" % (pending_index + 1)
+		saved = migrated
+		# Old selection named the combined level; resume at its story unless that
+		# level was already completed, in which case retain a selectable entry.
+		var old_index := old_ids.find(selection)
+		if old_index >= 0: selection = "scene_01%02dA" % (old_index + 1)
 	if saved is Array:
-		# The added home battle precedes the existing rescue stage. Preserve earned
-		# progress in earlier chapter saves that have already reached that rescue.
-		var rescue_won: bool = saved.has("scene_002") and _file.get_value("campaign", "pending_after", "") == "scene_003"
-		if ids.has("scene_005") and (saved.has("scene_003") or rescue_won) and not saved.has("scene_005"):
-			saved = saved.duplicate()
-			saved.append("scene_005")
-		# Only accept a sequential prefix: a malformed save cannot skip chapters.
 		for id in ids:
 			if not saved.has(id): break
 			completed.append(id)
-	var selection = _file.get_value("campaign", "selected", selected)
 	if selection is String and ids.has(selection) and unlocked(selection, ids): selected = selection
-	elif selection == "scene_003" and ids.has("scene_005") and unlocked("scene_005", ids): selected = "scene_005"
-	var pending = _file.get_value("campaign", "pending_after", "")
-	if pending is String and ids.has(pending) and unlocked(pending, ids): pending_after = pending
+	elif completed.size() < ids.size(): selected = ids[completed.size()]
+	if pending is String and ids.has(pending) and unlocked(pending, ids):
+		pending_after = pending
+		selected = pending
 	started = _file.get_value("campaign", "started", false) == true
 
 func configure_operators(initial: Array, recruitment: Dictionary, valid_ids: Array, departures: Dictionary = {}, returns: Dictionary = {}) -> void:
@@ -78,7 +97,7 @@ func unlocked(id: String, ids: Array) -> bool:
 	return index >= 0 and (index == 0 or completed.has(ids[index - 1]))
 
 func save(path: String) -> Error:
-	_file.set_value("campaign", "version", 2)
+	_file.set_value("campaign", "version", 3)
 	_file.set_value("player", "operators", operators)
 	_file.set_value("player", "away", away_operators)
 	_file.set_value("campaign", "selected", selected)

@@ -54,8 +54,8 @@ func run() -> void:
 	check(game.last_state.phase == "victory","Five-skill defense remains winnable")
 	game.free(); await process_frame
 	game = load("res://game/battle/battle_scene.tscn").instantiate()
-	game.campaign_level = "scene_004"
-	game.operator_ids.assign(preload("res://game/tests/chapter_fixture.gd").operator_ids("scene_004"))
+	game.campaign_level = "scene_0104B"
+	game.operator_ids.assign(preload("res://game/tests/chapter_fixture.gd").operator_ids("scene_0104B"))
 	root.add_child(game); game.set_process(false)
 	await settle()
 	check(game.validation_errors.is_empty() and game.skill_icons.size() == 4, "Formal stage receives icons from skill resources")

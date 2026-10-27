@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bk4kwubtiatt4"
-path="res://.godot/imported/city_restored.png-d20b65105bb9843fc72234c82349180b.ctex"
+uid="uid://cw7vthnm58a3l"
+path="res://.godot/imported/background.png-89e733ed8883626df70a40fe71abdf96.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://content/scenes/scene_004/city_restored.png"
-dest_files=["res://.godot/imported/city_restored.png-d20b65105bb9843fc72234c82349180b.ctex"]
+source_file="res://content/scenes/scene_0103A/background.png"
+dest_files=["res://.godot/imported/background.png-89e733ed8883626df70a40fe71abdf96.ctex"]
 
 [params]
 

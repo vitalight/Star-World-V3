@@ -18,14 +18,14 @@ speaker: character_013
 background: background_004
 framing: wide
 actors: character_013
-speaker: narrator
+speaker:
 > 阿五取出节点检测仪。
 
 ---
 background: background_004
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 仪器发出杂乱警报声。
 
 ---
@@ -125,6 +125,13 @@ speaker: character_011
 ---
 background: background_005
 framing: wide
+actors: 
+speaker: 
+> 一行人驱车出发。
+
+---
+background: background_005
+framing: wide
 actors: character_013|character_014
 speaker: character_013
 > 信号源正在增强。
@@ -140,15 +147,15 @@ speaker: character_014
 background: background_005
 framing: wide
 actors:
-speaker: narrator
-screen_shake: true
+speaker:
+anim_screen_shake: true
 > 远处传来爆炸声。
 
 ---
 background: background_005
 framing: wide
 actors:
-speaker: narrator
+speaker:
 > 救命——！
 
 ---
@@ -156,7 +163,7 @@ background: background_005
 framing: wide
 actors: character_011
 speaker: character_011
-actor_shake: character_011
+anim_actor_shake: character_011
 > 等等。
 > 那不是月月吗？！
 
@@ -164,7 +171,7 @@ actor_shake: character_011
 background: background_002
 framing: wide
 actors: enemy_001|character_015
-speaker: narrator
+speaker:
 > 街道中央，月月被怪物包围。
 
 ---

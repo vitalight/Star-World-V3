@@ -13,40 +13,47 @@ func run() -> void:
 	var catalog = Catalog.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "Campaign sources load")
-	check(catalog.levels.keys() == ["scene_002", "scene_005", "scene_003", "scene_004"], "Four battles follow revised chapter order")
+	check(catalog.levels.size() == 9, "Nine independent chapter stages")
 	var scripts: Array = []
 	for id in catalog.levels:
-		var script = catalog.story(catalog.levels[id].before)
+		if catalog.levels[id].type != "story": continue
+		var script = catalog.story(catalog.levels[id].story)
 		check(script.errors().is_empty(), "Valid story: " + id)
 		scripts.append(script)
-		if id != "scene_004": check(catalog.levels[id].after.is_empty(), "Aftermath continues in next introduction")
-	scripts.append(catalog.story(catalog.levels.scene_004.after))
 	check(text(scripts[0]).contains("存档啊") and not text(scripts[0]).contains("钻了进去"), "Cat stays through first battle")
-	check(text(scripts[1]).contains("一猫一怪撞入空洞") and text(scripts[1]).contains("准备战斗"), "Cat disappears before control team battle")
-	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("月月！撑住"), "Tracking leads to doctor rescue")
-	check(text(scripts[3]).contains("多一个医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
-	check(text(scripts[4]).contains("信号来自海上") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")
+	check(text(scripts[1]).contains("一猫一怪撞入空洞") and text(scripts[1]).contains("房间深处传来怪物叫声"), "Cat disappears before control team battle")
+	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("先救人"), "Tracking leads to doctor rescue")
+	check(text(scripts[3]).contains("我是医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
+	check(text(scripts[4]).contains("济州岛") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")
 	var portal_shakes := false
 	var cat_cry_shakes := false
 	for node in scripts[1].nodes.values():
-		if node.text.contains("空洞突然再次震动"): portal_shakes = node.get("screen_shake", false)
-		if node.text.contains("小黄！！"): cat_cry_shakes = node.get("actor_shake", []).has("character_011")
+		if node.text.contains("空洞突然再次震动"): portal_shakes = node.get("anim_screen_shake", false)
+		if node.text.contains("小黄！！"): cat_cry_shakes = node.get("anim_actor_shake", []).has("character_011")
 	check(portal_shakes, "Portal tremor has authored screen shake")
 	check(cat_cry_shakes, "Emotional cat cry shakes protagonist")
-	var monster_turns := false
 	var both_exit := false
 	for node in scripts[0].nodes.values():
-		if node.text.contains("怪物转向大星"):
-			monster_turns = node.get("actor_flip", []).has("enemy_001") and node.get("actor_mirrored", []).has("enemy_001")
 		if node.text.contains("小黄") and node.text.contains("扑向"):
-			both_exit = node.get("actor_exit_left", []) == ["enemy_001", "character_012"]
-	check(monster_turns, "Monster turn has explicit flip and final facing")
+			both_exit = node.get("anim_actor_exit_right", []) == ["enemy_001", "character_012"]
 	check(both_exit, "Pounce sends both actors offstage")
 	var textures: Dictionary = catalog.story_textures()
 	check(textures.actors.has("enemy_001") and textures.actors.enemy_001 != null, "Enemy appearance is available to story view")
 	var view = View.new()
 	view.configure(textures.backgrounds, textures.actors)
 	root.add_child(view)
+	var preceding := {}
+	var warning := {}
+	for node in scripts[0].nodes.values():
+		if node.text.contains("我家什么时候多了个洞"): preceding = node
+		if node.text == "小黄！别过去！": warning = node
+	view.show_snapshot(preceding)
+	var protagonist_facing: bool = view.actor_views[0].flip_h
+	view.show_snapshot(warning)
+	check(view.actor_views[0].flip_h == protagonist_facing, "Unlisted protagonist keeps default facing when cat is mirrored")
+	check(view.actor_views[1].flip_h, "Authored cat is mirrored during warning")
+	view._process(0.2)
+	check(view.actor_views[0].flip_h == protagonist_facing and view.actor_views[1].flip_h, "Shake preserves both authored directions")
 	for dimensions in [Vector2i(1280, 720), Vector2i(960, 600), Vector2i(1600, 900)]:
 		root.size = dimensions
 		await process_frame
@@ -71,6 +78,7 @@ func run() -> void:
 		for node in scripts[0].nodes.values():
 			if node.get("framing") == "wide":
 				view.show_snapshot(node)
+				view._process(view.BACKGROUND_TRANSITION_DURATION)
 				reveal_found = view.background.texture == textures.backgrounds.background_001
 				break
 		check(reveal_found, "Portal reveal restores wide background")
