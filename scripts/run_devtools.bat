@@ -24,11 +24,11 @@ echo [Import] temp/devtools/import.log
 "%GODOT_PATH%" --headless --path "%PROJECT_ROOT%" --editor --import --quit > "%PROJECT_ROOT%\temp\devtools\import.log" 2>&1
 if errorlevel 1 (
     type "%PROJECT_ROOT%\temp\devtools\import.log"
-    echo [ERROR] Resource import failed. See docs/troubleshooting.md.
+    echo [ERROR] Resource import failed. Check the Godot output and GODOT_PATH.
     exit /b 1
 )
 echo [Run] Developer Hub
 "%GODOT_PATH%" --path "%PROJECT_ROOT%" res://devtools/hub/developer_hub.tscn %*
 set "RUN_RESULT=%ERRORLEVEL%"
-if not "%RUN_RESULT%"=="0" echo [ERROR] Godot exited with code %RUN_RESULT%. See docs/troubleshooting.md.
+if not "%RUN_RESULT%"=="0" echo [ERROR] Godot exited with code %RUN_RESULT%. Check the Godot output and GODOT_PATH.
 exit /b %RUN_RESULT%

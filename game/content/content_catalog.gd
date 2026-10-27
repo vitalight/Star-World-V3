@@ -179,7 +179,7 @@ func appearances(id: String, operator_ids: Array = []) -> Dictionary:
 func story_textures() -> Dictionary:
 	var result := {"backgrounds": {}, "actors": {}}
 	for id in backgrounds: result.backgrounds[id] = load(backgrounds[id])
-	for id in characters: result.actors[id] = _appearances[id].poses[0]
+	for id in _appearances: result.actors[id] = _appearances[id].poses[0]
 	return result
 
 func skill_icons(id: String, operator_ids: Array = []) -> Dictionary:
@@ -211,6 +211,15 @@ func story(path: String) -> Resource:
 		elif not node.is_empty():
 			if line.begins_with("background: "): node.background = line.substr(12).strip_edges()
 			elif line.begins_with("framing: "): node.framing = line.substr(9).strip_edges()
+			elif line.begins_with("screen_shake: "):
+				var value := line.substr(14).strip_edges()
+				if value not in ["true", "false"]: errors.append("%s:%d [screen_shake] 必须为 true 或 false" % [path, offset + 1])
+				node.screen_shake = value == "true"
+			elif line.begins_with("actor_shake:"): node.actor_shake = Array(line.substr(12).strip_edges().split("|", false))
+			elif line.begins_with("actor_flip:"): node.actor_flip = Array(line.substr(11).strip_edges().split("|", false))
+			elif line.begins_with("actor_mirrored:"): node.actor_mirrored = Array(line.substr(15).strip_edges().split("|", false))
+			elif line.begins_with("actor_exit_left:"): node.actor_exit_left = Array(line.substr(16).strip_edges().split("|", false))
+			elif line.begins_with("actor_exit_right:"): node.actor_exit_right = Array(line.substr(17).strip_edges().split("|", false))
 			elif line.begins_with("actors:"): node.actors = Array(line.substr(7).strip_edges().split("|", false))
 			elif line.begins_with("speaker: "): node.speaker_actor = line.substr(9).strip_edges()
 			elif line.begins_with("> "): node.text += ("\n" if not node.text.is_empty() else "") + line.substr(2)
@@ -227,10 +236,17 @@ func _add_line(script: Resource, node: Dictionary, index: int, path: String, at:
 	if not backgrounds.has(node.get("background", "")): errors.append("%s:%d [background] 未知背景" % [path, at])
 	if node.actors.size() > 2 or (node.actors.size() == 2 and node.actors[0] == node.actors[1]): errors.append("%s:%d [actors] 最多两名不重复角色" % [path, at])
 	for actor in node.actors:
-		if not characters.has(actor): errors.append("%s:%d [actors] 未知角色 %s" % [path, at, actor])
+		if not characters.has(actor) and not enemies.has(actor): errors.append("%s:%d [actors] 未知角色 %s" % [path, at, actor])
+	for field in ["actor_shake", "actor_flip", "actor_mirrored", "actor_exit_left", "actor_exit_right"]:
+		for actor in node.get(field, []):
+			if not node.actors.has(actor): errors.append("%s:%d [%s] 效果目标必须出场 %s" % [path, at, field, actor])
+		if node.get(field, []).size() != _unique_count(PackedStringArray(node.get(field, []))):
+			errors.append("%s:%d [%s] 效果目标不能重复" % [path, at, field])
+	for actor in node.get("actor_exit_left", []):
+		if node.get("actor_exit_right", []).has(actor): errors.append("%s:%d [actor_exit_left/actor_exit_right] 同一角色不能同时向两侧离场 %s" % [path, at, actor])
 	var speaker: String = node.get("speaker_actor", "")
 	if speaker != "narrator" and not node.actors.has(speaker): errors.append("%s:%d [speaker] 说话人必须出场" % [path, at])
-	node.speaker = characters[speaker].stats.name if characters.has(speaker) else "旁白"
+	node.speaker = characters[speaker].stats.name if characters.has(speaker) else (enemies[speaker].stats.name if enemies.has(speaker) else "旁白")
 	node.speaker_actor = "" if speaker == "narrator" else speaker
 	node.next = "line_%d" % (index + 1)
 	script.nodes["line_%d" % index] = node.duplicate(true)

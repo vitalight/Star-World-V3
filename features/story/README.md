@@ -24,3 +24,7 @@
 `story_view.gd` 是独立 Control，不创建会话。调用方用 `configure(backgrounds, actors)` 传入 ID → Texture2D 映射，再调用 `show_snapshot(snapshot)`。它按比例铺满背景、显示单人居中/双人左右的透明角色、降低非说话角色亮度，并绘制底部黑色渐变、说话人、可滚动对白和选择按钮。`advance_requested` / `choice_requested(index)` 只表达输入意图，由调用方决定能否推进。`ui_sound_requested(id)` 在按钮按下和点击推进时发出，由调用方决定是否播放，视图自身不持有音频节点。贴图不会拉伸，不读取任何固定 content 路径。
 
 暂不支持条件分支、变量、存档、脚本事件、打字机或转场动画。音频播放由调用方接入，模块只发出 UI 音效意图。自动播放、跳过和记录弹层属于 Story Test 控制，不是会话隐含行为。
+
+震动演出字段：节点可设置 `screen_shake: bool` 与 `actor_shake: Array[String]`。actor_shake 只能包含本段 actors 中的唯一 ID。视图每次 show_snapshot 都从静止布局开始播放本段的衰减震动，重播会重新触发；调用方应只在进入／重播节点时显示快照。画面震动移动背景与所有角色，单独角色震动只移动目标；UI 保持静止。效果不阻塞推进，下一段、结束或空快照立即清除，resize 不重播。验证：`res://features/story/tests/story_shake_test.gd`。
+
+角色运动字段：`actor_flip`、`actor_mirrored`、`actor_exit_left`、`actor_exit_right` 都是本段已出场且唯一的角色 ID 数组，默认为空。未指定 actor_mirrored 时，双角色镜头默认左侧镜像、右侧原图朝向，单角色居中默认镜像朝右；显式 actor_mirrored 列表覆盖默认朝向（空列表清除所有镜像）。actor_mirrored 定义完整的最终朝向；actor_flip 从其相反朝向经过横向收窄转到最终朝向，约0.24秒。actor_exit_left／actor_exit_right 分别让目标向左／向右移出并淡出，约0.45秒后隐藏，同一角色不能同时配置左右离场。每次 show_snapshot 从本段显式状态重新播放，不继承前段的缩放、朝向、透明度和离场状态；可与震动叠加。验证：`res://features/story/tests/story_actor_motion_test.gd`。

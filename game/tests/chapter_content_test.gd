@@ -15,7 +15,7 @@ func _initialize() -> void:
 	catalog.reload()
 	check(catalog.errors.is_empty(), "Catalog valid: " + "\n".join(catalog.errors))
 	if not catalog.errors.is_empty(): quit(1); return
-	check(catalog.characters.size() == 5 and catalog.levels.size() == 3, "Authored scope is five characters and three stages")
+	check(catalog.characters.size() == 5 and catalog.levels.size() == 4, "Authored scope is five characters and four stages")
 	check(catalog.enemies.size() == 4 and catalog.skills.size() == 5, "All authored enemies and skills registered")
 	check(catalog.skill_icons("scene_002").character_011.resource_path == "res://content/ui/skill_icons/icon_01.tres", "Formal skill icon comes from skill resource")
 	check(not catalog.characters.character_011.stats.skill.has("icon"), "Battle configuration excludes skill texture")
@@ -49,6 +49,30 @@ func _initialize() -> void:
 	quit(1 if failures else 0)
 
 func parser_validation(catalog: RefCounted) -> void:
+	var cue_path := "res://temp/chapter_one/shake_parser.md"
+	var cue_text := "# Shake\n---\nbackground: background_001\nactors: character_011|character_012\nspeaker: character_011\nscreen_shake: true\nactor_shake: character_011\n> Shake\n---\nbackground: background_001\nactors: character_011\nspeaker: character_011\n> Quiet\n"
+	write_text(cue_path, cue_text)
+	catalog.errors.clear()
+	var cue_story = catalog.story(cue_path)
+	check(catalog.errors.is_empty() and cue_story.errors().is_empty(), "Authored shake metadata validates")
+	check(cue_story.nodes.line_0.screen_shake and cue_story.nodes.line_0.actor_shake == ["character_011"], "Markdown exports both shake cues")
+	check(not cue_story.nodes.line_1.has("screen_shake") and not cue_story.nodes.line_1.has("actor_shake"), "Shake cues do not carry into next line")
+	var directed := cue_text.replace("actor_shake: character_011", "actor_shake: character_011\nactor_exit_left: character_011\nactor_exit_right: character_012")
+	write_text(cue_path, directed)
+	catalog.errors.clear()
+	cue_story = catalog.story(cue_path)
+	check(catalog.errors.is_empty() and cue_story.nodes.line_0.actor_exit_left == ["character_011"] and cue_story.nodes.line_0.actor_exit_right == ["character_012"], "Markdown preserves independent exit directions")
+	check(not cue_story.nodes.line_1.has("actor_exit_left") and not cue_story.nodes.line_1.has("actor_exit_right"), "Exit directions do not inherit into next beat")
+	write_text(cue_path, directed.replace("actor_exit_right: character_012", "actor_exit_right: character_011"))
+	catalog.errors.clear()
+	catalog.story(cue_path)
+	check("\n".join(catalog.errors).contains("[actor_exit_left/actor_exit_right]"), "Opposing exit cues report content diagnostic")
+	for invalid in [cue_text.replace("screen_shake: true", "screen_shake: maybe"), cue_text.replace("actor_shake: character_011", "actor_shake: character_015"), cue_text.replace("actor_shake: character_011", "actor_shake: character_011|character_011")]:
+		write_text(cue_path, invalid)
+		catalog.errors.clear()
+		catalog.story(cue_path)
+		check(not catalog.errors.is_empty() and "\n".join(catalog.errors).contains("shake]"), "Invalid authored cue reports its field")
+	catalog.errors.clear()
 	var path := "res://temp/chapter_one/parser.csv"
 	var file := FileAccess.open(path, FileAccess.WRITE)
 	file.store_string("id,name\nexample_001,\"中文,对白\n第二行\"\nexample_001,重复\nexample_002,正常\n")
@@ -72,7 +96,7 @@ func source_reload(catalog: RefCounted) -> void:
 	catalog.reload(base, base + "/data")
 	check(catalog.errors.is_empty() and catalog.characters.character_011.stats.name == "测试大星，中文\n第二行", "Saved TRES edit changes Chinese multiline battle name after reload")
 	var story = catalog.story(catalog.levels.scene_002.before)
-	check(story.nodes.line_1.speaker == "测试大星，中文\n第二行", "Story speakers resolve updated display name by stable ID")
+	check(story.nodes.line_2.speaker == "测试大星，中文\n第二行", "Story speakers resolve updated display name by stable ID")
 	var previous: Dictionary = catalog.characters.character_011.stats.duplicate(true)
 	path = base + "/data/skill_001.tres"
 	edit_resource(path, "multiplier", 2.4)

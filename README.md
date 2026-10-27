@@ -54,16 +54,13 @@ StarWorldV3/
 │   ├── adapters/               # 状态、事件与表现之间的适配
 │   ├── content/                # 资源／表格／剧情加载与校验
 │   └── tests/                  # 跨模块集成验证
-├── docs/                       # 架构与评审记录
+├── agents/                     # 按角色组织的项目约定
 ├── temp/                       # 临时数据，不纳入 Git
 └── Human/                      # 人工需求和原始参考
     └── StarterContent/         # 外部输入的初始素材，保留原始内容
 ```
 
-- 具体归属、依赖和验证规则见 [docs/architecture.md](docs/architecture.md)。
-- 场景、角色、地形内容 ID 分别使用 `scene_001`、`character_001`、`terrain_001` 格式，详细规则见架构约定的“内容 ID”。
-- 评审模板见 [docs/module_review.md](docs/module_review.md)，具体记录存入 `docs/reviews/`。
-Git 提交使用 `type(scope): description`，详见 [提交约定](docs/git_conventions.md)。
+- 角色职责、架构、验证和提交约定见 [项目约定入口](AGENTS.md)。
 - 新文件和目录使用 `snake_case`。外部输入目录 `Human/StarterContent/` 保留指定大小写。
 - Godot 的 `.uid` 和素材 `.import` 元数据纳入版本管理，`.godot/` 缓存不提交。
 

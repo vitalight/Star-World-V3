@@ -22,3 +22,9 @@ wave_020,scene_004,115,3,13,enemy_003,upper,6
 wave_021,scene_004,133,4,9,enemy_001,lower,7
 wave_022,scene_004,165,2,13,enemy_003,lower,8
 wave_023,scene_004,175,2,10,enemy_004,upper,9
+wave_024,scene_005,3,3,7,enemy_001,main,1
+wave_025,scene_005,40,4,8,enemy_001,main,2
+wave_026,scene_005,82,3,9,enemy_001,main,3
+wave_027,scene_005,112,2,12,enemy_002,breach,4
+wave_028,scene_005,142,3,8,enemy_001,main,5
+wave_029,scene_005,185,1,1,enemy_002,breach,6

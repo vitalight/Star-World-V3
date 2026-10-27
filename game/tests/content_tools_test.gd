@@ -22,8 +22,8 @@ func run() -> void:
 	root.add_child(workspace); await settle()
 	workspace.game.set_process(false)
 	var picker: OptionButton = workspace.debug_window.level_picker
-	check(picker.item_count == 4, "Game Test offers sample plus chapter")
-	for index in [1, 2, 3, 0]:
+	check(picker.item_count == 5, "Game Test offers sample plus chapter")
+	for index in [1, 2, 3, 4, 0]:
 		picker.select(index); picker.item_selected.emit(index)
 		check(workspace.game.battle != null and workspace.game.validation_errors.is_empty(), "Game Test selection loads valid battle " + str(index))
 		workspace.game.reload_level()
@@ -43,15 +43,15 @@ func run() -> void:
 	workspace.queue_free(); await settle()
 	workspace = load("res://devtools/story_test/story_workspace.tscn").instantiate()
 	root.add_child(workspace); await settle()
-	check(workspace.source_picker.item_count == 4, "Story Test offers only three stage stories and chapter epilogue")
-	for index in range(4):
+	check(workspace.source_picker.item_count == 5, "Story Test offers only four stage stories and chapter epilogue")
+	for index in range(5):
 		workspace.source_picker.select(index)
 		workspace._load_source(index)
 		check(not workspace.modal.visible and workspace.session.snapshot().type == "line", "Story Test loads chapter scene " + str(index))
 		if index == 2:
 			await settle(); await capture("story_test_chapter")
 	workspace._load_source(0)
-	check(workspace.source_picker.get_item_metadata(0) == ["scene_002", "before"] and workspace.session.snapshot().text.contains("突然停电"), "Story Test defaults to formal 1-1 opening")
+	check(workspace.source_picker.get_item_metadata(0) == ["scene_002", "before"] and workspace.session.snapshot().text.contains("晚上七点"), "Story Test defaults to formal 1-1 opening")
 	workspace.queue_free(); await settle()
 	print("CONTENT TOOLS: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

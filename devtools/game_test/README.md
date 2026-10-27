@@ -2,7 +2,7 @@
 
 从 Developer Hub 进入 Game Test，或在 Godot 中 F6 运行 `game/battle/battle_scene.tscn`。默认项目入口是 Player Mode，开发者脚本显式启动 Hub。Game Test 使用主视口完整显示战场，没有固定宽高比留边和工作区滚动外壳。
 
-F3 调试窗的关卡下拉框保留开发样例，并增加第一章三关；选择后重置战斗，“重新加载关卡”读取已保存的角色／敌人／技能 `.tres`、关卡／波次 CSV、MD 和地图。正式章节编辑方式见 `content/campaign/README.md`；下述 Inspector 数值资源编辑方式针对原 scene_001 样例。
+F3 调试窗的关卡下拉框保留开发样例，并增加第一章四关；选择后重置战斗，“重新加载关卡”读取已保存的角色／敌人／技能 `.tres`、关卡／波次 CSV、MD 和地图。正式章节编辑方式见 `content/campaign/README.md`；下述 Inspector 数值资源编辑方式针对原 scene_001 样例。
 
 F3 调试窗与战斗左上菜单的“开发者面板”均提供“跳过战斗并胜利”。Game Test 只展示胜利结果；Player Mode 沿用正常胜利流程保存待播放剧情，战后剧情完成后解锁下一关。面板打开不改变暂停状态，已结束的战斗不能覆盖结果。
 

@@ -172,13 +172,14 @@ func show_levels() -> void:
 		issues.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		return
 	var ids: Array = catalog.levels.keys()
+	var stage_spacing := minf(315.0, 720.0 / maxf(1.0, ids.size() - 1))
 	for i in ids.size():
 		var id: String = ids[i]
 		if not progress.unlocked(id, ids): continue
-		var x := 90.0 + i * 315.0
+		var x := 90.0 + i * stage_spacing
 		var node := _button(canvas, "✓" if progress.completed.has(id) else "%02d" % (i + 1), Rect2(x, 360, 205, 110), _select_level.bind(id), id == progress.selected)
 		node.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_text(canvas, catalog.levels[id].name, Rect2(x - 30, 505, 285, 65), 27).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_text(canvas, catalog.levels[id].name, Rect2(x - 15, 505, 235, 65), 22 if ids.size() > 3 else 27).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_text(canvas, "已完成" if progress.completed.has(id) else "可行动", Rect2(x, 590, 205, 40), 23, Color("81ddea")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_line(Vector2(30, 815), Vector2(1020, 815))
 	if completed: _text(canvas, "第一章完成 · 小黄的信号来自海洋", Rect2(80, 710, 940, 60), 28, Color("dfc49b"))

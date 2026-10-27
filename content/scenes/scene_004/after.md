@@ -1,74 +1,147 @@
-# 上海 · 灯火归来
+# 1-5 灯火归来
 
 ---
 background: background_003
-actors:
+framing: wide
+actors: 
 speaker: narrator
-> 倒计时归零，悬在塔下的光环终于合拢。
-> 江对岸亮起一扇窗，接着是整栋楼。灯火越过街道，一点点回到城市深处。
+> 最后一只怪物倒下。
 
 ---
 background: background_003
-actors: character_014
-speaker: character_014
-> 亮了……你们听，车声也回来了。
-
----
-background: background_003
-actors:
-speaker: narrator
-> 维修装置忽然发出一声轻响。杂音之间，跳出了一条微弱的信号。
-> 大星低头看向掌心。铃铛没有动。
-
----
-background: background_003
-actors: character_011|character_013
+framing: wide
+actors: character_013
 speaker: character_013
-> 找到了。是空洞留下的生命信号，和你描述的那只猫吻合。
-> 它还活着。
+> 就是现在。
 
 ---
 background: background_003
-actors: character_011|character_013
+framing: wide
+actors: character_013
+speaker: narrator
+> 阿五开始维修节点。
+
+---
+background: background_003
+framing: wide
+actors:
+speaker: narrator
+> 异常光环开始收缩。
+
+---
+background: background_006
+framing: wide
+actors:
+speaker: narrator
+> 东方明珠灯光亮起。
+> 远处城市灯火逐片恢复。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_015
 speaker: character_011
-> 在哪里？
+> ……
 
 ---
-background: background_003
-actors: character_011|character_013
-speaker: character_013
-> 海上。信号在移动，得继续追踪。
-> 明天一早，我们去港口。
-
----
-background: background_003
+background: background_006
+framing: wide
 actors: character_011|character_015
 speaker: character_015
-> 今晚先把手养好。船上可没有医院。
+> 终于平静了。
 
 ---
-background: background_003
-actors: character_011|character_015
+background: background_006
+framing: wide
+actors: character_014|character_015
+speaker: character_014
+> 看来今晚不用摸黑回家了。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
 speaker: character_011
-> 好。等找到它，我带它来向你道谢。
-> ……它可能会躲你身后。别看今天跑得快，平时胆子可小了。
+> 阿五，快定位小黄在哪？
 
 ---
-background: background_003
-actors: character_011
-speaker: narrator
-> 大星把铃铛收回口袋。这一次，他没有再攥紧它。
-> 江风送来远处船舶的汽笛声。他望向声音传来的方向。
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 我瞅瞅。
 
 ---
-background: background_003
-actors: character_011
-speaker: character_011
-> 小黄，等我。这次换我带你回家。
-
----
-background: background_003
+background: background_006
+framing: wide
 actors:
 speaker: narrator
-> 第一章 · 上海 完
-> 城市的灯亮了。海的另一边，还有一个小小的身影没有回家。
+> 检测仪重新启动。
+> 屏幕出现稳定信号。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 找到了。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_011
+actor_shake: character_011
+> 在哪？！
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 定位到了。
+> 但是……
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_011
+> 但是什么？
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 信号来自遥远的...济州岛。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_011
+> 济州岛？
+> 怎么跑这么远去了。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 不知道。现在出现异常的情况太多了。
+
+---
+background: background_006
+framing: wide
+actors: character_011|character_014
+speaker: character_011
+> ……
+> 小黄。我一定会找回你的。
+
+---
+background: background_006
+actors:
+speaker: narrator
+> 第一章结束
+> 下一目标：前往济州岛，寻找小黄。

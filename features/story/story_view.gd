@@ -16,16 +16,35 @@ var _dialogue_scroll: ScrollContainer
 var _backgrounds: Dictionary = {}
 var _actors: Dictionary = {}
 var _state: Dictionary = {}
+var _stage: Control
+var _actor_positions: Array[Vector2] = []
+var _effect_time := 0.0
+var _screen_shake := false
+var _actor_shake: Array = []
+var _actor_flip: Array = []
+var _actor_mirrored: Array = []
+var _actor_exit_left: Array = []
+var _actor_exit_right: Array = []
+const SCREEN_SHAKE_DURATION := 0.55
+const ACTOR_SHAKE_DURATION := 0.36
+const ACTOR_FLIP_DURATION := 0.24
+const ACTOR_EXIT_DURATION := 0.45
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background = _texture()
+	clip_contents = true
+	_stage = Control.new()
+	_stage.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_stage)
+	background = _texture(_stage)
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for index in 2:
-		var actor := _texture()
+		var actor := _texture(_stage)
 		actor.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		actor_views.append(actor)
+		_actor_positions.append(Vector2.ZERO)
 	_gradient([Color(0, 0, 0, 0.62), Color.TRANSPARENT], [0.0, 1.0], true)
 	_gradient([Color.TRANSPARENT, Color(0, 0, 0, 0.78), Color.BLACK], [0.58, 0.82, 1.0], false)
 	speaker = _label(28, ACCENT)
@@ -44,6 +63,7 @@ func _ready() -> void:
 	ending.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	resized.connect(_layout)
 	_layout()
+	set_process(false)
 	if not _state.is_empty():
 		show_snapshot(_state)
 
@@ -53,7 +73,18 @@ func configure(backgrounds: Dictionary, actors: Dictionary) -> void:
 
 func show_snapshot(state: Dictionary) -> void:
 	_state = state.duplicate(true)
-	if not is_node_ready() or state.is_empty():
+	_effect_time = 0.0
+	_screen_shake = state.get("screen_shake", false) and state.get("type") == "line"
+	_actor_shake = state.get("actor_shake", []).duplicate() if state.get("type") == "line" else []
+	_actor_flip = state.get("actor_flip", []).duplicate() if state.get("type") == "line" else []
+	_actor_mirrored = state.get("actor_mirrored", []).duplicate()
+	_actor_exit_left = state.get("actor_exit_left", []).duplicate() if state.get("type") == "line" else []
+	_actor_exit_right = state.get("actor_exit_right", []).duplicate() if state.get("type") == "line" else []
+	if not is_node_ready():
+		return
+	set_process(_screen_shake or not _actor_shake.is_empty() or not _actor_flip.is_empty() or not _actor_exit_left.is_empty() or not _actor_exit_right.is_empty())
+	if state.is_empty():
+		_layout()
 		return
 	background.texture = _backgrounds.get(state.get("background", ""))
 	if background.texture != null and state.get("framing", "wide") == "left_close":
@@ -88,13 +119,51 @@ func show_snapshot(state: Dictionary) -> void:
 			button.pressed.connect(func(): choice_requested.emit(index))
 	_layout()
 
-func _texture() -> TextureRect:
+func _texture(parent: Node = null) -> TextureRect:
 	var view := TextureRect.new()
 	view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	view.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	add_child(view)
+	(parent if parent != null else self).add_child(view)
 	return view
+
+func _process(delta: float) -> void:
+	_effect_time += delta
+	_apply_effects()
+	if _effect_time >= maxf(maxf(SCREEN_SHAKE_DURATION, ACTOR_SHAKE_DURATION), maxf(ACTOR_FLIP_DURATION, ACTOR_EXIT_DURATION)):
+		set_process(false)
+
+func _apply_effects() -> void:
+	var unit := minf(size.x / 1600.0, size.y / 900.0)
+	var screen_strength := maxf(0.0, 1.0 - _effect_time / SCREEN_SHAKE_DURATION) if _screen_shake else 0.0
+	_stage.position = Vector2(sin(_effect_time * TAU * 8.0), sin(_effect_time * TAU * 6.0)) * 10.0 * unit * screen_strength
+	# Overscan only while shaking so the moving image never exposes an edge.
+	var margin := 14.0 * unit if screen_strength > 0.0 else 0.0
+	background.offset_left = -margin
+	background.offset_top = -margin
+	background.offset_right = margin
+	background.offset_bottom = margin
+	var actor_strength := maxf(0.0, 1.0 - _effect_time / ACTOR_SHAKE_DURATION)
+	var actors: Array = _state.get("actors", [])
+	for index in actor_views.size():
+		var actor := actor_views[index]
+		var key: String = actors[index] if index < actors.size() else ""
+		var offset := Vector2.ZERO
+		if _actor_shake.has(key):
+			offset = Vector2(sin(_effect_time * TAU * 8.0), sin(_effect_time * TAU * 6.0) * 0.35) * 16.0 * unit * actor_strength
+		var flip_progress := clampf(_effect_time / ACTOR_FLIP_DURATION, 0.0, 1.0)
+		actor.flip_h = _actor_mirrored.has(key) if _state.has("actor_mirrored") else (not actors.is_empty() and index == 0)
+		actor.scale = Vector2.ONE
+		if _actor_flip.has(key):
+			# Turn through a narrow profile, then open into the authored facing.
+			actor.scale.x = maxf(0.001, absf(cos(PI * flip_progress)))
+			if flip_progress < 0.5: actor.flip_h = not actor.flip_h
+		var exiting := _actor_exit_left.has(key) or _actor_exit_right.has(key)
+		var exit_direction := -1.0 if _actor_exit_left.has(key) else 1.0
+		var exit_progress := clampf(_effect_time / ACTOR_EXIT_DURATION, 0.0, 1.0) if exiting else 0.0
+		actor.position = _actor_positions[index] + offset + Vector2(exit_direction * size.x * 1.1 * exit_progress * exit_progress, 0.0)
+		actor.modulate.a = 1.0 - exit_progress
+		actor.visible = index < actors.size() and exit_progress < 1.0
 
 func _gradient(colors: Array, offsets: Array, top: bool) -> void:
 	var ramp := Gradient.new()
@@ -156,8 +225,9 @@ func _layout() -> void:
 	var actor_width := minf(size.x * (0.58 if count == 1 else 0.46), actor_height * 1.1)
 	for index in actor_views.size():
 		var center_x: float = size.x * (0.5 if count == 1 else [0.31, 0.69][index])
-		actor_views[index].position = Vector2(center_x - actor_width * 0.5, size.y * 0.94 - actor_height)
+		_actor_positions[index] = Vector2(center_x - actor_width * 0.5, size.y * 0.94 - actor_height)
 		actor_views[index].size = Vector2(actor_width, actor_height)
+		actor_views[index].pivot_offset = actor_views[index].size * 0.5
 	var inset := maxf(28, size.x * 0.12)
 	var text_width := size.x - inset * 2
 	var compact := size.x < 1000 or size.y < 700
@@ -176,6 +246,7 @@ func _layout() -> void:
 	continue_button.size = Vector2(125, 46)
 	ending.position = Vector2(inset, size.y - 43)
 	ending.size = Vector2(text_width, 28)
+	_apply_effects()
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:

@@ -2,3 +2,6 @@ id,texture
 background_001,res://content/scenes/scene_002/background.png
 background_002,res://content/scenes/scene_003/background.png
 background_003,res://content/scenes/scene_004/background.png
+background_004,res://content/scenes/scene_005/background.png
+background_005,res://content/scenes/scene_003/city_drive.png
+background_006,res://content/scenes/scene_004/city_restored.png

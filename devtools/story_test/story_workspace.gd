@@ -50,7 +50,8 @@ func _ready() -> void:
 	for id in source_catalog.levels:
 		for kind in ["before", "after"]:
 			if source_catalog.levels[id][kind].is_empty(): continue
-			source_picker.add_item(source_catalog.levels[id].name + (" · 剧情" if kind == "before" else " · 章末尾声"))
+			var title: String = source_catalog.levels[id].name if kind == "before" else source_catalog.story(source_catalog.levels[id][kind]).title
+			source_picker.add_item(title + (" · 剧情" if kind == "before" else " · 章末尾声"))
 			source_picker.set_item_metadata(source_picker.item_count - 1, [id, kind])
 	source_picker.item_selected.connect(_load_source)
 	toolbar.add_child(source_picker)

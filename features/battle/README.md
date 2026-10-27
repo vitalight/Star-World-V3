@@ -82,7 +82,7 @@ battle.reset()
 
 模块专属自动测试：`tests/battle_test.gd`。Game Test 集成仍需独立模块评审。
 
-Game Test 已按 `docs/reviews/game_test.md` 的检查和回归接入。`unit_spec.gd`、`wave_spec.gd`、`level_spec.gd` 是 Inspector 可编辑的纯数据 Resource，输出上述同一份字典协议；battle 本身仍不加载场景和这些具体资源。地图采集、输入与表现适配位于对应表现 feature 和 game，不改动模拟规则。
+`unit_spec.gd`、`wave_spec.gd`、`level_spec.gd` 是 Inspector 可编辑的纯数据 Resource，输出上述同一份字典协议；battle 本身仍不加载场景和这些具体资源。地图采集、输入与表现适配位于对应表现 feature 和 game，不改动模拟规则。
 
 
 ## 路线预告与生成时序

@@ -8,7 +8,7 @@ func run() -> void:
 	if FileAccess.file_exists(DEBUG_SAVE): DirAccess.remove_absolute(DEBUG_SAVE)
 	await spawn(DEBUG_SAVE)
 	await click("开始游戏")
-	for id in ["scene_002", "scene_003", "scene_004"]:
+	for id in ["scene_002", "scene_005", "scene_003", "scene_004"]:
 		if player.page == "levels": await click("开始行动   ›")
 		await click("跳过剧情")
 		var game = player.battle_scene
@@ -34,7 +34,7 @@ func run() -> void:
 			await dispose()
 			await spawn(DEBUG_SAVE)
 			await click("读取存档")
-			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_003", "Developer victory resumes next merged story across restart")
+			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_005", "Developer victory resumes next merged story across restart")
 		else: await click("继续")
 		if id == "scene_004": await click("跳过剧情")
 		check(player.progress.completed.has(id), "Developer win commits progress through normal continuation")

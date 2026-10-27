@@ -9,6 +9,7 @@ static func operator_ids(id: String) -> Array:
 
 static func deployments(id: String) -> Array:
 	if id == "scene_002": return [["character_011", Vector2i(4, 1), 2], ["character_012", Vector2i(5, 3), 2]]
+	if id == "scene_005": return [["character_011", Vector2i(4, 1), 2], ["character_014", Vector2i(5, 3), 2], ["character_013", Vector2i(5, 2), 2]]
 	var lower := 4 if id == "scene_003" else 5
 	var result := [["character_011", Vector2i(5, 1), 2], ["character_014", Vector2i(5, lower), 2], ["character_013", Vector2i(5, 2), 2]]
 	if id == "scene_004": result.append(["character_015", Vector2i(6, 3), 2])

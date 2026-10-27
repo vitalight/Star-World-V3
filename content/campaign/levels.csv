@@ -1,4 +1,5 @@
 id,name,description,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,before,after
 scene_002,1-1 家中异常,守住家门，留意后方突然出现的裂隙。,res://content/scenes/scene_002/map.tscn,5,20,99,1,2,0,res://content/scenes/scene_002/before.md,
-scene_003,1-2 路边救援,守住两条街道，清除围困医生的异常。,res://content/scenes/scene_003/map.tscn,5,34,99,1,3,0,res://content/scenes/scene_003/before.md,
-scene_004,1-3 东方明珠主节点,守住防线，完成主节点修复。,res://content/scenes/scene_004/map.tscn,5,48,99,0.75,4,210,res://content/scenes/scene_004/before.md,res://content/scenes/scene_004/after.md
+scene_005,1-2 管控队出场,与阿五和胡胡清除家中的残余怪物。,res://content/scenes/scene_005/map.tscn,5,34,99,1,3,0,res://content/scenes/scene_005/before.md,
+scene_003,1-3 寻找小黄下落,追踪根节点，救援被怪物包围的月月。,res://content/scenes/scene_003/map.tscn,5,34,99,1,3,0,res://content/scenes/scene_003/before.md,
+scene_004,1-4 根节点·东方明珠,守住防线，稳定失控的根节点。,res://content/scenes/scene_004/map.tscn,5,48,99,0.75,4,210,res://content/scenes/scene_004/before.md,res://content/scenes/scene_004/after.md

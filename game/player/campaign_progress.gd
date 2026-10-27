@@ -28,12 +28,19 @@ func load_progress(path: String, ids: Array) -> void:
 			if id is String and operators.has(id) and not away_operators.has(id): away_operators.append(id)
 	var saved = _file.get_value("campaign", "completed", [])
 	if saved is Array:
+		# The added home battle precedes the existing rescue stage. Preserve earned
+		# progress in earlier chapter saves that have already reached that rescue.
+		var rescue_won: bool = saved.has("scene_002") and _file.get_value("campaign", "pending_after", "") == "scene_003"
+		if ids.has("scene_005") and (saved.has("scene_003") or rescue_won) and not saved.has("scene_005"):
+			saved = saved.duplicate()
+			saved.append("scene_005")
 		# Only accept a sequential prefix: a malformed save cannot skip chapters.
 		for id in ids:
 			if not saved.has(id): break
 			completed.append(id)
 	var selection = _file.get_value("campaign", "selected", selected)
 	if selection is String and ids.has(selection) and unlocked(selection, ids): selected = selection
+	elif selection == "scene_003" and ids.has("scene_005") and unlocked("scene_005", ids): selected = "scene_005"
 	var pending = _file.get_value("campaign", "pending_after", "")
 	if pending is String and ids.has(pending) and unlocked(pending, ids): pending_after = pending
 	started = _file.get_value("campaign", "started", false) == true

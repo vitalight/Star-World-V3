@@ -63,7 +63,7 @@ func run() -> void:
 	await capture("main")
 	await click("开始游戏")
 	check(player.page == "levels" and player.progress.selected == "scene_002", "Fresh chapter opens first stage")
-	check(not player.progress.unlocked("scene_003", player.catalog.levels.keys()), "Second stage initially locked")
+	check(not player.progress.unlocked("scene_005", player.catalog.levels.keys()), "Second stage initially locked")
 	for dimensions in [Vector2i(1280, 800), Vector2i(960, 600), Vector2i(1600, 900)]:
 		root.size = dimensions; await settle()
 		await capture("levels_%dx%d" % [dimensions.x, dimensions.y])
@@ -88,7 +88,7 @@ func run() -> void:
 	check(game.last_state.phase == "ready", "Retry resets the same battle")
 	await click("☰"); await click("退出战斗")
 	check(player.page == "levels", "Battle menu returns to chapter")
-	for id in ["scene_002", "scene_003", "scene_004"]:
+	for id in ["scene_002", "scene_005", "scene_003", "scene_004"]:
 		check(player.progress.selected == id, "Selected next stage: " + id)
 		if player.page == "levels": await click("开始行动   ›")
 		check(player.page == "story" and player.story_level == id and player.story_kind == "before", "One merged introduction per stage")
@@ -113,7 +113,7 @@ func run() -> void:
 			await dispose(); await spawn()
 			check(player.progress.pending_after == id, "Pending story survives restart")
 			await click("读取存档")
-			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_003", "Resume enters next merged story")
+			check(player.page == "story" and player.story_kind == "before" and player.story_level == "scene_005", "Resume enters next merged story")
 		else:
 			await click("继续")
 		await capture("after_" + id)
@@ -123,7 +123,7 @@ func run() -> void:
 		else:
 			check(player.story_kind == "before" and player.story_level == player.progress.selected, "Victory flows directly into next stage story")
 		check(player.progress.completed.has(id) and player.progress.pending_after.is_empty(), "Victory transition commits progress")
-	check(player.completed and player.progress.completed.size() == 3, "Chapter completes after all stories")
+	check(player.completed and player.progress.completed.size() == 4, "Chapter completes after all stories")
 	await capture("chapter_complete")
 	await dispose(); await spawn()
 	check(player.completed, "Completed chapter survives restart")

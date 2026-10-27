@@ -47,6 +47,25 @@ func _check_presentation(node: Dictionary, id: String, result: PackedStringArray
 			result.append("%s：actors 必须使用非空角色 ID" % id)
 	if actors.size() == 2 and actors[0] == actors[1]:
 		result.append("%s：出场角色不能重复" % id)
+	if not node.get("screen_shake", false) is bool:
+		result.append("%s：screen_shake 必须是布尔值" % id)
+	for field in ["actor_shake", "actor_flip", "actor_mirrored", "actor_exit_left", "actor_exit_right"]:
+		var targets = node.get(field, [])
+		if not targets is Array:
+			result.append("%s：%s 必须是角色 ID 数组" % [id, field])
+		else:
+			var seen := {}
+			for actor in targets:
+				if not actor is String or not actors.has(actor) or seen.has(actor):
+					result.append("%s：%s 必须为已出场且不重复的角色 ID" % [id, field])
+				seen[actor] = true
+	if node.has("actor_exit"):
+		result.append("%s：actor_exit 已改为 actor_exit_left / actor_exit_right" % id)
+	var left = node.get("actor_exit_left", [])
+	var right = node.get("actor_exit_right", [])
+	if left is Array and right is Array:
+		for actor in left:
+			if right.has(actor): result.append("%s：同一角色不能同时向左和向右离场" % id)
 	var active = node.get("speaker_actor", "")
 	if active is String and not active.is_empty() and not actors.has(active):
 		result.append("%s：说话角色必须在 actors 中出场" % id)

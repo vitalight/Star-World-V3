@@ -1,97 +1,162 @@
-# 为还没回家的人
+# 1-4 根节点·东方明珠
 
 ---
 background: background_002
-actors:
-speaker: narrator
-> 担架被推进医院，最后一盏手电的光也退进门内。
-> 白衣医生这才靠着墙，缓缓松开一直按住伤口的手。
-
----
-background: background_002
+framing: wide
 actors: character_011|character_015
 speaker: character_015
-> 我叫月月。最后一位伤员也安顿好了……谢谢你们。
-> 你的手怎么了？让我看看。
+> 呼……
+> 我差点以为今天要交代在这里了。
 
 ---
 background: background_002
+framing: wide
 actors: character_011|character_015
 speaker: character_011
-> 刚才摔的，不碍事。
-> 你有没有见过一只橘猫？戴着黄色围巾。铃铛……在我这里。
+> 你怎么一个人在外面？
 
 ---
 background: background_002
+framing: wide
 actors: character_011|character_015
 speaker: character_015
-> 没见到。对不起。
-> 不过，别拿这只手继续硬撑。你找到它的时候，总得能把它抱起来。
+> 医院突然停电。
+> 我正准备赶过去，结果半路就遇上这些东西了。
 
 ---
 background: background_002
-actors:
-speaker: narrator
-> 月月替他缠好绷带，又检查了一遍随身的药包。
-> 她望向江边。那道白光比刚才更亮了，云层里却传来玻璃开裂般的声音。
-
----
-background: background_002
-actors: character_013|character_015
-speaker: character_013
-> 主节点撑不了多久了。我们得去东方明珠。
-> 医院里暂时安全，你可以留下。
-
----
-background: background_002
+framing: wide
 actors: character_013|character_015
 speaker: character_015
-> 留下的医生够了。可你们这一路，连个会包扎的人都没有。
-> 药我带着。走吧。
+> 先别说我了。
+> 你们三个怎么一个比一个狼狈？
 
 ---
-background: background_003
-actors:
-speaker: narrator
-> 东方明珠下，碎裂的光环悬在半空。每转过一圈，地面便跟着一颤。
-> 塔后的居民楼里，有人举着手电，在窗边一明一灭地打着信号。
-
----
-background: background_003
-actors: character_013|character_014
+background: background_002
+framing: wide
+actors: character_013|character_015
 speaker: character_013
-> 修复装置接上了，需要三分半。
-> 在它停下来之前，不能让那些东西穿过防线。
+> 工作需要。
 
 ---
-background: background_003
+background: background_002
+framing: wide
 actors: character_013|character_014
 speaker: character_014
-> 我守下面。告诉楼里的人，离窗户远一点。
-> 等灯亮了，再出来看江景。
+> 翻译一下。
+> 刚打完架。
 
 ---
-background: background_003
-actors: character_011|character_013
-speaker: character_011
-> 节点修好以后……还能找到小黄吗？
+background: background_002
+framing: wide
+actors: character_014|character_015
+speaker: character_015
+> ……坐好。
+> 我先给你们处理一下。
 
 ---
-background: background_003
+background: background_002
+framing: wide
+actors:
+speaker: narrator
+> 应急治疗之后。
+
+---
+background: background_002
+framing: wide
+actors: character_015
+speaker: character_015
+> 你们不是还要去处理那个什么节点吗？
+
+---
+background: background_002
+framing: wide
+actors: character_015
+speaker: character_015
+> 一路上肯定还会有人受伤。
+
+---
+background: background_002
+framing: wide
+actors: |character_015
+speaker: character_015
+> 我是医生，可以给你们帮助。
+
+---
+background: background_002
+framing: wide
+actors: character_014|character_015
+speaker: character_014
+> 那太好了。欢迎加入临时加班小队。
+
+---
+background: background_002
+framing: wide
+actors:
+speaker: narrator
+> 节点检测仪突然响起滴滴声。
+
+---
+background: background_002
+framing: wide
 actors: character_011|character_013
 speaker: character_013
-> 干扰会减弱。如果它留下了信号，我们就能听见。
-> 先让这里安静下来。
+> 找到了。
 
 ---
-background: background_003
-actors: character_011
-speaker: narrator
-> 大星隔着口袋，轻轻碰了碰那枚铃铛。
-> 他抬起头，站到了防线前。
-
----
-background: background_003
-actors: character_011
+background: background_002
+framing: wide
+actors: character_011|character_013
 speaker: character_011
-> 好。为了还没回家的人。
+> 在哪？
+
+---
+background: background_002
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 东方明珠。
+
+---
+background: background_003
+framing: wide
+actors:
+speaker: narrator
+> 塔下悬浮着巨大的异常光环。
+
+---
+background: background_003
+framing: wide
+actors: character_011|character_014
+speaker: character_011
+> ……
+> 这个比我家那个大多了吧。
+
+---
+background: background_003
+framing: wide
+actors: character_011|character_014
+speaker: character_014
+> 这就是根节点。
+
+---
+background: background_003
+framing: wide
+actors: enemy_001|enemy_002
+speaker: narrator
+> 大量怪物从光环周围出现。
+
+---
+background: background_003
+framing: wide
+actors: character_011|character_013
+speaker: character_013
+> 节点已经严重失控。
+> 想修复它，必须先把周围清干净。
+
+---
+background: background_003
+framing: wide
+actors: character_011|character_013
+speaker: character_011
+> 那就抓紧时间！
