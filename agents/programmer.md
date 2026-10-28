@@ -22,5 +22,6 @@
 ## 测试与验证
 
 - 使用环境变量 `GODOT_PATH` 调用 Godot。规则测试用无界面模式；渲染、截图及窗口输入用真实窗口，音频听感通过实际播放检查。等待渲染帧的测试不能用 `--headless`。
+- 受限环境下 Godot 无法写入默认用户目录时，使用 `powershell -ExecutionPolicy Bypass -File scripts/run_godot_test.ps1 --headless --script res://features/battle/tests/battle_test.gd`；图形测试去掉 `--headless` 并传入对应脚本。该入口仅将测试进程的用户数据和缓存放入 `temp/godot-test/`，不读取或覆盖正式玩家存档；正式游戏仍使用默认用户目录。
 - 专属测试放在 `features/<module>/tests/`，集成测试放在 `game/tests/`；从公共接口验证可观察行为。按改动选择 [Art Test](../devtools/art_test/README.md)、[Story Test](../devtools/story_test/README.md)、[Game Test](../devtools/game_test/README.md) 或玩家流程验证，共享表现复用同一实现。
 - 集成模块时检查职责、输入输出、依赖、验证结果和已知限制；报告实际检查及未覆盖项。评审不能代替测试。

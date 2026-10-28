@@ -12,6 +12,8 @@ signal debug_victory_requested
 signal continue_requested
 signal ui_sound_requested(id: String)
 var developer_tools_enabled := false
+## Optional nine-slice panel art supplied by the game composition layer.
+var panel_texture: Texture2D
 var dragged_roster := ""
 var pressed_roster := ""
 var suppress_card_click := false
@@ -21,12 +23,14 @@ var drop_hit_test: Callable
 var readouts: VBoxContainer
 var cards := {}
 var status: Label
+var life_status: Label
+var leak_warning: Label
 var notice: Label
 var selection: Label
 var retreat_button: Button
 var skill_button: Button
 var skill_status: Label
-var normal_skill_style: StyleBoxFlat
+var normal_skill_style: StyleBox
 var ready_skill_style: StyleBoxFlat
 var deployment_cancel_button: Button
 var deployment_anchor := Vector2.ZERO
@@ -74,6 +78,7 @@ func _ready() -> void:
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(top)
 	var menu_button := _button(top, "☰", func(): game_menu.visible = not game_menu.visible)
+	menu_button.accessibility_name = "战斗菜单"
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -85,15 +90,60 @@ func _ready() -> void:
 		button.add_theme_font_size_override("font_size", 29)
 	var progress := _panel_container()
 	progress.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	progress.offset_left = -198; progress.offset_right = 198
-	progress.offset_top = 12; progress.offset_bottom = 67
+	progress.offset_left = -210; progress.offset_right = 210
+	progress.offset_top = 10; progress.offset_bottom = 78
 	progress.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	status = _label(progress, "准备部署", 22)
-	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var progress_row := HBoxContainer.new()
+	progress_row.add_theme_constant_override("separation", 0)
+	progress.add_child(progress_row)
+	var enemy_group := HBoxContainer.new()
+	enemy_group.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	enemy_group.alignment = BoxContainer.ALIGNMENT_CENTER
+	enemy_group.add_theme_constant_override("separation", 10)
+	progress_row.add_child(enemy_group)
+	_status_icon(enemy_group, preload("res://features/battle_hud/enemy_progress.svg"))
+	var enemy_readout := VBoxContainer.new()
+	enemy_readout.add_theme_constant_override("separation", -4)
+	enemy_group.add_child(enemy_readout)
+	status = _label(enemy_readout, "0 / 0", 22)
+	var enemy_caption := _label(enemy_readout, "敌人数量", 14)
+	enemy_caption.add_theme_color_override("font_color", Color("aac1c9"))
+	var divider := ColorRect.new()
+	divider.color = Color("6b8991")
+	divider.custom_minimum_size = Vector2(1, 34)
+	divider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	progress_row.add_child(divider)
+	var life_group := HBoxContainer.new()
+	life_group.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	life_group.alignment = BoxContainer.ALIGNMENT_CENTER
+	life_group.add_theme_constant_override("separation", 10)
+	progress_row.add_child(life_group)
+	_status_icon(life_group, preload("res://features/battle_hud/base_life.svg"))
+	var life_readout := VBoxContainer.new()
+	life_readout.add_theme_constant_override("separation", -4)
+	life_group.add_child(life_readout)
+	life_status = _label(life_readout, "0", 22)
+	var life_caption := _label(life_readout, "基地生命", 14)
+	life_caption.add_theme_color_override("font_color", Color("aac1c9"))
+	leak_warning = Label.new()
+	leak_warning.text = "敌人接近！"
+	leak_warning.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	leak_warning.offset_left = -120; leak_warning.offset_right = 120
+	leak_warning.offset_top = 108; leak_warning.offset_bottom = 140
+	leak_warning.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	leak_warning.add_theme_font_size_override("font_size", 22)
+	leak_warning.add_theme_color_override("font_color", Color("ffac83"))
+	leak_warning.add_theme_color_override("font_shadow_color", Color("21100e"))
+	leak_warning.add_theme_constant_override("shadow_offset_x", 2)
+	leak_warning.add_theme_constant_override("shadow_offset_y", 2)
+	leak_warning.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	leak_warning.hide()
+	add_child(leak_warning)
 	objective_label = Label.new()
 	objective_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	objective_label.offset_left = -180; objective_label.offset_right = 180
-	objective_label.offset_top = 75; objective_label.offset_bottom = 104
+	objective_label.offset_top = 82; objective_label.offset_bottom = 108
 	objective_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	objective_label.add_theme_font_size_override("font_size", 19)
 	objective_label.add_theme_color_override("font_color", Color("b5dfed"))
@@ -118,8 +168,10 @@ func _ready() -> void:
 	economy_rows.add_theme_constant_override("separation", 0)
 	economy_panel.add_child(economy_rows)
 	economy = _label(economy_rows, "", 44)
+	economy.add_theme_color_override("font_color", Color("f6d38c"))
 	economy.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	deployment_count = _label(economy_rows, "", 22)
+	deployment_count.add_theme_color_override("font_color", Color("bed1d2"))
 	deployment_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bottom = HBoxContainer.new()
 	bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
@@ -133,7 +185,7 @@ func _ready() -> void:
 		card.custom_minimum_size = Vector2(100, 128)
 		card.clip_contents = true
 		card.accessibility_name = roster[key].name
-		card.add_theme_stylebox_override("normal", _panel())
+		style_battle_button(card)
 		card.pressed.connect(func():
 			if suppress_card_click: return
 			ui_sound_requested.emit("sfx_ui_click")
@@ -149,12 +201,13 @@ func _ready() -> void:
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(portrait)
 		var strip := ColorRect.new()
-		strip.color = Color(0.05, 0.08, 0.09, 0.88)
+		strip.color = Color("10232df2")
 		strip.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 		strip.offset_bottom = 27
 		strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(strip)
 		var value := _label(card, "%d" % roster[key].cost, 20)
+		value.add_theme_color_override("font_color", Color("f6d38c"))
 		value.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 		value.offset_left = 31; value.offset_right = 72
 		value.offset_bottom = 27
@@ -185,6 +238,7 @@ func _ready() -> void:
 	info_panel.resized.connect(_center_info_panel)
 	info_panel.custom_minimum_size = Vector2(235, 0)
 	var info := VBoxContainer.new()
+	info.add_theme_constant_override("separation", 8)
 	info_panel.add_child(info)
 	operator_portrait = TextureRect.new()
 	operator_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -207,6 +261,7 @@ func _ready() -> void:
 	skill_description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	skill_description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	skill_status = _label(info, "", 14)
+	skill_status.add_theme_color_override("font_color", Color("f6d38c"))
 	skill_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	retreat_button = _button(self, "↶", func(): retreat_requested.emit())
 	retreat_button.add_theme_font_size_override("font_size", 36)
@@ -223,18 +278,9 @@ func _ready() -> void:
 		button.custom_minimum_size = Vector2(56, 56)
 		button.size = Vector2(56, 56)
 		button.z_index = 10
-		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
-			var square := StyleBoxFlat.new()
-			square.bg_color = Color("34464b") if state == "hover" else Color("172024")
-			if state == "pressed": square.bg_color = Color("485653")
-			if state == "disabled": square.bg_color = Color(0.07, 0.09, 0.10, 0.75)
-			if state == "focus": square.bg_color = Color.TRANSPARENT
-			square.border_color = Color("e5e4cd") if state == "focus" else Color("66716c")
-			square.set_border_width_all(1)
-			button.add_theme_stylebox_override(state, square)
 		button.hide()
-	normal_skill_style = skill_button.get_theme_stylebox("normal") as StyleBoxFlat
-	ready_skill_style = normal_skill_style.duplicate()
+	normal_skill_style = skill_button.get_theme_stylebox("normal")
+	ready_skill_style = StyleBoxFlat.new()
 	ready_skill_style.bg_color = Color("61451c")
 	ready_skill_style.border_color = Color("ffd66c")
 	ready_skill_style.set_border_width_all(2)
@@ -247,12 +293,11 @@ func _ready() -> void:
 	game_menu.add_child(menu_items)
 	_button(menu_items, "退出战斗", func(): menu_requested.emit())
 	_button(menu_items, "重新开始", func(): game_menu.hide(); replay_requested.emit())
-	if developer_tools_enabled:
-		_button(menu_items, "开发者面板", func(): game_menu.hide(); developer_panel.show())
 	game_menu.hide()
 	developer_panel = _panel_container()
-	developer_panel.position = Vector2(18, 110)
-	developer_panel.custom_minimum_size.x = 300
+	developer_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	developer_panel.offset_left = 18; developer_panel.offset_right = 318
+	developer_panel.offset_top = -120; developer_panel.offset_bottom = -18
 	developer_panel.z_index = 20
 	var developer_items := VBoxContainer.new()
 	developer_panel.add_child(developer_items)
@@ -260,11 +305,9 @@ func _ready() -> void:
 	developer_items.add_child(developer_header)
 	var developer_title := _label(developer_header, "开发者面板", 22)
 	developer_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_button(developer_header, "×", func(): developer_panel.hide())
 	debug_victory_button = _button(developer_items, "跳过战斗并胜利", func():
-		developer_panel.hide()
 		debug_victory_requested.emit())
-	developer_panel.hide()
+	developer_panel.visible = developer_tools_enabled
 	end_panel = _panel_container()
 	end_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	var ending := VBoxContainer.new()
@@ -353,6 +396,7 @@ func _fit() -> void:
 	economy_panel.offset_top = bottom.offset_top - 124
 	economy_panel.offset_bottom = bottom.offset_top - 8
 	status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
+	life_status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
 	operator_portrait.custom_minimum_size.y = 112 if compact else 160
 	info_panel.size = Vector2(228, 0)
 	_center_info_panel()
@@ -380,34 +424,72 @@ func _label(parent: Node, value: String, font_size: int) -> Label:
 	var label := Label.new()
 	label.text = value
 	label.add_theme_font_size_override("font_size", font_size)
-	label.add_theme_color_override("font_color", Color("e5e4cd"))
+	label.add_theme_color_override("font_color", Color("e8efea"))
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(label)
 	return label
+
+func _status_icon(parent: Node, texture: Texture2D) -> void:
+	var icon := TextureRect.new()
+	icon.texture = texture
+	icon.custom_minimum_size = Vector2(34, 34)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(icon)
 
 func _button(parent: Node, value: String, callback: Callable) -> Button:
 	var clicked := func():
 		ui_sound_requested.emit("sfx_ui_click")
 		callback.call()
 	var button := action(value, Rect2(), clicked, parent)
+	style_battle_button(button)
 	button.custom_minimum_size = Vector2(62, 42)
 	button.add_theme_font_size_override("font_size", 19)
 	return button
 
-func _panel_container() -> PanelContainer:
-	var panel := PanelContainer.new()
-	var style := _panel()
-	style.skew = Vector2.ZERO
+func battle_panel_style() -> StyleBox:
+	var style: StyleBox
+	if panel_texture:
+		var textured := StyleBoxTexture.new()
+		textured.texture = panel_texture
+		textured.texture_margin_left = 14; textured.texture_margin_right = 14
+		textured.texture_margin_top = 12; textured.texture_margin_bottom = 12
+		style = textured
+	else:
+		style = _panel()
 	style.content_margin_left = 14; style.content_margin_right = 14
 	style.content_margin_top = 12; style.content_margin_bottom = 12
+	return style
+
+func style_battle_button(button: Button) -> void:
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style := battle_panel_style()
+		style.content_margin_left = 8; style.content_margin_right = 8
+		style.content_margin_top = 4; style.content_margin_bottom = 4
+		if style is StyleBoxTexture:
+			if state == "hover": style.modulate_color = Color(1.3, 1.3, 1.3, 1.0)
+			if state == "pressed": style.modulate_color = Color(1.5, 1.5, 1.5, 1.0)
+			if state == "disabled": style.modulate_color = Color(0.65, 0.65, 0.65, 0.8)
+		button.add_theme_stylebox_override(state, style)
+
+func _panel_container() -> PanelContainer:
+	var panel := PanelContainer.new()
+	var style := battle_panel_style()
 	panel.add_theme_stylebox_override("panel", style)
 	add_child(panel)
 	return panel
 
+func set_leak_warning(threatened: bool, flash: float) -> void:
+	leak_warning.visible = threatened
+	life_status.add_theme_color_override("font_color", Color("e8efea").lerp(Color("ff3f38"), clampf(flash, 0.0, 1.0)))
+
 func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, speed: float, deploy_limit: int) -> void:
 	selected_roster = chosen_roster; selected_unit = chosen_unit
 	var finished: bool = state.phase in ["victory", "defeat"]
-	status.text = status_readout("%d / %d" % [state.killed + state.escaped, state.remaining + state.killed + state.escaped], str(state.life))
+	status.text = "%d / %d" % [state.killed + state.escaped, state.remaining + state.killed + state.escaped]
+	life_status.text = str(state.life)
 	objective_label.visible = state.has("objective")
 	if state.has("objective"):
 		objective_label.text = "节点修复  %d%%" % floori(100.0 * state.objective.elapsed / state.objective.duration)

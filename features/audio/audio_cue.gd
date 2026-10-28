@@ -8,3 +8,4 @@ extends Resource
 @export var stream: AudioStream
 @export_range(-40.0, 12.0, 0.1) var volume_db := 0.0
 @export_range(0.0, 0.5, 0.01) var pitch_variance := 0.0
+@export_range(0.0, 10.0, 0.01, "or_greater") var start_offset := 0.0

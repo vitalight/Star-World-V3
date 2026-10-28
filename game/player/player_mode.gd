@@ -163,10 +163,6 @@ func show_main() -> void:
 		settings.add_theme_stylebox_override(state, style)
 	for color_name in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		settings.add_theme_color_override(color_name, Color.TRANSPARENT)
-	if not has_progress:
-		var notice := _text(canvas, "暂无存档", Rect2(641, 768, 390, 30), 17, Color("e4edf4"))
-		notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
 func _main_button(value: String, rect: Rect2, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = value; button.position = rect.position; button.size = rect.size
@@ -223,7 +219,7 @@ func _set_sfx_volume(value: float) -> void:
 	audio.apply_settings(audio_settings)
 	audio_settings.save(audio_settings_path)
 
-func show_levels() -> void:
+func show_levels(preserve_scroll := -1) -> void:
 	_menu_page("levels", 0.28)
 	_play_music("music_main")
 	var back := _level_button(canvas, "‹", Rect2(48, 50, 60, 58), show_main, false)
@@ -248,8 +244,6 @@ func show_levels() -> void:
 	_lock_icon(locked_chapter, Vector2(305, 27))
 	var route := _level_panel(canvas, Rect2(432, 161, 542, 730), Color("101f36e8"), Color("536a89"))
 	_text(route, "第一章 · 上海", Rect2(32, 22, 360, 45), 30, Color("f7f4ef"))
-	_text(route, "寻找失踪的小黄", Rect2(34, 68, 340, 30), 19, Color("a6b7d0"))
-	_text(route, "%d / %d  已完成" % [progress.completed.size(), ids.size()], Rect2(320, 72, 190, 28), 17, Color("adbed5")).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_level_fill(route, Rect2(32, 110, 478, 1), Color("52657d"))
 	var scroll := ScrollContainer.new()
 	scroll.name = "LevelScroll"
@@ -275,7 +269,10 @@ func show_levels() -> void:
 		locked.custom_minimum_size = Vector2(0, 76)
 		_lock_icon(locked, Vector2(25, 21))
 		_text(locked, "锁定", Rect2(195, 19, 100, 38), 20, Color("8399bb"))
-	if selected_button: _reveal_level.call_deferred(scroll, selected_button)
+	if preserve_scroll >= 0:
+		_restore_level_scroll.call_deferred(scroll, preserve_scroll)
+	elif selected_button:
+		_reveal_level.call_deferred(scroll, selected_button)
 	_level_detail(catalog.levels[progress.selected])
 	var issues: PackedStringArray = catalog.diagnostics(progress.selected)
 	if not issues.is_empty():
@@ -301,6 +298,10 @@ func _lock_icon(parent: Control, pos: Vector2) -> void:
 func _reveal_level(scroll: ScrollContainer, selected: Control) -> void:
 	await get_tree().process_frame
 	if is_instance_valid(scroll) and is_instance_valid(selected): scroll.ensure_control_visible(selected)
+
+func _restore_level_scroll(scroll: ScrollContainer, position: int) -> void:
+	await get_tree().process_frame
+	if is_instance_valid(scroll): scroll.scroll_vertical = position
 
 func _detail_label(value: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
@@ -445,8 +446,10 @@ func _level_button(parent: Control, label: String, rect: Rect2, action: Callable
 
 func _select_level(id: String) -> void:
 	if not _level_unlocked(id): return
+	var scroll := find_child("LevelScroll", true, false) as ScrollContainer
+	var scroll_position := scroll.scroll_vertical if scroll else -1
 	progress.selected = id
-	show_levels()
+	show_levels(scroll_position)
 
 func begin_action() -> void:
 	if not progress.pending_after.is_empty():
@@ -520,6 +523,7 @@ func start_battle() -> void:
 	_play_music("music_battle")
 	result_recorded = false
 	battle_scene = BattleScene.instantiate()
+	battle_scene.developer_tools_enabled = developer_mode
 	battle_scene.audio = audio
 	battle_scene.campaign_level = progress.selected
 	battle_scene.operator_ids.assign(progress.available_operators())
@@ -533,6 +537,7 @@ func start_battle() -> void:
 		battle_scene.hud.add_child(back); return
 	return_button = Button.new()
 	return_button.text = "返回关卡"
+	battle_scene.hud.style_battle_button(return_button)
 	return_button.custom_minimum_size = Vector2(220, 48)
 	return_button.add_theme_font_size_override("font_size", 22)
 	return_button.pressed.connect(_leave_result)
@@ -544,11 +549,7 @@ func _show_tutorial() -> void:
 	tutorial = PanelContainer.new()
 	tutorial.position = Vector2(190, 96)
 	tutorial.mouse_filter = Control.MOUSE_FILTER_STOP
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("101d28ed")
-	style.border_color = Color("66818f")
-	style.set_border_width_all(1)
-	style.set_corner_radius_all(5)
+	var style: StyleBox = battle_scene.hud.battle_panel_style()
 	style.content_margin_left = 18; style.content_margin_right = 18
 	style.content_margin_top = 14; style.content_margin_bottom = 14
 	tutorial.add_theme_stylebox_override("panel", style)
@@ -563,6 +564,7 @@ func _show_tutorial() -> void:
 	label.add_theme_font_size_override("font_size", 18)
 	column.add_child(label)
 	var close := Button.new(); close.text = "知道了"
+	battle_scene.hud.style_battle_button(close)
 	close.custom_minimum_size.y = 36
 	close.pressed.connect(func(): tutorial.hide())
 	column.add_child(close)

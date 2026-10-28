@@ -61,7 +61,7 @@ speaker:
 
 用 Godot 打开对应 `map.tscn`：在 Terrain 的 TileMapLayer 刷图，在 Routes 下编辑 Path2D。格子64像素，格心偏移32；路径手柄为零，线段沿格子轴向。地形、部署类型、路线仍只来自地图，不在表格另存一份。地图设置 `external_level=true`，正式关卡／波次数值从 CSV 读取，单位从 .tres 读取。`tint` 调整该地图的地表配色。
 
-第一章四张战斗地图共用 `content/terrains/terrain_002` 城市地形。地图的 `terrain_atlas` 指定运行时 4×4 图集，`background_texture` 指定战场外围背景，`perimeter_style` 指定外围样式；选关预览和战斗读取同一配置。背景仅作装饰，不改变地图或路线，未指定时沿用原背景。未指定图集的开发样例继续使用原地形。城市 TileSet 保留原有 R/H/G/W 的高度、部署与通行属性，不能仅凭贴图改变规则。
+第一章四张战斗地图和 Game Test 默认开发样例共用 `content/terrains/terrain_002` 城市地形。地图的 `terrain_atlas` 指定运行时 4×4 图集，`background_texture` 指定战场外围背景，`perimeter_style` 指定外围样式；选关预览和战斗读取同一配置。背景仅作装饰，不改变地图或路线，未指定时沿用原背景。城市 TileSet 保留原有 R/H/G/W 的高度、部署与通行属性，不能仅凭贴图改变规则。
 
 1-2B 当前沿用 1-1B 的地图路线和波次；这是现有内容安排，后续关卡玩法设计时再评估。
 

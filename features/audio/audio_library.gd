@@ -44,4 +44,6 @@ func errors() -> PackedStringArray:
 			issues.append("Cue %s: 音效需使用 SFX 总线" % cue.id)
 		if cue.pitch_variance < 0.0 or cue.pitch_variance > 0.5:
 			issues.append("Cue %s: 音高浮动需在 0.0..0.5" % cue.id)
+		if cue.start_offset < 0.0 or (cue.stream != null and cue.start_offset > 0.0 and cue.start_offset >= cue.stream.get_length()):
+			issues.append("Cue %s: 起始偏移必须在音频时长内" % cue.id)
 	return issues

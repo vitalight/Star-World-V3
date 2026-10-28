@@ -7,13 +7,7 @@
 
 设置 `GODOT_PATH` 为 Godot 可执行文件路径后，双击 [`scripts/run_game.bat`](scripts/run_game.bat) 进入游戏；运行 `scripts\run_game.bat -d` 进入开发者模式。双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 启动开发者首页，从中进入 Player Mode 也使用开发者模式。
 
-普通模式下“开始游戏”从第一关开始，“读取存档”恢复已有进度；新游戏开始行动后会保存新进度。开发者模式开放所有已配置关卡，进度仅保留在本次运行中，不覆盖普通存档。
-
 项目默认入口为 `game/player/player_mode.tscn`：主界面 → 独立剧情关 → 独立战斗关 → 下一剧情关，章末播放独立尾声关。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。背景音乐与音效由 [音频内容](content/audio/README.md) 的 cue 清单驱动，主菜单右上角可调 BGM／音效音量。
-
-第一章「上海」包含家中异常、路边救援、东方明珠主节点，以及五名角色。角色、技能、敌人通过 Godot Inspector 编辑 `.tres`，关卡与波次继续使用 CSV，对白使用 Markdown，地形与路线仍用 Godot 地图编辑器；说明与例子见 [内容编辑](content/campaign/README.md)。Game Test 的 F3 调试窗可切换正式三关，Story Test 可选择三段关卡剧情与章末尾声并重新加载。
-
-Game Test 已接入完整战斗：从首页进入后可部署干员、开始防守、释放技能、撤退和重开；F3 打开内嵌调试窗。地图使用 TileMapLayer 编辑并生成 3D 战场，路线和波次均可在编辑器配置。操作、编辑与验证说明见 [Game Test](devtools/game_test/README.md)。
 
 ## 目录结构
 
@@ -62,7 +56,6 @@ StarWorldV3/
     └── StarterContent/         # 外部输入的初始素材，保留原始内容
 ```
 
-- 角色职责、架构、验证和提交约定见 [项目约定入口](AGENTS.md)。
 - 新文件和目录使用 `snake_case`。外部输入目录 `Human/StarterContent/` 保留指定大小写。
 - Godot 的 `.uid` 和素材 `.import` 元数据纳入版本管理，`.godot/` 缓存不提交。
 

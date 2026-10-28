@@ -1,0 +1,3 @@
+Create a production-ready UI panel asset, a single horizontal tactical RPG HUD panel viewed flat, isolated on transparent background. Very dark navy blue translucent interior, extremely thin satin titanium gray border and a sparse hairline pale cyan accent at corners. Straight edges and subtly cut corners. Flat, minimal elegant high-end sci-fi user interface, scalable nine-slice, blank center, panel fills canvas with small transparent margin. No text, no icons, no thick border, no large corner ornaments, no bevel, no external shadow.
+
+Generated with built-in imagegen without image references. Not selected.

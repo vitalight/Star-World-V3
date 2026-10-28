@@ -1,12 +1,14 @@
 extends Control
 const Game = preload("res://game/battle/battle_scene.tscn")
 const DebugWindow = preload("res://devtools/game_test/debug_window.gd")
+@export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
 var game: Node3D
 var debug_window: PanelContainer
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	game = Game.instantiate()
+	game.operator_roster = operator_roster
 	add_child(game)
 	game.exit_requested.connect(_return_to_hub)
 	var layer := CanvasLayer.new()

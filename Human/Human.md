@@ -28,28 +28,15 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
 
 ## Todo
 
-- [x] Dev Mode
-    - [x] Logic Test：验收
-    - [x] Game Test：集成最终关卡 Art + Logic。支持tilemap编辑地图
-    - [x] Story Test：初版
-    - [x] Game Config：配置角色（职业、技能、外观）、场景（地形、波次、外观）
 - [ ] Player Mode
-    - [x] 产品化UI（初始界面，存档，关卡选择）
-    - [ ] 填充新版正式资产（角色、剧情）
     - [ ] 设计第一章关卡
-    - [ ] 新手引导
 - [ ] Extra
+    - [ ] 教学系统：教玩家怎么玩 
     - [ ] 干员技能树（消耗金币）
-
-美化
-- 重新生成、更新UI（关卡选择界面）
-- 战斗关卡背景，不要纯色
-- 战斗UI（角色头像不对，左上角关卡提示太丑，特效方向需要根据攻击方向改变）
-
-更新剧情名字，不能一眼看出剧情。
+    - [ ] 存档系统：支持多个存档   
 
 从头更新
-- 正式的第一关战斗
+- 正式的第一章战斗
 
 第一章 正式资产
 - 角色

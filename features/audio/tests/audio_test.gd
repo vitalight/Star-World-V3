@@ -30,7 +30,9 @@ func _stream() -> AudioStreamWAV:
 	var stream := AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = 22050
-	stream.data = PackedByteArray(); stream.data.resize(2204)
+	var samples := PackedByteArray()
+	samples.resize(2204)
+	stream.data = samples
 	return stream
 
 func _any_playing(players: Array) -> bool:
@@ -67,6 +69,15 @@ func _check_library(library: AudioLibrary) -> void:
 	var issues: PackedStringArray = broken.errors()
 	check(issues.size() == 7, "Structural problems are reported: %d" % issues.size())
 	check(library.find("sfx_pending").stream == null and library.errors().is_empty(), "Stream-less cues are valid")
+	var timing = Library.new()
+	var invalid = _cue("sfx_offset", "SFX", _stream())
+	timing.cues.assign([invalid])
+	invalid.start_offset = -0.01
+	check(not timing.errors().is_empty(), "Negative SFX offset rejected")
+	invalid.start_offset = invalid.stream.get_length()
+	check(not timing.errors().is_empty(), "Offset at stream end rejected")
+	invalid.start_offset = 0.02
+	check(timing.errors().is_empty(), "Offset within stream accepted")
 
 func _check_settings() -> void:
 	var settings = Settings.new()

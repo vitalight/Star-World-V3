@@ -11,7 +11,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	root.content_scale_size = Vector2i(1280,720)
 	root.size = Vector2i(1280,720)
-	var game = load("res://game/battle/battle_scene.tscn").instantiate()
+	var game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game)
 	game.set_process(false)
 	var art = load("res://devtools/art_test/battle_stage.gd").new()

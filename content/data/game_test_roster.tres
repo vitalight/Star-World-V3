@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/actor_roster.gd" id="script"]
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
+[ext_resource type="Resource" path="res://content/data/character_011.tres" id="character_011"]
+[ext_resource type="Resource" path="res://content/data/character_012.tres" id="character_012"]
+[ext_resource type="Resource" path="res://content/data/character_013.tres" id="character_013"]
+[ext_resource type="Resource" path="res://content/data/character_014.tres" id="character_014"]
+[ext_resource type="Resource" path="res://content/data/character_015.tres" id="character_015"]
+
+[resource]
+script = ExtResource("script")
+actors = Dictionary[String, ExtResource("actor_type")]({
+"character_011": ExtResource("character_011"),
+"character_012": ExtResource("character_012"),
+"character_013": ExtResource("character_013"),
+"character_014": ExtResource("character_014"),
+"character_015": ExtResource("character_015")
+})

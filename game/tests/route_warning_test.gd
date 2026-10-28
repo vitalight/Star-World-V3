@@ -28,7 +28,7 @@ func packet_peak(rendered: Image, baseline: Image) -> int:
 	check(best > 0.5,"Route ribbon is visibly rendered")
 	return peak
 func run() -> void:
-	game = load("res://game/battle/battle_scene.tscn").instantiate()
+	game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	for frame in 6: await process_frame
 	var config: Dictionary = game.configuration.duplicate(true)

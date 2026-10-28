@@ -1,0 +1,3 @@
+Create a production-ready UI panel asset, a single horizontal rounded-rectangle tactical RPG HUD panel viewed flat, isolated on transparent background. Deep midnight navy subtly translucent center; extremely thin and understated muted steel-blue 1-pixel-look outline, faint pale-blue edge highlight, very small clipped corners. Nine-slice scalable, clean uniform edges and spacious blank center. Simple elegant premium design, matching tactical sci-fi game. Panel fills canvas leaving a small transparent margin. No text, no icons, no bolts, no thick bevel, no ornaments, no shadow, no glow.
+
+Generated with built-in imagegen without image references. Selected by user; cropped to (12, 94, 2160, 627) and resized to 324 x 80 for the runtime HUD.

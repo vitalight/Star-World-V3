@@ -21,7 +21,7 @@ func run() -> void:
 		check(entry.texture is AtlasTexture and entry.texture.get_image().get_size().x > 0,"Icon slice loads")
 		areas[entry.texture.region] = true
 	check(areas.size() == 16,"Icon slices are distinct")
-	var game = load("res://game/battle/battle_scene.tscn").instantiate()
+	var game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	await settle()
 	var pure = Battle.new(game.configuration)
@@ -53,7 +53,7 @@ func run() -> void:
 	check(pure.snapshot() == game.last_state,"Pure and assembled battle results agree with all skills enabled")
 	check(game.last_state.phase == "victory","Five-skill defense remains winnable")
 	game.free(); await process_frame
-	game = load("res://game/battle/battle_scene.tscn").instantiate()
+	game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	game.campaign_level = "scene_0104B"
 	game.operator_ids.assign(preload("res://game/tests/chapter_fixture.gd").operator_ids("scene_0104B"))
 	root.add_child(game); game.set_process(false)

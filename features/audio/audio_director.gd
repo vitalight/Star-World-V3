@@ -89,7 +89,7 @@ func play_sfx(id: String) -> bool:
 	player.stream = cue.stream
 	player.volume_db = cue.volume_db
 	player.pitch_scale = clampf(1.0 + _rng.randf_range(-cue.pitch_variance, cue.pitch_variance), 0.1, 4.0)
-	player.play()
+	player.play(cue.start_offset)
 	return true
 
 func _process(delta: float) -> void:

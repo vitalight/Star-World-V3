@@ -43,6 +43,7 @@ func run() -> void:
 
 func _check_manifest() -> void:
 	check(Cues.errors().is_empty(), "Cue manifest has no structural errors: %s" % [Cues.errors()])
+	check(is_equal_approx(Cues.find("sfx_attack").start_offset, 0.06) and Cues.find("sfx_hit").start_offset == 0.0 and Cues.find("sfx_heal").start_offset == 0.0, "Attack starts earlier without shifting hit or healing cues")
 	for id in ["music_main", "music_battle"]:
 		var cue = Cues.find(id)
 		check(cue != null, "Music cue exists: " + id)

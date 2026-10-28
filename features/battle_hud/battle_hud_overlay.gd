@@ -21,12 +21,32 @@ func action(text: String, rect: Rect2, callback: Callable, parent: Node = self) 
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.add_theme_font_size_override("font_size", 25)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.07, 0.09, 0.10, 0.83)
-	style.skew = Vector2(-0.13, 0)
+	style.bg_color = Color("172831e8")
+	style.border_color = Color("66818a")
+	style.set_border_width_all(1)
+	style.corner_radius_top_left = 4
+	style.corner_radius_bottom_right = 4
+	style.content_margin_left = 12; style.content_margin_right = 12
+	style.content_margin_top = 6; style.content_margin_bottom = 6
 	button.add_theme_stylebox_override("normal", style)
 	var hover := style.duplicate()
-	hover.bg_color = Color(0.25, 0.32, 0.34, 0.95)
+	hover.bg_color = Color("31505a")
+	hover.border_color = Color("b4d4d5")
 	button.add_theme_stylebox_override("hover", hover)
+	var pressed := style.duplicate()
+	pressed.bg_color = Color("4b6260")
+	button.add_theme_stylebox_override("pressed", pressed)
+	var disabled := style.duplicate()
+	disabled.bg_color = Color("17232bcc")
+	disabled.border_color = Color("44535a")
+	button.add_theme_stylebox_override("disabled", disabled)
+	var focus := StyleBoxFlat.new()
+	focus.bg_color = Color.TRANSPARENT
+	focus.border_color = Color("f5cf83")
+	focus.set_border_width_all(2)
+	button.add_theme_stylebox_override("focus", focus)
+	button.add_theme_color_override("font_color", Color("edf3e9"))
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
 	button.pressed.connect(callback)
 	parent.add_child(button)
 	return button
@@ -109,6 +129,11 @@ func _draw() -> void:
 
 func _panel() -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.06, 0.075, 0.085, 0.76)
-	style.skew = Vector2(-0.12, 0)
+	style.bg_color = Color("10232de8")
+	style.border_color = Color("536e78")
+	style.set_border_width_all(1)
+	style.corner_radius_top_left = 4
+	style.corner_radius_bottom_right = 4
+	style.shadow_color = Color(0.01, 0.03, 0.04, 0.35)
+	style.shadow_size = 4
 	return style

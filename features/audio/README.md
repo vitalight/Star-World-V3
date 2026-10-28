@@ -6,7 +6,7 @@
 
 | 文件 | 类型 | 职责 |
 | --- | --- | --- |
-| `audio_cue.gd` | `@tool AudioCue extends Resource` | 一条声音：`id`、`bus`、`stream`、`volume_db`、`pitch_variance` |
+| `audio_cue.gd` | `@tool AudioCue extends Resource` | 一条声音：`id`、`bus`、`stream`、`volume_db`、`pitch_variance`、音效起始偏移 `start_offset`（秒） |
 | `audio_library.gd` | `@tool AudioLibrary extends Resource` | `cues` 显式引用、`find(id)`、`ids()`、`errors()` |
 | `audio_settings.gd` | `RefCounted` | `music_volume`／`sfx_volume` 的 `ConfigFile` 读写，缺失或损坏时回落默认值 |
 | `audio_director.gd` | `Node` | 幂等创建 `Music`／`SFX` 总线，双播放器交叉淡入淡出，12 路音效池 |
@@ -24,6 +24,7 @@ audio.play_sfx("sfx_ui_click")   # 未配置或流为空返回 false
 
 - 相同的音乐 id 重复请求不会重启；`fade = 0` 立即切换，便于无界面测试。
 - 音效池优先使用空闲播放器，满载时轮转覆盖最旧的一路；同一批事件由调用方去重。
+- 音效从 cue 的 `start_offset` 开始播放；默认为 0，且必须小于音频时长。音乐不使用此偏移。
 - 循环由素材导入设置决定（MP3 为 `.import` 的 `loop=true`），cue 不保存循环开关。
 - 音量作用在总线上：0 静音该总线，其余值按 `linear_to_db` 设置。
 

@@ -5,7 +5,7 @@
 - Character：全部 28 个角色按英雄、敌人、图集编号和行号排序。每列一个角色，依次显示正面待机、背面待机、正面攻击、背面攻击；水平滚动浏览，较矮窗口支持垂直滚动。来源与角色行号随列显示。
 - Effect：两张特效图集全部 32 个静态切片，包括大小变体；卡片随窗口宽度换行，垂直滚动浏览，显示来源及行列。此页不播放动画。
 - Animation：56 个角色方向预览（每个角色正背面各一项）与 32 个特效预览；默认循环播放，支持统一播放、暂停和重播。隐藏页面停止更新，返回后恢复原先播放／暂停状态；重播从开头开始并播放。
-- Battle：16:9 自适应 3D 荒原哨站，10×6 地块、道路与高台、有受光层次的麦黄色草丛、岩石围墙、红蓝出入口、使用正式编队的 5 名干员和 3 类敌人模拟快照（开始先展示 2 秒路线预告，再出现敌人）；角色、血条、HUD、镜头与入口标记复用 Game Test 显示实现，已部署卡片按同一规则隐藏。没有移动、伤害、部署或波次计算。小窗口完整缩放战场并留边。
+- Battle：16:9 自适应 3D 城市战场，10×6 地块、道路与高台、城市外围及背景、红蓝出入口、使用正式编队的 5 名干员和 3 类敌人模拟快照（开始先展示 2 秒路线预告，再出现敌人）；角色、血条、HUD、镜头与入口标记复用 Game Test 显示实现，已部署卡片按同一规则隐藏。没有移动、伤害、部署或波次计算。小窗口完整缩放战场并留边。
 
 - Skill：仅展示16张技能图标、素材编号和图集行列位置，支持窄窗口换行与纵向滚动。
 
@@ -15,13 +15,13 @@
 
 浏览目录在 `asset_catalog.gd`，开发预览直接引用 Human/StarterContent：角色 hero-atlas-101-v2～103-v2 与敌人 enemy-atlas-101～104 均展示所有四行；特效 effect-atlas-01、effect-atlas-02。每张按 4 × 4 网格读取区域，不重新采样或覆盖原图，也不为原始素材浏览批量分配正式内容 ID。Character 和 Animation 页共用此目录。
 
-Battle 与 Game Test 共用 scene_001：开发样例各自的 content/data/character_001、003～006.tres 内嵌 stats 与 appearance；队伍来自独立的 content/data/test_roster.tres，由入口注入，关卡不引用角色。角色 appearance 共享正式图集：前四名使用 character_011/atlas.png 第 1～4 行，第五名使用 character_015/atlas.png 第 1 行，头像使用对应行第一列；样例战斗数值和职业图标保持原配置。敌人 character_008～010 共享 enemy_001/atlas.png 第 2～4 行；effect_001、terrain_001 保持原资源。原有 ID 保持稳定；character_008～character_010 的敌方资源存放于 `content/enemies/`。来源登记见 `content/characters/README.md` 和 `content/enemies/README.md`。scene_001 现在为 3D 地图；旧 2D battlefield_view 与 actor_view 入口保留。
+Battle 与 Game Test 共用 scene_001：Art Test 的开发样例使用 content/data/character_001、003～006.tres，队伍由 content/data/test_roster.tres 注入；Game Test 默认编队直接引用第一章正式角色。关卡不引用角色。角色 appearance 共享正式图集：前四名使用 character_011/atlas.png 第 1～4 行，第五名使用 character_015/atlas.png 第 1 行，头像使用对应行第一列；样例战斗数值和职业图标保持原配置。敌人 character_008～010 共享 enemy_001/atlas.png 第 2～4 行；effect_001 保持原资源，地形及背景使用第一章的 terrain_002。原有 ID 保持稳定；character_008～character_010 的敌方资源存放于 `content/enemies/`。来源登记见 `content/characters/README.md` 和 `content/enemies/README.md`。scene_001 现在为 3D 地图；旧 2D battlefield_view 与 actor_view 入口保留。
 
 ## Battle 展示控制
 
 右上 1×/2× 仅调整展示特效速度，暂停仅冻结特效。左上菜单通过“重新开始”重播展示；点击右上倍速切换 1×／2×。血条、费用、进度与冷却均来自模拟快照，默认五名干员均在场，因此卡片按共用规则隐藏。切到其他页签停止动画和 SubViewport 持续渲染，返回时保留暂停与速度偏好；离开工作区释放整个 3D 世界。
 
-战场组装在 `battle_stage.gd`；实际布局和围墙在 scene_001，具体资源由调用方传入表现 feature。地形使用独立顶面、倒角侧壁、单格纹理和真实方向光阴影；scene_001 外围使用断续深灰岩石废墟，保留 0.42／0.60 的高低层次；角色使用深度裁切立片与软接触阴影，斩击使用外部展示时钟。HUD 使用与 Game Test 相同的边缘锚定排布，预览画布随工作区等比缩放。
+战场组装在 `battle_stage.gd`；实际布局和外围在 scene_001，具体资源由调用方传入表现 feature。地形使用独立顶面、倒角侧壁、单格纹理和真实方向光阴影；scene_001 外围使用城市路缘与背景；角色使用深度裁切立片与软接触阴影，斩击使用外部展示时钟。HUD 使用与 Game Test 相同的边缘锚定排布，预览画布随工作区等比缩放。
 
 ## 动画限制与模块依赖
 

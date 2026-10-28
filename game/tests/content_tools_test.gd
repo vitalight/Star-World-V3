@@ -21,6 +21,24 @@ func run() -> void:
 	var workspace = load("res://devtools/game_test/game_workspace.tscn").instantiate()
 	root.add_child(workspace); await settle()
 	workspace.game.set_process(false)
+	var catalog = preload("res://game/content/content_catalog.gd").new()
+	catalog.reload()
+	var operator_ids := ["character_011", "character_012", "character_013", "character_014", "character_015"]
+	var reference: Dictionary = workspace.game.configuration.duplicate(true)
+	reference.roster = catalog.operator_configuration(operator_ids)
+	reference = preload("res://features/battle/config.gd").normalize(reference)
+	check(workspace.game.configuration.roster == reference.roster, "Game Test uses the official operator stats and skills")
+	for id in operator_ids:
+		var actor = workspace.game.operator_roster.actors[id]
+		check(actor.resource_path == "res://content/data/%s.tres" % id, "Game Test references the official actor file: " + id)
+		check(workspace.game.appearances[id].atlas.resource_path == catalog._appearances[id].atlas.resource_path and workspace.game.appearances[id].atlas_row == catalog._appearances[id].atlas_row, "Game Test uses the official appearance: " + id)
+	workspace.game.reload_level()
+	check(workspace.game.configuration.roster == reference.roster, "Reload retains official operator data")
+	var standalone = preload("res://game/battle/battle_scene.tscn").instantiate()
+	root.add_child(standalone)
+	standalone.set_process(false)
+	check(standalone.configuration.roster == reference.roster, "Standalone battle scene uses the same official operators")
+	standalone.free()
 	var picker: OptionButton = workspace.debug_window.level_picker
 	check(picker.item_count == 5, "Game Test offers sample plus chapter")
 	for index in [1, 2, 3, 4, 0]:
@@ -28,6 +46,8 @@ func run() -> void:
 		check(workspace.game.battle != null and workspace.game.validation_errors.is_empty(), "Game Test selection loads valid battle " + str(index))
 		workspace.game.reload_level()
 		check(workspace.game.battle.snapshot().phase == "ready", "Saved content reload resets battle")
+		if index == 0:
+			check(workspace.game.configuration.roster == reference.roster, "Returning to sample restores the official Game Test roster")
 		if index == 3:
 			workspace.debug_window.show()
 			await settle(); await capture("game_test_chapter")

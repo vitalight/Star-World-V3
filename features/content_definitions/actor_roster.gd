@@ -8,7 +8,11 @@ func configuration() -> Dictionary:
 	var result := {}
 	var keys := actors.keys()
 	keys.sort_custom(func(a, b): return actors[a].stats.content_id.naturalnocasecmp_to(actors[b].stats.content_id) < 0)
-	for key in keys: result[key] = actors[key].stats.configuration()
+	for key in keys:
+		result[key] = actors[key].stats.configuration()
+		# Alias-keyed legacy fixtures resolve their appearance by roster key.
+		if key == actors[key].stats.content_id:
+			result[key].content_id = actors[key].stats.content_id
 	return result
 
 func appearances() -> Dictionary:

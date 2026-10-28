@@ -33,7 +33,7 @@ func capture(name: String, game, kind: String) -> void:
 	rendered.save_png("res://temp/verification/" + name + ".png")
 func run() -> void:
 	root.size = Vector2i(1280,800)
-	var game = load("res://game/battle/battle_scene.tscn").instantiate()
+	var game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game)
 	game.set_process(false)
 	for frame in 6: await process_frame

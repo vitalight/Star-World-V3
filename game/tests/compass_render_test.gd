@@ -21,7 +21,7 @@ func difference(a: Image, b: Image, region: Rect2i, require_cyan := false) -> in
 			count += 1
 	return count
 func run() -> void:
-	game = load("res://game/battle/battle_scene.tscn").instantiate()
+	game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	for dimensions in [Vector2i(1280,800),Vector2i(960,600),Vector2i(1600,900)]:
 		root.size = dimensions

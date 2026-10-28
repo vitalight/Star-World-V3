@@ -32,18 +32,21 @@ func button(node: Node, text: String) -> Button:
 func click(text: String) -> void:
 	await settle()
 	var target := button(player, text)
-	check(target != null and not target.disabled, "Button available: " + text)
+	check(target != null and not target.disabled, "Button available: %s (page: %s)" % [text, player.page if "page" in player else str(player.name)])
 	if not target or target.disabled: return
 	var point := target.get_global_rect().get_center()
 	check(root.get_visible_rect().encloses(target.get_global_rect()), "Button fits viewport: " + text)
-	var motion := InputEventMouseMotion.new(); motion.position = point
+	# Synchronize the native cursor before sending the complete GUI click.
+	root.warp_mouse(point)
+	await process_frame
+	var motion := InputEventMouseMotion.new(); motion.position = point; motion.global_position = point
 	root.push_input(motion, true)
 	await process_frame
 	for pressed in [true, false]:
 		var event := InputEventMouseButton.new()
-		event.position = point; event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+		event.position = point; event.global_position = point
+		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
 		root.push_input(event, true)
-		await process_frame
 	await settle()
 
 func spawn(path := SAVE) -> void:

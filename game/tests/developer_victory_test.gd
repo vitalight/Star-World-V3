@@ -10,7 +10,9 @@ func run() -> void:
 	await click("开始游戏")
 	for id in ["scene_0101B", "scene_0102B", "scene_0103B", "scene_0104B"]:
 		if player.page == "levels": await click("开始行动   ›")
+		player.developer_mode = true
 		await click("跳过剧情")
+		player.developer_mode = false
 		var game = player.battle_scene
 		game.set_process(false)
 		if id == "scene_0101B": await click("知道了")
@@ -25,10 +27,10 @@ func run() -> void:
 				await process_frame
 			check(game.last_state.paused, "Final stage skip starts from a paused running battle")
 		var before: Dictionary = game.battle.snapshot()
-		await click("☰")
-		await click("开发者面板")
-		check(game.hud.developer_panel.visible and not game.hud.game_menu.visible, "Menu opens developer panel")
-		check(game.battle.snapshot() == before, "Opening panel does not pause or mutate simulation")
+		check(game.hud.developer_panel.visible and not game.hud.game_menu.visible, "Developer panel is expanded without opening menu")
+		var panel_rect: Rect2 = game.hud.developer_panel.get_rect()
+		check(is_equal_approx(panel_rect.position.x, 18) and abs(panel_rect.end.y - (game.hud.size.y - 18)) < 1, "Developer panel is anchored at bottom left")
+		check(game.battle.snapshot() == before, "Developer panel does not pause or mutate simulation")
 		await capture("developer_panel_" + id)
 		await click("跳过战斗并胜利")
 		check(game.last_state.phase == "victory" and game.hud.end_panel.visible, "Skip uses actual victory result")

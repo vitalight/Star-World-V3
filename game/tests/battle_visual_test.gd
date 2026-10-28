@@ -83,7 +83,7 @@ func deploy(args: Array) -> void:
 
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute("res://temp/verification")
-	change_scene_to_file("res://devtools/game_test/game_workspace.tscn")
+	change_scene_to_file("res://game/tests/game_workspace_fixture.tscn")
 	await settle()
 	workspace = current_scene; game = workspace.game
 	game.set_process(false)
@@ -182,7 +182,7 @@ func run() -> void:
 	await settle()
 	check(old.get_ref() == null, "Leaving Game Test releases workspace and world")
 	for repeat in 2:
-		change_scene_to_file("res://devtools/game_test/game_workspace.tscn")
+		change_scene_to_file("res://game/tests/game_workspace_fixture.tscn")
 		await settle()
 		check(current_scene.game.last_state.phase == "ready", "Reenter starts fresh")
 		change_scene_to_file("res://devtools/hub/developer_hub.tscn")

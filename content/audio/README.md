@@ -26,6 +26,7 @@ content/audio/
 
 - 音乐：`music_main`（主菜单／关卡／剧情／设置）、`music_battle`（战斗）
 - 已有音效：`sfx_ui_click`、`sfx_attack`、`sfx_hit`、`sfx_heal`、`sfx_notify`（路线预警）
+- 攻击音效在攻击起手事件播放，从素材 0.06 秒处开始，以减少前段低音量造成的听感延迟。
 - 占位音效：部署、撤退、生成、费用、技能起止、受击、落空、阻挡、死亡、逃脱、胜负
 
 ## 署名

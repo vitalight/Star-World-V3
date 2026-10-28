@@ -5,20 +5,23 @@ signal continue_requested
 const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
 const Battle = preload("res://features/battle/battle.gd")
 const Presentation = preload("res://game/adapters/battle_presentation.gd")
+const LeakWarning = preload("res://game/adapters/leak_warning.gd")
 const BattleAudio = preload("res://game/adapters/battle_audio.gd")
 const Hud = preload("res://features/battle_hud/playable_hud.gd")
 const Field = preload("res://features/battlefield_view/editable_field.gd")
 const Catalog = preload("res://game/content/content_catalog.gd")
 @export var map_source: PackedScene = preload("res://content/scenes/scene_001/map.tscn")
 @export var campaign_level := ""
+var developer_tools_enabled := false
 @export var operator_ids: Array[String] = []
-@export var operator_roster: Resource = preload("res://content/data/test_roster.tres")
+@export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
 var battle: RefCounted
 var map_data: Node2D
 var field: Node3D
 var camera: Camera3D
 var hud: Control
 var presentation: RefCounted
+var leak_warning: RefCounted
 var audio: Node
 var battle_audio: RefCounted
 var world: Node3D
@@ -54,7 +57,7 @@ func reload_level() -> void:
 	if world: world.free()
 	if map_data: map_data.free()
 	if hud: hud.get_parent().free()
-	presentation = null; battle = null; hud = null; battle_audio = BattleAudio.new(audio) if audio else null
+	presentation = null; leak_warning = null; battle = null; hud = null; battle_audio = BattleAudio.new(audio) if audio else null
 	field = null; markers = null; overlays = null
 	last_state = {}; configuration = {}
 	selected_roster = ""; selected_unit = -1; candidate = Vector2i(-99, -99); speed = 1.0
@@ -122,11 +125,13 @@ func reload_level() -> void:
 	overlays = Node3D.new(); world.add_child(overlays)
 	var layer := CanvasLayer.new(); add_child(layer)
 	hud = Hud.new()
-	hud.developer_tools_enabled = true
+	hud.panel_texture = preload("res://content/ui/battle/tactical_panel_v2a.png")
+	hud.developer_tools_enabled = developer_tools_enabled
 	hud.roster = configuration.roster
 	hud.catalog = appearances
 	hud.skill_icons = skill_icons
 	layer.add_child(hud)
+	leak_warning = LeakWarning.new(configuration.routes, markers, hud)
 	hud.pause_requested.connect(toggle_pause)
 	hud.speed_requested.connect(func(): set_speed(speed * 2.0 if speed < 4.0 else 1.0))
 	hud.replay_requested.connect(reset)
@@ -191,9 +196,11 @@ func _process(delta: float) -> void:
 		if auto_start_left <= 0.000001: start()
 	var previous: float = battle.snapshot().time
 	battle.advance(elapsed)
-	refresh(battle.snapshot().time - previous)
+	var visual_delta: float = battle.snapshot().time - previous
+	var feedback_delta: float = elapsed if state.phase in ["victory", "defeat"] and not state.paused else visual_delta
+	refresh(visual_delta, feedback_delta)
 
-func refresh(visual_delta := 0.0) -> void:
+func refresh(visual_delta := 0.0, feedback_delta := -1.0) -> void:
 	if not battle: return
 	last_state = battle.snapshot()
 	var events: Array = battle.take_events()
@@ -206,6 +213,7 @@ func refresh(visual_delta := 0.0) -> void:
 		deployment_pending = false; direction_chosen = false
 		hud.cancel_drag()
 	hud.update_state(last_state, selected_roster, selected_unit, speed, configuration.deploy_limit)
+	leak_warning.sync(last_state, events, visual_delta if feedback_delta < 0.0 else feedback_delta)
 	observed.emit(last_state.duplicate(true), events.duplicate(true))
 	update_overlays()
 	update_operator_anchor()
@@ -263,7 +271,7 @@ func reset() -> void:
 	hud.cancel_drag()
 	deployment_pending = false; direction_chosen = false
 	hud.game_menu.hide()
-	hud.developer_panel.hide()
+	hud.developer_panel.visible = developer_tools_enabled
 	hud.set_notice("")
 	refresh()
 

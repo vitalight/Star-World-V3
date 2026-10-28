@@ -74,9 +74,11 @@ static func route_markers(parent: Node3D, routes: Dictionary, terrain: Node3D) -
 			var key := str([cell, index])
 			if endpoints.has(key): continue
 			endpoints[key] = true
-			portal(parent, Vector3(cell.x, terrain.surface_height(cell) + 0.06, cell.y), ENEMY_COLOR if index == 0 else BASE_COLOR)
+			var marker := portal(parent, Vector3(cell.x, terrain.surface_height(cell) + 0.06, cell.y), ENEMY_COLOR if index == 0 else BASE_COLOR)
+			marker.set_meta("endpoint_cell", cell)
+			marker.set_meta("is_base", index == -1)
 
-static func portal(parent: Node3D, at: Vector3, color: Color) -> void:
+static func portal(parent: Node3D, at: Vector3, color: Color) -> Node3D:
 	var marker := Node3D.new()
 	marker.position = at
 	marker.set_meta("portal_color", color)
@@ -97,3 +99,4 @@ static func portal(parent: Node3D, at: Vector3, color: Color) -> void:
 		instance.material_override = material
 		instance.position = Vector3(0, 0.43, 0) + offset
 		marker.add_child(instance)
+	return marker

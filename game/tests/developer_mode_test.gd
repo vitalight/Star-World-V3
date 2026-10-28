@@ -31,8 +31,16 @@ func run() -> void:
 	await settle()
 	if "--developer-mode" in OS.get_cmdline_user_args():
 		check(player.developer_mode and player._level_unlocked("scene_0105A"), "Command-line mode unlocks all stages")
+		player.progress.selected = "scene_0101B"
+		player.start_battle()
+		check(player.battle_scene.hud.developer_panel.visible, "Command-line developer mode displays battle panel")
 	else:
 		check(not player.developer_mode, "Normal launch is not developer mode")
+		player.progress.selected = "scene_0101B"
+		player.start_battle()
+		check(not player.battle_scene.hud.developer_panel.visible, "Normal player battle hides developer panel")
+		await settle()
+		saved.save(SAVE)
 		player.new_game()
 		check(player.progress.selected == "scene_0101A" and player.progress.completed.is_empty(), "New game resets progress")
 		check(not player._level_unlocked("scene_0101B"), "New game keeps later stages locked")
@@ -45,6 +53,9 @@ func run() -> void:
 		check(player.progress.selected == "scene_0104B", "Developer can select a later battle")
 		player.begin_action()
 		check(player.page == "battle" and player.battle_scene.campaign_level == "scene_0104B", "Developer can enter a later battle")
+		check(player.battle_scene.hud.developer_panel.visible, "Developer player battle displays panel")
+		player.battle_scene.reset()
+		check(player.battle_scene.hud.developer_panel.visible, "Restart keeps developer panel expanded")
 		var readback := ConfigFile.new()
 		readback.load(SAVE)
 		check(readback.get_value("campaign", "completed") == ["scene_0101A", "scene_0101B"] and readback.get_value("campaign", "selected") == "scene_0102A", "Developer mode does not alter normal save")

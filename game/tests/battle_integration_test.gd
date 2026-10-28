@@ -1,7 +1,7 @@
 extends SceneTree
 const Battle = preload("res://features/battle/battle.gd")
 const Map = preload("res://content/scenes/scene_001/map.tscn")
-const Scene = preload("res://game/battle/battle_scene.tscn")
+const Scene = preload("res://game/tests/sample_battle_fixture.tscn")
 const Fixture = preload("res://game/tests/defense_fixture.gd")
 var failures := 0
 var checks := 0
@@ -22,6 +22,10 @@ func run() -> void:
 	check(map.errors().is_empty(), "Default map validates: " + str(map.errors()))
 	check(map.cells().size() == 60 and map.routes().size() == 2, "60 cells and two paths")
 	var tiles: TileMapLayer = map.get_node("Terrain")
+	var chapter_map = load("res://content/scenes/scene_0101B/map.tscn").instantiate()
+	check(tiles.tile_set == chapter_map.get_node("Terrain").tile_set, "Test map uses chapter city TileSet")
+	check(map.terrain_atlas == chapter_map.terrain_atlas and map.background_texture == chapter_map.background_texture and map.perimeter_style == chapter_map.perimeter_style, "Test map uses chapter battlefield art")
+	chapter_map.free()
 	var cell := Vector2i(0, 0)
 	for pair in [[Vector2i(0, 1), "ground", 0.0], [Vector2i(0, 0), "high", 0.42], [Vector2i(2, 2), "high", 0.42], [Vector2i(0, 3), "none", 0.0]]:
 		tiles.set_cell(cell, 0, pair[0])
@@ -199,7 +203,7 @@ func verify_roster(game: Node3D) -> void:
 
 func verify_auto_start(game: Node3D) -> void:
 	var menu: Array = game.hud.game_menu.get_child(0).get_children().map(func(button): return button.text)
-	check(menu == ["退出战斗", "重新开始", "开发者面板"], "Battle menu exposes exit, restart and developer panel")
+	check(menu == ["退出战斗", "重新开始"] and not game.hud.developer_panel.visible, "Normal battle hides developer panel and menu entry")
 	game._process(0.5)
 	check(game.last_state.phase == "ready" and game.last_state.spawned == 0, "Initial preparation does not spawn early")
 	game.toggle_pause()

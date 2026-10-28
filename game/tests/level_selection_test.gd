@@ -18,6 +18,18 @@ func check(value: bool, message: String) -> void:
 func settle() -> void:
 	for i in 8: await process_frame
 
+func click_card(card: Button) -> void:
+	var point := card.get_global_rect().get_center()
+	var motion := InputEventMouseMotion.new()
+	motion.position = point; motion.global_position = point
+	root.push_input(motion, true)
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = point; event.global_position = point
+		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+		root.push_input(event, true)
+	await settle()
+
 func verify_list(unlocked_count: int, locked: bool) -> void:
 	var list: VBoxContainer = player.find_child("LevelList", true, false)
 	check(list.get_child_count() == unlocked_count + int(locked), "Only unlocked levels and one next placeholder are visible")
@@ -82,6 +94,22 @@ func run() -> void:
 	detail_scroll = player.find_child("DetailScroll", true, false)
 	check(panel.size.y > short_height and detail_scroll.get_v_scroll_bar().max_value > detail_scroll.get_v_scroll_bar().page, "Long detail expands and can scroll")
 	entry.description = old_description
+	player.developer_mode = true
+	player.show_levels()
+	await settle()
+	scroll = player.find_child("LevelScroll", true, false)
+	scroll.scroll_vertical = 220
+	await settle()
+	var original_scroll := scroll.scroll_vertical
+	check(original_scroll > 0, "Developer level list is scrolled")
+	var upper_card: Button = player.find_child("Level_" + ids[3], true, false)
+	await click_card(upper_card)
+	scroll = player.find_child("LevelScroll", true, false)
+	check(player.progress.selected == ids[3] and scroll.scroll_vertical == original_scroll, "Selecting an earlier level preserves list scroll position")
+	var lower_card: Button = player.find_child("Level_" + ids[6], true, false)
+	await click_card(lower_card)
+	scroll = player.find_child("LevelScroll", true, false)
+	check(player.progress.selected == ids[6] and scroll.scroll_vertical == original_scroll, "Selecting a later level preserves list scroll position")
 	player.queue_free()
 	await settle()
 	print("LEVEL SELECTION: %d checks, %d failures" % [checks, failures])

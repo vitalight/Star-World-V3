@@ -29,7 +29,7 @@ func select_actor(id: int) -> void:
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute("res://temp/verification")
 	root.size = Vector2i(1280,800)
-	game = load("res://game/battle/battle_scene.tscn").instantiate()
+	game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	await settle()
 	var before_selection: Dictionary = game.battle.snapshot()

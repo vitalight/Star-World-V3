@@ -1,6 +1,6 @@
 extends SceneTree
 ## Real GUI pointer gestures, simulation-driven foot bars, and unwarped billboards.
-const Scene = preload("res://devtools/game_test/game_workspace.tscn")
+const Scene = preload("res://game/tests/game_workspace_fixture.tscn")
 var game: Node3D
 var failures := 0
 var checks := 0

@@ -1,5 +1,5 @@
 extends SceneTree
-const Scene = preload("res://game/battle/battle_scene.tscn")
+const Scene = preload("res://game/tests/sample_battle_fixture.tscn")
 var checks := 0
 var failures := 0
 var game: Node3D

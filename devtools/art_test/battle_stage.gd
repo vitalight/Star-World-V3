@@ -45,10 +45,12 @@ func _ready() -> void:
 	viewport.add_child(world)
 	field = MAP.instantiate()
 	field.graybox = graybox
+	var source = field.map_source.instantiate()
+	field.has_backdrop = source.background_texture != null
 	world.add_child(field)
 	StageView.setup_environment(world)
+	StageView.set_background(world, source.background_texture)
 	camera = StageView.create_camera(world)
-	var source = field.map_source.instantiate()
 	configuration = source.configuration()
 	configuration.roster = operator_roster.configuration()
 	catalog = operator_roster.appearances()

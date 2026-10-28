@@ -1,10 +1,12 @@
 # Game Test
 
+敌人未被阻挡且沿路线距终点不超过 1 格时，受威胁的终点标记闪烁并显示「敌人接近！」；多个终点可同时预警。敌人离场或被阻挡后预警消失，漏怪时顶部基地生命短暂闪红。战斗暂停时预警与闪红冻结；终局后闪红仍会淡出，重开清除提示。表现读取战斗快照和 escape 事件，不改变漏怪规则。真实窗口验证入口为 `game/tests/leak_warning_test.gd`。
+
 从 Developer Hub 进入 Game Test，或在 Godot 中 F6 运行 `game/battle/battle_scene.tscn`。默认项目入口是 Player Mode，开发者脚本显式启动 Hub。Game Test 使用主视口完整显示战场，没有固定宽高比留边和工作区滚动外壳。
 
-F3 调试窗的关卡下拉框保留开发样例，并增加第一章四关；选择后重置战斗，“重新加载关卡”读取已保存的角色／敌人／技能 `.tres`、关卡／波次 CSV、MD 和地图。正式章节编辑方式见 `content/campaign/README.md`；下述 Inspector 数值资源编辑方式针对原 scene_001 样例。
+F3 调试窗的关卡下拉框保留开发样例，并增加第一章四关；选择后重置战斗，“重新加载关卡”读取已保存的角色／敌人／技能 `.tres`、关卡／波次 CSV、MD 和地图。默认开发样例使用第一章的城市地形、外围和背景，保留自身的地图布局与路线；编队直接引用第一章的五名正式角色。正式章节编辑方式见 `content/campaign/README.md`。
 
-F3 调试窗与战斗左上菜单的“开发者面板”均提供“跳过战斗并胜利”。Game Test 只展示胜利结果；Player Mode 沿用正常胜利流程保存待播放剧情，战后剧情完成后解锁下一关。面板打开不改变暂停状态，已结束的战斗不能覆盖结果。
+F3 调试窗提供“跳过战斗并胜利”。Player Mode 的开发者模式在战斗左下角直接展开开发者面板，提供相同操作；普通玩家模式不显示面板。Game Test 只展示胜利结果；Player Mode 沿用正常胜利流程记录待播放剧情，战后剧情完成后解锁下一关。面板不改变暂停状态，已结束的战斗不能覆盖结果。
 
 ## 操作
 
@@ -19,19 +21,19 @@ F3 或左下角小按钮“F3”打开内嵌小窗：拖标题移动，拖右下
 ## 在编辑器制作关卡
 
 - 打开 `content/scenes/scene_001/map.tscn`，选择 **Terrain / TileMapLayer** 在 2D 编辑器刷图。四种地块为道路地面、高台、高台草丛、水域；橡皮擦删除的格子没有 3D 地块且不可部署。
-- 图集 `content/terrains/terrain_001/tileset.tres` 的自定义数据：`appearance` 为 R/H/G/W，`height` 是 3D 顶面高度，`deployment` 为 ground/high/none，`walkable` 表示路线可通行。编辑图集为单格 64×64；实际 3D 渲染仍使用原有高分辨率 atlas。
+- 图集 `content/terrains/terrain_002/tileset.tres` 的自定义数据：`appearance` 为 R/H/G/W，`height` 是 3D 顶面高度，`deployment` 为 ground/high/none，`walkable` 表示路线可通行。编辑图集为单格 64×64；实际 3D 渲染使用同目录的城市 atlas。
 - 默认地图 bounds 为 `(0,0,10,6)`。地图从零坐标开始，改变大小时同步编辑 bounds。3D 地块、围墙、底座和游戏镜头据此适配；不要将路线穿过水或空格。
 - 在 **Routes** 下选择 upper / lower 的 Path2D 编辑折线路径。2D 格心为 `(32+64*x, 32+64*y)`；建议吸附步长 64、偏移 32。控制点必须对齐格心，线段沿横／纵轴，曲线的入／出手柄保持零。路径节点名称即路线 ID，首点是出生点，末点是基地入口；编辑器用红／蓝点标记两端。
-- 选根节点的 **Level** 资源，或直接打开同目录 `level.tres`：修改基地生命、费用、上限、编队、敌人和波次。开发样例编队／敌人的数值使用 `content/data/character_NNN.tres`／`enemy_NNN.tres`；波次的 time 为绝对战斗时间，enemy 和 route 必须匹配字典键与 Path2D 名称，number 用于显示波次编号。
+- 选根节点的 **Level** 资源，或直接打开同目录 `level.tres`：修改基地生命、费用、上限、敌人和波次。默认编队由 `content/data/game_test_roster.tres` 指定，直接引用正式角色；波次的 time 为绝对战斗时间，enemy 和 route 必须匹配字典键与 Path2D 名称，number 用于显示波次编号。
 - 地图根节点的配置警告显示越界、断路、水域、不对齐、非法资源与波次引用。运行时出现配置错误会显示原因并阻止开始，修复后可再次重新加载。
 - 保存后打开 `content/scenes/scene_001/preview.tscn` 的 3D 视图。选中 Field，点击 Inspector 的 **刷新 TileMap 的 3D 预览**；该预览也可 F6 运行。它与正式游戏及 Art Test 复用相同地形生成器。
 - 在正在运行的 Game Test 中用“重新加载关卡”读取已保存资源，包括外部数值与 TileSet。该操作重置战斗；仅修改尚未保存的编辑器内容不会影响运行中的关卡。
 
-编辑 scene_001 样例时，在 content/data 配置直接 UnitSpec 格式的 character_NNN.tres／enemy_NNN.tres，并将数值资源加入 Level；样例外观保留原素材目录的 appearance.tres。正式新增单位则按 content/campaign/README.md 使用包含 stats／appearance 的 ActorDefinition 文件并在 actors.tres 注册。数值中的稳定 content_id 用于 game 查找外观；外观资源包含正／背面待机与攻击四种姿态、头像和显示高度。数值不引用贴图，正式模块不加载 Human 原图。
+编辑 scene_001 样例时，敌人和波次在 Level 中配置；默认干员使用正式角色的 ActorDefinition 文件。新增正式单位按 content/campaign/README.md 配置并在 actors.tres 注册。数值中的稳定 content_id 用于 game 查找外观；外观资源包含正／背面待机与攻击四种姿态、头像和显示高度。数值不引用贴图，正式模块不加载 Human 原图。
 
-## 可重复防守方案
+## 自动化测试夹具的防守方案
 
-坐标从零开始，朝向编号为右0、下1、左2、上3。准备态部署以下干员，全部朝左：
+以下方案使用自动化测试专用的旧样例编队，不适用于默认正式编队。坐标从零开始，朝向编号为右0、下1、左2、上3。准备态部署以下干员，全部朝左：
 
 | 干员 | 格子 |
 | --- | --- |
@@ -138,4 +140,4 @@ Art Test 的 Battle 页以模拟快照使用同一表现适配器、角色资源
 
 共享actor_view_3d提供干员idle呼吸（周期2.4秒，上下幅度0.025世界单位）和敌人walk摆动（周期0.55秒，左右位移幅度0.012世界单位，绕脚下支点摆角约±2°）。干员沿镜头竖轴平移；敌人以轻微侧倾为主、少量横向位移为辅，旋转始终位于镜头平面内，保持billboard和原有尺寸；逻辑坐标、脚下罗盘与血条保持稳定。攻击姿态、敌人被阻挡及待部署预览不播放该平移。动画由advance_visual接收战斗时钟，暂停冻结、倍速同步，重开清空相位；Art Test的Battle页复用同一实现和预览时钟。
 
-Game Test 与 Art Test 的开发玩家干员列表位于 content/data/test_roster.tres，独立于地图和关卡；scene_001 不保存 roster 或角色引用。正式 Player Mode 从存档读取当前可出战干员并注入所选关卡，1-1B（scene_0101B）固定由大星、小黄出战，其余旧关重打保留当前队伍。
+Game Test 默认编队位于 content/data/game_test_roster.tres，直接引用 character_011～015 的正式角色文件；Art Test 和固定数值自动化测试使用 test_roster.tres。scene_001 不保存 roster 或角色引用。正式 Player Mode 从存档读取当前可出战干员并注入所选关卡，1-1B（scene_0101B）固定由大星、小黄出战，其余旧关重打保留当前队伍。

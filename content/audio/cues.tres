@@ -39,6 +39,7 @@ bus = "SFX"
 stream = ExtResource("sfx_attack_stream")
 volume_db = -6.0
 pitch_variance = 0.05
+start_offset = 0.06
 
 [sub_resource type="Resource" id="cue_sfx_hit"]
 script = ExtResource("cue")

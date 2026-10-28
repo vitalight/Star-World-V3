@@ -6,7 +6,7 @@ func check(ok: bool, text: String) -> void:
 	checks += 1
 	if not ok: failures += 1; push_error(text)
 func run() -> void:
-	var game = load("res://game/battle/battle_scene.tscn").instantiate()
+	var game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
 	root.add_child(game); game.set_process(false)
 	for frame in 6: await process_frame
 	for key in game.configuration.roster:
@@ -60,8 +60,8 @@ func run() -> void:
 		game.fit_camera()
 		for actor in game.presentation.actors.values():
 			actor.update_projection()
-			var displacement: Vector2 = game.camera.unproject_position(actor.sprite.global_position) - game.camera.unproject_position(actor.global_position)
-			check(displacement.distance_to(Vector2(0,20)) < 0.05, "Actor is lowered by 20 screen pixels: " + str(dimensions))
+			var displacement: Vector2 = game.camera.unproject_position(actor.visual_position()) - game.camera.unproject_position(actor.global_position)
+			check(displacement.distance_to(Vector2(0,20)) < 0.05, "Actor visual anchor is lowered by 20 screen pixels: " + str(dimensions))
 			check(is_equal_approx(actor.visual_position().y,actor.global_position.y), "Presentation shift preserves terrain/flight height")
 			check(actor.compass.global_position.distance_to(actor.global_position + Vector3.UP * 0.008) < 0.001, "Compass stays on the terrain anchor independently of camera and sprite offset")
 		for unit in game.last_state.units:
