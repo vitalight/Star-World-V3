@@ -1,4 +1,4 @@
-# 1-4 根节点·东方明珠
+# 1-4 明珠失辉
 
 ---
 background: background_002

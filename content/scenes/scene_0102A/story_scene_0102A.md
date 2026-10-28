@@ -1,4 +1,4 @@
-# 1-2 管控队出场
+# 1-2 逐光而来
 
 ---
 background: background_001
