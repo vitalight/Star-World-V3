@@ -8,6 +8,8 @@
 | content/data/enemy_002.tres | 疾行近战 | 2 | 裂隙疾犬 |
 | content/data/enemy_003.tres | 重甲近战 | 4 | 裂甲卫士 |
 | content/data/enemy_004.tres | 远程 | 3 | 节点投射者 |
+| content/data/enemy_005.tres | 飞行 | 3 | 节点投射者（飞行变体） |
+| content/data/enemy_006.tres | Boss | 4 | 裂甲卫士（Boss） |
 
 保留现有 ID、显示名、数值、波次和战斗机制。每个正式配置内嵌 appearance，直接引用图集并设置 atlas_row，头像随第一列生成。
 
