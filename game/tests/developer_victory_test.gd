@@ -16,7 +16,13 @@ func run() -> void:
 		if id == "scene_0101B": await click("知道了")
 		if id == "scene_0104B":
 			game.start()
-			await click("Ⅱ")
+			await settle()
+			var point: Vector2 = game.hud.pause_button.get_global_rect().get_center()
+			for pressed in [true, false]:
+				var event := InputEventMouseButton.new()
+				event.position = point; event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+				root.push_input(event, true)
+				await process_frame
 			check(game.last_state.paused, "Final stage skip starts from a paused running battle")
 		var before: Dictionary = game.battle.snapshot()
 		await click("☰")

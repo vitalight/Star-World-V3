@@ -59,7 +59,7 @@ func _orient() -> void:
 	if not camera: return
 	var direction := destination - origin
 	var angle := atan2(direction.dot(camera.global_basis.y), direction.dot(camera.global_basis.x))
-	if kind == "projectile": angle += PI # The supplied bullet points left.
+	if kind in ["projectile", "slash"]: angle += PI # Both supplied textures point left.
 	sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 	sprite.global_basis = camera.global_basis.rotated(camera.global_basis.z, angle).scaled(sprite.scale)
 

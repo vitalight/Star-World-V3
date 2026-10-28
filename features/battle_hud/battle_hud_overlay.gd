@@ -43,18 +43,16 @@ func _ready() -> void:
 	add_child(vignette)
 	action("☰", Rect2(22, 16, 62, 52), func(): settings.visible = not settings.visible)
 	speed_button = action("1×", Rect2(1080, 16, 78, 52), func(): speed_requested.emit())
-	pause_button = action("Ⅱ", Rect2(1174, 16, 78, 52), func(): pause_requested.emit())
+	pause_button = action("", Rect2(1174, 16, 78, 52), func(): pause_requested.emit())
 	for i in portraits.size():
 		var card := action("", Rect2(628 + i * 123, 590, 117, 130), func(): pass)
 		card.tooltip_text = "展示角色 · 预览素材"
 		card.clip_contents = true
 		var portrait := TextureRect.new()
-		portrait.position = Vector2(0, 15)
+		portrait.position = Vector2(0, 27)
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		var source := portraits[i].get_image()
-		var extent := source.get_size()
-		portrait.texture = ImageTexture.create_from_image(source.get_region(Rect2i(int(extent.x * 0.15), 0, int(extent.x * 0.7), int(extent.y * 0.65))))
-		portrait.size = Vector2(117, 110)
+		portrait.texture = portraits[i]
+		portrait.size = Vector2(117, 103)
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(portrait)
@@ -82,10 +80,14 @@ func _ready() -> void:
 	action("重播展示", Rect2(15, 15, 240, 56), func(): replay_requested.emit(), settings)
 	action("恢复 1×", Rect2(15, 85, 240, 56), func(): reset_speed_requested.emit(), settings)
 	settings.hide()
+	set_playback(false, 1.0)
 
 func set_playback(paused: bool, speed: float) -> void:
 	if pause_button:
-		pause_button.text = "▶" if paused else "Ⅱ"
+		pause_button.icon = preload("res://features/battle_hud/play.svg") if paused else preload("res://features/battle_hud/pause.svg")
+		pause_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		pause_button.accessibility_name = "继续" if paused else "暂停"
+		pause_button.add_theme_constant_override("icon_max_width", 26)
 		speed_button.text = "%d×" % int(speed)
 
 func set_readout(values: Dictionary) -> void:

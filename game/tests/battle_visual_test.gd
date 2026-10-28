@@ -96,6 +96,7 @@ func run() -> void:
 		check(game.hud.size.is_equal_approx(root.get_visible_rect().size), "HUD fills viewport " + str(dimensions))
 		for card in game.hud.cards.values():
 			check(root.get_visible_rect().encloses(card.button.get_global_rect()), "Card stays inside viewport")
+			check(card.portrait.texture == game.hud.catalog[game.hud.cards.find_key(card)].portrait and card.portrait.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_CENTERED, "Roster displays the complete portrait")
 		for cell in game.map_data.cells():
 			var at := Vector3(cell.x, game.field.surface_height(cell) + 0.015, cell.y)
 			var point: Vector2 = game.camera.unproject_position(at)
@@ -132,6 +133,7 @@ func run() -> void:
 	check(game.battle.find_unit(1).skill_left > 0, "Skill button submits command")
 	await click(game.hud.pause_button.get_global_rect().get_center())
 	check(game.last_state.paused, "Pause button pauses simulation")
+	check(game.hud.pause_button.text.is_empty() and game.hud.pause_button.accessibility_name == "继续", "Pause control shows a play icon when paused")
 	var state: Dictionary = game.last_state.duplicate(true)
 	var actor = game.presentation.actors[1]
 	var alpha: Color = actor.sprite.modulate

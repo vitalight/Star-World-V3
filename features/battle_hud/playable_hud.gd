@@ -79,7 +79,7 @@ func _ready() -> void:
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(spacer)
 	speed_button = _button(top, "1×", func(): speed_requested.emit())
-	pause_button = _button(top, "Ⅱ", func(): pause_requested.emit())
+	pause_button = _button(top, "", func(): pause_requested.emit())
 	for button in [menu_button, speed_button, pause_button]:
 		button.custom_minimum_size = Vector2(93, 63)
 		button.add_theme_font_size_override("font_size", 29)
@@ -141,14 +141,11 @@ func _ready() -> void:
 		card.gui_input.connect(func(event): _card_input(key, event))
 		bottom.add_child(card)
 		var portrait := TextureRect.new()
-		var texture: Texture2D = catalog[key].portrait
-		var crop := AtlasTexture.new()
-		crop.atlas = texture
-		crop.region = Rect2(texture.get_size() * Vector2(0.18, 0.02), texture.get_size() * Vector2(0.64, 0.57))
-		portrait.texture = crop
+		portrait.texture = catalog[key].portrait
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		portrait.offset_top = 27
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(portrait)
 		var strip := ColorRect.new()

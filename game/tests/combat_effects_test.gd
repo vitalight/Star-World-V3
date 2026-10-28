@@ -37,6 +37,12 @@ func run() -> void:
 	root.add_child(game)
 	game.set_process(false)
 	for frame in 6: await process_frame
+	for direction in [Vector3.RIGHT, Vector3.LEFT]:
+		var effect = game.presentation.spawn_effect(game.presentation.effect_texture, "slash", 1.3)
+		var origin: Vector3 = game.camera.global_position - game.camera.global_basis.z * 5.0
+		effect.play_slash(origin, origin + game.camera.global_basis * direction)
+		check((-effect.sprite.global_basis.x.normalized()).dot(game.camera.global_basis * direction) > 0.99, "Slash texture faces its target on either side")
+		effect.queue_free()
 	for args in Fixture.deployments(): game.command("deploy", args)
 	game.start()
 	var seen := {}

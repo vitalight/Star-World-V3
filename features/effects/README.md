@@ -4,7 +4,7 @@
 
 - `play_once(color, seconds)`：单次缩放淡出，用于受击、治疗、技能启动。
 - `play_projectile(from, to, seconds, color)`：沿世界坐标飞行的子弹，贴图默认朝左，按照镜头平面朝向目标；`destination` 可由适配器更新以跟随移动目标。
-- `play_slash(from, to, color)`：在攻击者前方播放朝向目标的刀光。
+- `play_slash(from, to, color)`：在攻击者前方播放朝向目标的刀光，素材默认朝左，按镜头平面中的攻击方向旋转。
 - `advance_visual(delta)`：只由外部模拟时钟推进；不自行使用真实时间。到期释放节点，`kind` 区分 projectile、slash、impact、heal、skill。
 
 战斗单次特效作为小幅叠加提示，使用 render_priority 10 与 no_depth_test，保证在角色立片上可读；不会影响地块、角色或战斗拾取。循环预览保持原深度行为。

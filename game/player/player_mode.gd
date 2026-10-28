@@ -542,14 +542,28 @@ func start_battle() -> void:
 func _show_tutorial() -> void:
 	tutorial_seen = true
 	tutorial = PanelContainer.new()
-	tutorial.position = Vector2(18, 96)
+	tutorial.position = Vector2(190, 96)
 	tutorial.mouse_filter = Control.MOUSE_FILTER_STOP
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("101d28ed")
+	style.border_color = Color("66818f")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(5)
+	style.content_margin_left = 18; style.content_margin_right = 18
+	style.content_margin_top = 14; style.content_margin_bottom = 14
+	tutorial.add_theme_stylebox_override("panel", style)
 	var column := VBoxContainer.new(); tutorial.add_child(column)
+	column.add_theme_constant_override("separation", 10)
+	var title := Label.new(); title.text = "行动提示"
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", Color("b5dfed"))
+	column.add_child(title)
 	var label := Label.new()
 	label.text = "部署大星守住正面。\n小黄费用低，撤退后能很快再次部署。"
 	label.add_theme_font_size_override("font_size", 18)
 	column.add_child(label)
 	var close := Button.new(); close.text = "知道了"
+	close.custom_minimum_size.y = 36
 	close.pressed.connect(func(): tutorial.hide())
 	column.add_child(close)
 	battle_scene.hud.add_child(tutorial)
