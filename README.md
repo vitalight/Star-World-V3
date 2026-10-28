@@ -5,7 +5,9 @@
 
 ## 运行
 
-双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 一键导入资源并启动开发者首页。
+设置 `GODOT_PATH` 为 Godot 可执行文件路径后，双击 [`scripts/run_game.bat`](scripts/run_game.bat) 进入游戏；运行 `scripts\run_game.bat -d` 进入开发者模式。双击 [`scripts/run_devtools.bat`](scripts/run_devtools.bat) 启动开发者首页，从中进入 Player Mode 也使用开发者模式。
+
+普通模式下“开始游戏”从第一关开始，“读取存档”恢复已有进度；新游戏开始行动后会保存新进度。开发者模式开放所有已配置关卡，进度仅保留在本次运行中，不覆盖普通存档。
 
 项目默认入口为 `game/player/player_mode.tscn`：主界面 → 独立剧情关 → 独立战斗关 → 下一剧情关，章末播放独立尾声关。直接运行项目即可进入 Player Mode；开发者首页仍由上述脚本启动，也提供 Player Mode 卡片。玩家流程和存档说明见 [Player Mode](game/player/README.md)。背景音乐与音效由 [音频内容](content/audio/README.md) 的 cue 清单驱动，主菜单右上角可调 BGM／音效音量。
 

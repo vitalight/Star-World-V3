@@ -54,7 +54,7 @@ func _ready() -> void:
 	player_button.add_theme_stylebox_override("hover", card_style(Color("2a4654"), Color("83d8ec")))
 	player_button.add_theme_stylebox_override("pressed", card_style(Color("142b35"), Color("83d8ec")))
 	player_button.add_theme_color_override("font_color", Color("bcecf7"))
-	player_button.pressed.connect(func(): get_tree().change_scene_to_file("res://game/player/player_mode.tscn"))
+	player_button.pressed.connect(_open_player)
 	header.add_child(player_button)
 	layout.add_child(divider())
 	scroll = ScrollContainer.new()
@@ -113,7 +113,9 @@ func build_card(entry: Dictionary) -> void:
 	var focus := card_style(Color.TRANSPARENT, entry.accent)
 	focus.set_border_width_all(2)
 	button.add_theme_stylebox_override("focus", focus)
-	button.pressed.connect(func(): get_tree().change_scene_to_file(entry.scene))
+	button.pressed.connect(func():
+		if entry.title == "Player Mode": _open_player()
+		else: get_tree().change_scene_to_file(entry.scene))
 	workspaces.add_child(button)
 	var inset := MarginContainer.new()
 	inset.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -150,6 +152,18 @@ func card_style(background: Color, border: Color) -> StyleBoxFlat:
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(12)
 	return style
+
+func _open_player() -> void:
+	_open_player_deferred.call_deferred()
+
+func _open_player_deferred() -> void:
+	var tree := get_tree()
+	var player = load("res://game/player/player_mode.tscn").instantiate()
+	player.developer_mode = true
+	tree.root.remove_child(self)
+	tree.root.add_child(player)
+	tree.current_scene = player
+	queue_free()
 
 func text(parent: Node, value: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
