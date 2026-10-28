@@ -5,6 +5,8 @@
 
 [ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas.png" id="city_atlas"]
 
+[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
+
 [sub_resource type="Curve2D" id="Curve2D_gqoe8"]
 _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 608, 96)
@@ -22,6 +24,7 @@ script = ExtResource("1_5j37n")
 bounds = Rect2i(0, 0, 10, 7)
 tint = Color(1, 1, 1, 1)
 terrain_atlas = ExtResource("city_atlas")
+background_texture = ExtResource("city_bg")
 perimeter_style = 1
 external_level = true
 

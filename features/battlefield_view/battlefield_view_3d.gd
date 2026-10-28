@@ -6,6 +6,7 @@ extends Node3D
 @export var decorations: Array[Vector3] = []
 @export var graybox := false
 var perimeter_style := 0
+var has_backdrop := false
 var cells: Dictionary = {}
 var tops: Array[Material] = []
 var side: StandardMaterial3D
@@ -105,7 +106,8 @@ func _ready() -> void:
 			add_child(column)
 	var width := layout[0].length() if not layout.is_empty() else 10
 	var depth := layout.size()
-	block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("656e70") if perimeter_style == 1 else Color("767667")))
+	if not has_backdrop:
+		block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("656e70") if perimeter_style == 1 else Color("767667")))
 
 func grass(at: Vector3) -> void:
 	# Low, separated tufts keep tactical silhouettes clear.

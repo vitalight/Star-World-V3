@@ -5,6 +5,7 @@ const BASE_COLOR := Color("63c6f5")
 
 static func setup_environment(parent: Node3D) -> void:
 	var environment := WorldEnvironment.new()
+	environment.name = "BattleEnvironment"
 	environment.environment = Environment.new()
 	environment.environment.background_mode = Environment.BG_COLOR
 	environment.environment.background_color = Color("55584f")
@@ -18,6 +19,27 @@ static func setup_environment(parent: Node3D) -> void:
 	light.light_energy = 0.95
 	light.shadow_enabled = true
 	parent.add_child(light)
+
+static func set_background(parent: Node3D, texture: Texture2D) -> void:
+	var old := parent.get_node_or_null("BattleBackdrop")
+	if old: old.free()
+	var world := parent.get_node("BattleEnvironment") as WorldEnvironment
+	world.environment.background_mode = Environment.BG_CANVAS if texture else Environment.BG_COLOR
+	if not texture: return
+	world.environment.background_canvas_max_layer = -1
+	var layer := CanvasLayer.new()
+	layer.name = "BattleBackdrop"
+	layer.layer = -1
+	parent.add_child(layer)
+	var image := TextureRect.new()
+	image.texture = texture
+	image.modulate = Color(0.7, 0.7, 0.7, 1.0)
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(image)
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 static func create_camera(parent: Node3D) -> Camera3D:
 	var camera := Camera3D.new()

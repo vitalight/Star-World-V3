@@ -5,6 +5,7 @@ extends Node2D
 @export var bounds := Rect2i(0, 0, 10, 6)
 @export var tint := Color.WHITE
 @export var terrain_atlas: Texture2D
+@export var background_texture: Texture2D
 @export_enum("Ruins", "City") var perimeter_style := 0
 @export var external_level := false
 

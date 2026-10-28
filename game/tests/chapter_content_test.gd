@@ -31,6 +31,7 @@ func _initialize() -> void:
 		var map = load(catalog.levels[id].map).instantiate()
 		check(catalog.map_errors(id, map).is_empty(), "Map valid: " + "\n".join(catalog.map_errors(id, map)))
 		check(map.terrain_atlas != null and map.terrain_atlas.resource_path == "res://content/terrains/terrain_002/atlas.png" and map.perimeter_style == 1, id + " uses shared city terrain")
+		check(map.background_texture != null and map.background_texture.resource_path == "res://content/terrains/terrain_002/city_backdrop_v2.png", id + " uses shared city backdrop")
 		var config: Dictionary = catalog.configuration(id, map, Fixture.operator_ids(id))
 		map.free()
 		var battle = Battle.new(config)
@@ -45,7 +46,7 @@ func _initialize() -> void:
 		check(battle.snapshot().phase == "defeat", id + " undefended stage loses")
 	if not "--packed" in OS.get_cmdline_user_args():
 		var sample = load("res://content/scenes/scene_001/map.tscn").instantiate()
-		check(sample.terrain_atlas == null and sample.perimeter_style == 0, "Development sample retains original terrain")
+		check(sample.terrain_atlas == null and sample.background_texture == null and sample.perimeter_style == 0, "Development sample retains original terrain")
 		sample.free()
 		type_validation(catalog)
 		parser_validation(catalog)

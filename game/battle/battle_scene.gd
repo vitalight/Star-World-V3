@@ -74,6 +74,7 @@ func reload_level() -> void:
 	map_data = ResourceLoader.load(map_source.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP).instantiate()
 	map_data.hide()
 	add_child(map_data)
+	StageView.set_background(self, map_data.background_texture)
 	validation_errors = catalog.map_errors(campaign_level, map_data) if catalog else map_data.errors()
 	if catalog == null:
 		if operator_roster and not operator_roster.resource_path.is_empty():
@@ -93,6 +94,7 @@ func reload_level() -> void:
 	field.atlas = map_data.terrain_atlas if map_data.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
 	field.tint = map_data.tint
 	field.perimeter_style = map_data.perimeter_style
+	field.has_backdrop = map_data.background_texture != null
 	field.configure(map_data.cells(), map_data.bounds)
 	world.add_child(field)
 	appearances.clear()

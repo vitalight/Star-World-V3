@@ -6,10 +6,12 @@ var map_source: PackedScene
 func _ready() -> void:
 	Stage.setup_environment(self)
 	var map = map_source.instantiate()
+	Stage.set_background(self, map.background_texture)
 	var field = Field.new()
 	field.atlas = map.terrain_atlas if map.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
 	field.tint = map.tint
 	field.perimeter_style = map.perimeter_style
+	field.has_backdrop = map.background_texture != null
 	field.configure(map.cells(), map.bounds)
 	add_child(field)
 	var camera := Stage.create_camera(self)
