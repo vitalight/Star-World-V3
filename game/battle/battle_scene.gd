@@ -90,8 +90,9 @@ func reload_level() -> void:
 	configuration = battle.configuration()
 	reset_auto_start()
 	field = Field.new()
-	field.atlas = preload("res://content/terrains/terrain_001/atlas.png")
+	field.atlas = map_data.terrain_atlas if map_data.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
 	field.tint = map_data.tint
+	field.perimeter_style = map_data.perimeter_style
 	field.configure(map_data.cells(), map_data.bounds)
 	world.add_child(field)
 	appearances.clear()

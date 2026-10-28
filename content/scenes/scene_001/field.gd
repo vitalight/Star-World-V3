@@ -7,6 +7,9 @@ func _ready() -> void:
 	if cells.is_empty():
 		var source = map_source.instantiate()
 		configure(source.cells(), source.bounds)
+		atlas = source.terrain_atlas if source.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
+		tint = source.tint
+		perimeter_style = source.perimeter_style
 		source.free()
 	super._ready()
 
@@ -17,5 +20,8 @@ func rebuild() -> void:
 	tops.clear()
 	var source = ResourceLoader.load(map_source.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP).instantiate()
 	configure(source.cells(), source.bounds)
+	atlas = source.terrain_atlas if source.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
+	tint = source.tint
+	perimeter_style = source.perimeter_style
 	source.free()
 	super._ready()

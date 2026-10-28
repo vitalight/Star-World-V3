@@ -61,6 +61,10 @@ speaker:
 
 用 Godot 打开对应 `map.tscn`：在 Terrain 的 TileMapLayer 刷图，在 Routes 下编辑 Path2D。格子64像素，格心偏移32；路径手柄为零，线段沿格子轴向。地形、部署类型、路线仍只来自地图，不在表格另存一份。地图设置 `external_level=true`，正式关卡／波次数值从 CSV 读取，单位从 .tres 读取。`tint` 调整该地图的地表配色。
 
+第一章四张战斗地图共用 `content/terrains/terrain_002` 城市地形。地图的 `terrain_atlas` 指定运行时 4×4 图集，`perimeter_style` 指定外围样式；选关预览和战斗读取同一配置。未指定图集的开发样例继续使用原地形。城市 TileSet 保留原有 R/H/G/W 的高度、部署与通行属性，不能仅凭贴图改变规则。
+
+1-2B 当前沿用 1-1B 的地图路线和波次；这是现有内容安排，后续关卡玩法设计时再评估。
+
 新增剧情关时，在独立目录（如 `scene_0101A`）添加同编号文件 `story_scene_0101A.md`，在 levels.csv 添加 type=story 的行，只填写 story，不填写地图和战斗数值。新增战斗关时，复制地图到独立目录（如 `scene_0101B`），在 levels.csv 添加 type=battle 的行并配置地图和战斗数值，在 waves.csv 添加至少一组波次；story 留空。行序决定解锁顺序。背景贴图在 backgrounds.csv 注册，不要引用 Human 或 temp。
 
 初版外观对应：大星复用 character_001，阿五复用004，月月复用006，胡胡使用 hero-atlas-02 第2行的四姿态切片；小黄为本次制作的橘猫 SVG 占位。背景使用已整理的家中、街道及东方明珠手绘环境图。外观可以独立替换，不影响数值、存档或对白引用。

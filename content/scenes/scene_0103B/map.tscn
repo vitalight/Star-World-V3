@@ -1,7 +1,9 @@
 [gd_scene format=4]
 
 [ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_5ettf"]
-[ext_resource type="TileSet" path="res://content/terrains/terrain_001/tileset.tres" id="2_tcm5j"]
+[ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="2_tcm5j"]
+
+[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas.png" id="city_atlas"]
 
 [sub_resource type="Curve2D" id="Curve2D_rx1pv"]
 _data = {
@@ -17,7 +19,9 @@ point_count = 2
 
 [node name="EditableMap" type="Node2D" unique_id=1648006009]
 script = ExtResource("1_5ettf")
-tint = Color(0.5647059, 0.7490196, 0.80784315, 1)
+tint = Color(1, 1, 1, 1)
+terrain_atlas = ExtResource("city_atlas")
+perimeter_style = 1
 external_level = true
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=1927303667]

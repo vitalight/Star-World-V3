@@ -16,6 +16,9 @@ func configure(data: Dictionary, bounds: Rect2i) -> void:
 		layout.append(row)
 
 func build_perimeter() -> void:
+	if perimeter_style == 1:
+		build_city_perimeter()
+		return
 	# Broken outpost ruins frame the terrain without enclosing it like a board.
 	var stone := material(Color("96998c"))
 	if not graybox:
@@ -36,6 +39,24 @@ func build_perimeter() -> void:
 func wall_height(index: int) -> float:
 	# Most ruins match the inner platform; a few broken pillars rise slightly.
 	return 0.60 if index in [4, 9, 18, 28, 33] else 0.42
+
+func build_city_perimeter() -> void:
+	# Low concrete curbs frame the map without covering deployable cells.
+	var concrete := material(Color("a4a8a8"))
+	if not graybox:
+		concrete.albedo_texture = tops[14].albedo_texture
+		concrete.uv1_triplanar = true
+		concrete.uv1_world_triplanar = true
+	var width := layout[0].length()
+	var depth := layout.size()
+	for x in range(width):
+		if x % 4 != 2:
+			block(Vector3(x, -0.04, -0.94), Vector3(0.94, 0.3, 0.28), concrete)
+			block(Vector3(x, -0.04, depth - 0.06), Vector3(0.94, 0.3, 0.28), concrete)
+	for z in range(depth):
+		if z % 4 != 2:
+			block(Vector3(-0.94, -0.04, z), Vector3(0.28, 0.3, 0.94), concrete)
+			block(Vector3(width - 0.06, -0.04, z), Vector3(0.28, 0.3, 0.94), concrete)
 
 func wall_cube(at: Vector3, top: float, stone: Material) -> void:
 	var height := top + 0.20

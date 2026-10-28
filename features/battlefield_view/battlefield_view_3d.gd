@@ -5,6 +5,7 @@ extends Node3D
 @export var layout: PackedStringArray = []
 @export var decorations: Array[Vector3] = []
 @export var graybox := false
+var perimeter_style := 0
 var cells: Dictionary = {}
 var tops: Array[Material] = []
 var side: StandardMaterial3D
@@ -51,7 +52,7 @@ func beveled_tile(at: Vector3, height: float) -> void:
 	add_child(instance)
 
 func _ready() -> void:
-	side = material(Color("847660"))
+	side = material(Color("7b8282") if perimeter_style == 1 else Color("847660"))
 	# Extract each region once; filtering never samples its neighbouring atlas cell.
 	for index in 16:
 		var mat := material(Color.WHITE)
@@ -104,7 +105,7 @@ func _ready() -> void:
 			add_child(column)
 	var width := layout[0].length() if not layout.is_empty() else 10
 	var depth := layout.size()
-	block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("767667")))
+	block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("656e70") if perimeter_style == 1 else Color("767667")))
 
 func grass(at: Vector3) -> void:
 	# Low, separated tufts keep tactical silhouettes clear.
@@ -126,7 +127,7 @@ func grass(at: Vector3) -> void:
 			var height := tuft_height * rng.randf_range(0.7, 1.15)
 			var lean := rng.randf_range(0.05, 0.16)
 			var width := rng.randf_range(0.018, 0.033)
-			var color := Color("817843").lerp(Color("ac9d60"), rng.randf())
+			var color := Color("64785c").lerp(Color("859176"), rng.randf()) if perimeter_style == 1 else Color("817843").lerp(Color("ac9d60"), rng.randf())
 			var sections: Array[PackedVector3Array] = []
 			for segment in 6:
 				var t := segment / 5.0
@@ -141,7 +142,8 @@ func grass(at: Vector3) -> void:
 					for vertex in indices:
 						var t := vertex.x / 5.0
 						var shade := 0.92 if face == 0 else 1.06
-						builder.set_color(Color("756638").lerp(color, 0.25 + t * 0.75) * Color(shade, shade, shade))
+						var root_color := Color("52684d") if perimeter_style == 1 else Color("756638")
+						builder.set_color(root_color.lerp(color, 0.25 + t * 0.75) * Color(shade, shade, shade))
 						builder.add_vertex(sections[vertex.x][vertex.y])
 	builder.generate_normals()
 	var patch := MeshInstance3D.new()
