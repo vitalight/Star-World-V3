@@ -62,6 +62,31 @@ func run() -> void:
 	await settle()
 	game = current_scene.game
 	game.set_process(false)
+	var original_battle = game.battle
+	var low_cost_config: Dictionary = game.configuration.duplicate(true)
+	low_cost_config.initial_cost = 0.0
+	game.battle = preload("res://features/battle/battle.gd").new(low_cost_config)
+	game.refresh(); await settle()
+	await click(game.hud.cards.guard.button)
+	check(game.selected_roster == "guard" and game.hud.info_panel.visible, "Insufficient cost still allows selecting and inspecting a card")
+	var low_cost_before: Dictionary = game.battle.snapshot()
+	game.select_cell(Vector2i(3,1)); await settle()
+	check(not game.deployment_pending and game.battle.snapshot() == low_cost_before and game.hud.notice.text == "费用不足", "Insufficient cost rejects deployment without spending")
+	await drag_to("guard", cell_point(Vector2i(3,1)))
+	check(not game.deployment_pending and game.battle.snapshot() == low_cost_before and game.hud.notice.text == "费用不足", "Dragging with insufficient cost cannot deploy")
+	game.start()
+	game.battle.advance(game.configuration.roster.guard.cost / game.configuration.cost_regen + 1.0)
+	game.refresh(); await settle()
+	game.select_cell(Vector2i(3,1)); await settle()
+	check(game.deployment_pending, "Selected operator becomes deployable after cost recovers")
+	game.battle = original_battle
+	game.cancel_selection(); game.refresh(); await settle()
+	await click(game.hud.cards.guard.button)
+	check(game.hud.info_panel.visible and overlay_cells("deployable").is_empty() and overlay_cells("attack_range").is_empty(), "Selecting an affordable card shows details without deployment overlays")
+	var before_click: Dictionary = game.battle.snapshot()
+	var click_target := cell_point(Vector2i(3,1))
+	await mouse(click_target,true); await mouse(click_target,false); await settle()
+	check(not game.deployment_pending and game.battle.snapshot() == before_click, "Clicking a selected card and then a tile does not start deployment")
 	var regions := {"guard":Vector2(940.5,0), "tank":Vector2(0,313.5), "sniper":Vector2(627,313.5), "caster":Vector2(0,627), "medic":Vector2(940.5,627)}
 	for key in game.hud.cards:
 		var icon: TextureRect = game.hud.cards[key].class_icon
@@ -84,6 +109,7 @@ func run() -> void:
 	await shot("game_dragging")
 	await mouse(point,false); await settle()
 	check(game.deployment_pending and game.candidate == Vector2i(3,1),"Release on tile opens facing selection")
+	check(overlay_cells("deployable").is_empty() and not overlay_cells("attack_range").is_empty(), "Facing selection keeps attack range but clears deployment overlay")
 	check(game.last_state.cost == before,"Dropping waits for facing confirmation without charging")
 	check(is_instance_valid(game.deployment_preview) and game.deployment_preview.position.distance_to(game.presentation.position(Vector2(3,1))) < 0.001, "Pending operator stands at the chosen tile")
 	await mouse(point,true); await mouse(point,false)

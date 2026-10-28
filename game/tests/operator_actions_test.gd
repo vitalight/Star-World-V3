@@ -38,8 +38,10 @@ func run() -> void:
 		for key in ["guard", "tank"]:
 			await click_button(game.hud.cards[key].button)
 			check(game.selected_roster == key and game.hud.info_panel.visible, "Roster card opens details: " + key)
-			check(game.hud.operator_portrait.texture == game.appearances[key].portrait and game.hud.selection.text.contains(game.configuration.roster[key].name), "Switching roster card updates portrait and name")
-			check(game.hud.selection.text.contains("生命上限") and game.hud.selection.text.contains("再部署") and game.hud.skill_description.text.contains(game.configuration.roster[key].skill.name), "Roster details show base stats and skill")
+			check(game.hud.operator_portrait.texture == game.appearances[key].portrait and game.hud.operator_name.text == game.configuration.roster[key].name, "Switching roster card updates portrait and name")
+			check(game.hud.selection.text.contains("攻击") and not ["费用", "再部署", "生命", "技力"].any(func(word): return game.hud.selection.text.contains(word)) and game.hud.skill_description.text.contains(game.configuration.roster[key].skill.name), "Roster details show combat stats and skill without duplicate information")
+			check(game.hud.operator_class_icon.get_global_rect().end.x <= game.hud.operator_name.get_global_rect().position.x and absf(game.hud.operator_class_icon.get_global_rect().get_center().y - game.hud.operator_name.get_global_rect().get_center().y) < 1.0, "Class icon and name share a row")
+			check(game.hud.range_preview.cells == game.configuration.roster[key].range and game.hud.operator_class_icon.texture == game.appearances[key].class_icon, "Roster details show attack range and class")
 			check(not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Undeployed roster has no deployed actions")
 		check(root.get_visible_rect().encloses(game.hud.info_panel.get_global_rect()), "Roster details fit viewport " + str(dimensions))
 		await RenderingServer.frame_post_draw
@@ -47,6 +49,10 @@ func run() -> void:
 	game.cancel_selection()
 	check(not game.hud.info_panel.visible and game.battle.snapshot() == before_selection, "Cancelling roster details preserves battle state and playback")
 	root.size = Vector2i(1280,800); await settle()
+	await click_button(game.hud.cards.guard.button)
+	var undeployed_details: String = game.hud.selection.text
+	var undeployed_range: Array = game.hud.range_preview.cells.duplicate()
+	game.cancel_selection()
 	var deployed: Dictionary = game.command("deploy",["guard",Vector2i(3,1),2])
 	game.start()
 	var actor = game.presentation.actors[deployed.id]
@@ -54,6 +60,7 @@ func run() -> void:
 	check(float(actor.billboard_material.get_shader_parameter("readiness")) > 0, "Ready operator has gold material highlight")
 	await select_actor(deployed.id)
 	check(game.selected_unit == deployed.id and game.hud.info_panel.visible, "Clicking deployed operator opens details")
+	check(game.hud.selection.text == undeployed_details and game.hud.range_preview.cells == undeployed_range, "Deployed and undeployed details show the same fields and attack range")
 	check(game.hud.skill_button.icon != null and not game.hud.skill_button.disabled and not game.hud.skill_status.visible, "Ready skill icon can be activated")
 	check(game.hud.retreat_button.tooltip_text == "撤退" and game.hud.skill_button.tooltip_text.is_empty(), "Action icons avoid instructional tooltips")
 	check(game.hud.operator_portrait.texture == game.appearances.guard.portrait and game.hud.skill_portrait.texture == game.hud.skill_button.icon, "Left panel displays selected portrait and skill icon")

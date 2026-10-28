@@ -1,0 +1,29 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_7ssyb"]
+[ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="2_5njth"]
+[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas.png" id="city_atlas"]
+[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
+
+[sub_resource type="Curve2D" id="Curve2D_q6e7n"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 160, 32, 0, 0, 0, 0, 160, 224, 0, 0, 0, 0, 288, 224)
+}
+point_count = 4
+
+[node name="EditableMap" type="Node2D" unique_id=914044048]
+script = ExtResource("1_7ssyb")
+bounds = Rect2i(0, 0, 5, 4)
+terrain_atlas = ExtResource("city_atlas")
+background_texture = ExtResource("city_bg")
+perimeter_style = 1
+external_level = true
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=735756813]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAEAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAEAAAAFAAAA//////////8GAAAA//////////8HAAAA//////////8AAAEAAAAAAAEAAAABAAEAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEA//////////8GAAEA//////////8HAAEA//////////8AAAIAAAAAAAAAAAABAAIAAAAAAAEAAAACAAIAAAAAAAEAAAADAAIAAAAAAAEAAAAEAAIAAAAAAAAAAAAFAAIA//////////8GAAIA//////////8HAAIA//////////8AAAMAAAAAAAAAAAABAAMAAAAAAAAAAAACAAMAAAAAAAEAAAADAAMAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAMA//////////8GAAMA//////////8HAAMA//////////8AAAQA//////////8BAAQA//////////8CAAQA//////////8DAAQA//////////8EAAQA//////////8FAAQA//////////8GAAQA//////////8HAAQA//////////8=")
+tile_set = ExtResource("2_5njth")
+
+[node name="Routes" type="Node2D" parent="." unique_id=541382906]
+
+[node name="main" type="Path2D" parent="Routes" unique_id=2121803209]
+curve = SubResource("Curve2D_q6e7n")

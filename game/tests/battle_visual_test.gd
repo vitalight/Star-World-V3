@@ -66,7 +66,7 @@ func deploy(args: Array) -> void:
 	var cell: Vector2i = args[1]
 	var point: Vector2 = game.camera.unproject_position(Vector3(cell.x, game.field.surface_height(cell), cell.y))
 	check(game.pick_cell(point) == cell, "Ray picks authored surface " + str(cell))
-	await click(point)
+	await drag(game.hud.cards[args[0]].button.get_global_rect().get_center(), point)
 	check(game.candidate == cell and game.deployment_pending, "Cell opens direction confirmation")
 	await settle()
 	var directions := [Vector3.RIGHT,Vector3.BACK,Vector3.LEFT,Vector3.FORWARD]

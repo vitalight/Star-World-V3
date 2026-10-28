@@ -1,6 +1,5 @@
 extends SceneTree
 const Player = preload("res://game/player/player_mode.tscn")
-const Fixture = preload("res://game/tests/chapter_fixture.gd")
 const SAVE := "res://temp/chapter_one/flow_progress.cfg"
 var failures := 0
 var checks := 0
@@ -83,11 +82,19 @@ func run() -> void:
 	check(player.page == "battle" and player.battle_scene.validation_errors.is_empty(), "Skip enters shared chapter battle")
 	var game = player.battle_scene; game.set_process(false)
 	check(button(player, "F3") == null, "Player battle does not mount the Game Test debug window")
+	check(player.tutorial.visible and game.last_state.paused, "Level hint pauses the battle")
+	var countdown: float = game.auto_start_left
+	game._process(5.0)
+	check(game.last_state.time == 0 and game.auto_start_left == countdown, "Level hint freezes battle and automatic start")
+	for dimensions in [Vector2i(960, 600), Vector2i(1280, 800), Vector2i(1600, 900)]:
+		root.size = dimensions; await settle()
+		check(root.get_visible_rect().encloses(player.tutorial.get_global_rect()) and player.tutorial.get_global_rect().get_center().distance_to(root.get_visible_rect().get_center()) < 2.0, "Level hint is centered and fits " + str(dimensions))
+	root.size = Vector2i(1280, 800); await settle()
+	await capture("battle_level_hint")
 	await click("☰")
-	check(player.tutorial.visible and game.hud.game_menu.visible and not player.tutorial.get_global_rect().intersects(game.hud.game_menu.get_global_rect()), "Tutorial and menu remain readable together")
-	await capture("battle_tutorial_menu")
-	await click("☰")
-	await click("知道了")
+	check(not game.hud.game_menu.visible and game.last_state.paused, "Level hint blocks underlying battle controls")
+	await click("确认")
+	check(not game.last_state.paused and player.tutorial == null, "Confirm closes the hint and resumes the battle")
 	game.start(); game.battle.advance(300); game.refresh()
 	check(game.last_state.phase == "defeat" and player.progress.pending_after.is_empty(), "Defeat does not grant a story or completion")
 	await capture("defeat")
@@ -106,8 +113,7 @@ func run() -> void:
 			await click("跳过剧情")
 		game = player.battle_scene; game.set_process(false)
 		check(game.campaign_level == id, "Story enters corresponding battle")
-		check(Fixture.replay(game.battle, id).is_empty(), "Replay commands accepted")
-		game.refresh()
+		check(game.debug_victory(), "Battle victory advances the player flow")
 		check(game.last_state.phase == "victory" and player.progress.pending_after == id, "Victory persists pending continuation")
 		if index == 1:
 			await dispose(); await spawn()

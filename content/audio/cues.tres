@@ -1,14 +1,14 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="AudioLibrary" format=3 uid="uid://cjbd3pcupo2wk"]
 
-[ext_resource type="Script" path="res://features/audio/audio_library.gd" id="library"]
-[ext_resource type="Script" path="res://features/audio/audio_cue.gd" id="cue"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/music/music_main.mp3" id="music_main_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/music/music_battle.mp3" id="music_battle_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/sfx/sfx_ui_click.mp3" id="sfx_ui_click_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/sfx/sfx_attack.mp3" id="sfx_attack_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/sfx/sfx_hit.mp3" id="sfx_hit_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/sfx/sfx_heal.mp3" id="sfx_heal_stream"]
-[ext_resource type="AudioStreamMP3" path="res://content/audio/sfx/sfx_notify.mp3" id="sfx_notify_stream"]
+[ext_resource type="Script" uid="uid://4u71y0631je3" path="res://features/audio/audio_cue.gd" id="cue"]
+[ext_resource type="Script" uid="uid://dxsd2rhsah3y3" path="res://features/audio/audio_library.gd" id="library"]
+[ext_resource type="AudioStream" uid="uid://dmsys3avkeipr" path="res://content/audio/music/music_battle.mp3" id="music_battle_stream"]
+[ext_resource type="AudioStream" uid="uid://ctjicowo22i8f" path="res://content/audio/music/music_main.mp3" id="music_main_stream"]
+[ext_resource type="AudioStream" uid="uid://dpvjxpj5t0br" path="res://content/audio/sfx/sfx_attack.mp3" id="sfx_attack_stream"]
+[ext_resource type="AudioStream" uid="uid://f61u0wl7aiua" path="res://content/audio/sfx/sfx_heal.mp3" id="sfx_heal_stream"]
+[ext_resource type="AudioStream" uid="uid://kn8igo6ma15f" path="res://content/audio/sfx/sfx_hit.mp3" id="sfx_hit_stream"]
+[ext_resource type="AudioStream" uid="uid://dwruwgymymbls" path="res://content/audio/sfx/sfx_notify.mp3" id="sfx_notify_stream"]
+[ext_resource type="AudioStream" uid="uid://cwwfiw3evs4y6" path="res://content/audio/sfx/sfx_ui_click.mp3" id="sfx_ui_click_stream"]
 
 [sub_resource type="Resource" id="cue_music_main"]
 script = ExtResource("cue")
@@ -27,7 +27,6 @@ volume_db = -4.0
 [sub_resource type="Resource" id="cue_sfx_ui_click"]
 script = ExtResource("cue")
 id = "sfx_ui_click"
-bus = "SFX"
 stream = ExtResource("sfx_ui_click_stream")
 volume_db = -8.0
 pitch_variance = 0.03
@@ -35,7 +34,6 @@ pitch_variance = 0.03
 [sub_resource type="Resource" id="cue_sfx_attack"]
 script = ExtResource("cue")
 id = "sfx_attack"
-bus = "SFX"
 stream = ExtResource("sfx_attack_stream")
 volume_db = -6.0
 pitch_variance = 0.05
@@ -44,7 +42,6 @@ start_offset = 0.06
 [sub_resource type="Resource" id="cue_sfx_hit"]
 script = ExtResource("cue")
 id = "sfx_hit"
-bus = "SFX"
 stream = ExtResource("sfx_hit_stream")
 volume_db = -6.0
 pitch_variance = 0.08
@@ -52,7 +49,6 @@ pitch_variance = 0.08
 [sub_resource type="Resource" id="cue_sfx_heal"]
 script = ExtResource("cue")
 id = "sfx_heal"
-bus = "SFX"
 stream = ExtResource("sfx_heal_stream")
 volume_db = -5.0
 pitch_variance = 0.02
@@ -60,99 +56,84 @@ pitch_variance = 0.02
 [sub_resource type="Resource" id="cue_sfx_notify"]
 script = ExtResource("cue")
 id = "sfx_notify"
-bus = "SFX"
 stream = ExtResource("sfx_notify_stream")
 volume_db = -6.0
 
 [sub_resource type="Resource" id="cue_sfx_deploy"]
 script = ExtResource("cue")
 id = "sfx_deploy"
-bus = "SFX"
 volume_db = -4.0
 pitch_variance = 0.02
 
 [sub_resource type="Resource" id="cue_sfx_retreat"]
 script = ExtResource("cue")
 id = "sfx_retreat"
-bus = "SFX"
 volume_db = -4.0
 pitch_variance = 0.02
 
 [sub_resource type="Resource" id="cue_sfx_spawn"]
 script = ExtResource("cue")
 id = "sfx_spawn"
-bus = "SFX"
 volume_db = -8.0
 pitch_variance = 0.05
 
 [sub_resource type="Resource" id="cue_sfx_cost_gain"]
 script = ExtResource("cue")
 id = "sfx_cost_gain"
-bus = "SFX"
 volume_db = -4.0
 
 [sub_resource type="Resource" id="cue_sfx_skill_start"]
 script = ExtResource("cue")
 id = "sfx_skill_start"
-bus = "SFX"
 volume_db = -3.0
 
 [sub_resource type="Resource" id="cue_sfx_skill_end"]
 script = ExtResource("cue")
 id = "sfx_skill_end"
-bus = "SFX"
 volume_db = -6.0
 
 [sub_resource type="Resource" id="cue_sfx_hurt"]
 script = ExtResource("cue")
 id = "sfx_hurt"
-bus = "SFX"
 volume_db = -6.0
 pitch_variance = 0.05
 
 [sub_resource type="Resource" id="cue_sfx_miss"]
 script = ExtResource("cue")
 id = "sfx_miss"
-bus = "SFX"
 volume_db = -8.0
 
 [sub_resource type="Resource" id="cue_sfx_block"]
 script = ExtResource("cue")
 id = "sfx_block"
-bus = "SFX"
 volume_db = -6.0
 pitch_variance = 0.02
 
 [sub_resource type="Resource" id="cue_sfx_enemy_death"]
 script = ExtResource("cue")
 id = "sfx_enemy_death"
-bus = "SFX"
 volume_db = -4.0
 pitch_variance = 0.04
 
 [sub_resource type="Resource" id="cue_sfx_unit_death"]
 script = ExtResource("cue")
 id = "sfx_unit_death"
-bus = "SFX"
 volume_db = -4.0
 pitch_variance = 0.03
 
 [sub_resource type="Resource" id="cue_sfx_escape"]
 script = ExtResource("cue")
 id = "sfx_escape"
-bus = "SFX"
 volume_db = -3.0
 
 [sub_resource type="Resource" id="cue_sfx_victory"]
 script = ExtResource("cue")
 id = "sfx_victory"
-bus = "SFX"
 volume_db = -2.0
 
 [sub_resource type="Resource" id="cue_sfx_defeat"]
 script = ExtResource("cue")
 id = "sfx_defeat"
-bus = "SFX"
 volume_db = -2.0
 
 [resource]

@@ -1,7 +1,25 @@
 extends "res://features/battle_hud/battle_hud_overlay.gd"
 ## Interactive variant sharing the Art Test HUD's styles and playback intents.
+class RangePreview extends Control:
+	var cells: Array = []
+	func _draw() -> void:
+		if cells.is_empty(): return
+		var low := Vector2i.ZERO
+		var high := Vector2i.ZERO
+		for cell in cells:
+			low = Vector2i(mini(low.x, cell.x), mini(low.y, cell.y))
+			high = Vector2i(maxi(high.x, cell.x), maxi(high.y, cell.y))
+		var count := high - low + Vector2i.ONE
+		var step := minf(size.x / count.x, size.y / count.y)
+		var origin := (size - Vector2(count) * step) / 2.0
+		for cell in cells:
+			var rect := Rect2(origin + Vector2(cell - low) * step, Vector2.ONE * (step - 1.0))
+			draw_rect(rect, Color("f5e0bd") if cell == Vector2i.ZERO else Color("a75516"))
+			draw_rect(rect, Color("ff9b36"), false, 1.0)
+
 signal roster_selected(roster_id: String)
 signal roster_drag_started(roster_id: String)
+signal roster_drag_ended
 signal roster_drag_hovered(point: Vector2)
 signal roster_dropped(roster_id: String, point: Vector2)
 signal cancel_requested
@@ -51,6 +69,9 @@ var deployment_count: Label
 var operator_portrait: TextureRect
 var skill_portrait: TextureRect
 var skill_description: Label
+var range_preview: RangePreview
+var operator_class_icon: TextureRect
+var operator_name: Label
 var operator_anchor := Vector2.ZERO
 var game_menu: PanelContainer
 var developer_panel: PanelContainer
@@ -236,7 +257,7 @@ func _ready() -> void:
 	info_panel = _panel_container()
 	info_panel.position.x = 18
 	info_panel.resized.connect(_center_info_panel)
-	info_panel.custom_minimum_size = Vector2(235, 0)
+	info_panel.custom_minimum_size = Vector2(300, 0)
 	var info := VBoxContainer.new()
 	info.add_theme_constant_override("separation", 8)
 	info_panel.add_child(info)
@@ -246,7 +267,34 @@ func _ready() -> void:
 	operator_portrait.custom_minimum_size = Vector2(200, 160)
 	operator_portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	info.add_child(operator_portrait)
-	selection = _label(info, "", 16)
+	var heading := HBoxContainer.new()
+	heading.add_theme_constant_override("separation", 10)
+	info.add_child(heading)
+	operator_class_icon = TextureRect.new()
+	operator_class_icon.custom_minimum_size = Vector2(48, 48)
+	operator_class_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	operator_class_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	operator_class_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	heading.add_child(operator_class_icon)
+	operator_name = _label(heading, "", 24)
+	operator_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	operator_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var details := HBoxContainer.new()
+	details.add_theme_constant_override("separation", 8)
+	info.add_child(details)
+	var details_text := VBoxContainer.new()
+	details_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	details.add_child(details_text)
+	selection = _label(details_text, "", 16)
+	var range_column := VBoxContainer.new()
+	range_column.size_flags_vertical = Control.SIZE_SHRINK_END
+	details.add_child(range_column)
+	range_preview = RangePreview.new()
+	range_preview.custom_minimum_size = Vector2(76, 76)
+	range_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	range_column.add_child(range_preview)
+	var range_caption := _label(range_column, "攻击范围", 14)
+	range_caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	var skill_info := HBoxContainer.new()
 	skill_info.add_theme_constant_override("separation", 10)
 	info.add_child(skill_info)
@@ -372,9 +420,11 @@ func _begin_card_drag(key: String) -> void:
 	roster_drag_started.emit(key)
 
 func cancel_drag() -> void:
+	var was_dragging := not dragged_roster.is_empty()
 	pressed_roster = ""; dragged_roster = ""
 	if is_instance_valid(drag_preview): drag_preview.queue_free()
 	drag_preview = null
+	if was_dragging: roster_drag_ended.emit()
 
 func _over_ui(point: Vector2) -> bool:
 	var hovered := get_viewport().gui_get_hovered_control()
@@ -398,7 +448,7 @@ func _fit() -> void:
 	status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
 	life_status.add_theme_font_size_override("font_size", roundi((18 if compact else 22) * 1.2))
 	operator_portrait.custom_minimum_size.y = 112 if compact else 160
-	info_panel.size = Vector2(228, 0)
+	info_panel.size = Vector2(300, 0)
 	_center_info_panel()
 
 func _center_info_panel() -> void:
@@ -510,7 +560,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	for key in cards:
 		var cooldown: float = state.redeploy[key]
 		cards[key].button.visible = not deployed.has(key)
-		cards[key].button.disabled = finished or cooldown > 0 or state.cost < roster[key].cost
+		cards[key].button.disabled = finished or cooldown > 0
 		cards[key].portrait.modulate = Color(0.5, 0.5, 0.5) if state.cost < roster[key].cost else Color.WHITE
 		cards[key].cooldown.visible = cooldown > 0
 		cards[key].timer.text = "%.1f" % cooldown
@@ -520,14 +570,15 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	retreat_button.visible = deployed_selection and not finished
 	skill_button.visible = deployed_selection and not finished
 	if not selected.is_empty():
-		if deployed_selection:
-			selection.text = "%s\n生命 %d / %d\n技力 %.1f / %.1f" % [selected.name, ceili(selected.hp), ceili(selected.max_hp), selected.sp, selected.skill.required]
-		else:
-			selection.text = "%s\n生命上限 %d\n攻击 %d  防御 %d\n法抗 %d  阻挡 %d\n费用 %d  再部署 %.1fs" % [selected.name, ceili(selected.max_hp), selected.attack, selected.defense, selected.resistance, selected.block, selected.cost, selected.redeploy_time]
+		operator_name.text = selected.name
+		selection.text = "攻击 %d\n防御 %d\n法抗 %d\n阻挡 %d" % [selected.attack, selected.defense, selected.resistance, selected.block]
 		var ready: bool = deployed_selection and selected.skill.enabled and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
 		skill_button.disabled = not ready or state.phase != "running"
 		var appearance = catalog[selected.roster_id if deployed_selection else chosen_roster]
 		operator_portrait.texture = appearance.portrait
+		operator_class_icon.texture = appearance.class_icon
+		range_preview.cells = selected.range
+		range_preview.queue_redraw()
 		skill_button.icon = skill_icons.get(selected.roster_id if deployed_selection else chosen_roster, appearance.portrait)
 		skill_portrait.texture = skill_button.icon
 		if selected.skill.enabled:

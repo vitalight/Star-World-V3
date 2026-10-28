@@ -39,7 +39,7 @@ func errors(check_level := true) -> PackedStringArray:
 		result.append("Bounds: 地图需从 (0,0) 开始且尺寸为正")
 	for cell in data:
 		if not bounds.has_point(cell): result.append("Terrain %s: 超出 bounds" % cell)
-		if data[cell].appearance not in ["R", "H", "G", "W"] or data[cell].deployment not in ["ground", "high", "none"] or data[cell].height < 0:
+		if data[cell].appearance not in ["R", "H", "G", "W", "B", "D"] or data[cell].deployment not in ["ground", "high", "none"] or data[cell].height < 0:
 			result.append("Terrain %s: TileSet 自定义数据无效" % cell)
 	var paths := routes()
 	if paths.is_empty(): result.append("Routes: 至少需要一条路线")

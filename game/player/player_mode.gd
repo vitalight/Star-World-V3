@@ -9,6 +9,7 @@ const MainEmblem = preload("res://content/ui/player/main_emblem_v2.png")
 const MainButtonLight = preload("res://content/ui/player/main_button_light_v2.png")
 const MainButtonDark = preload("res://content/ui/player/main_button_dark_v2.png")
 const MainSettings = preload("res://content/ui/player/main_settings_v2.png")
+const FirstBattleHintImage = preload("res://content/ui/tutorial/scene_0101B_battle.png")
 const Catalog = preload("res://game/content/content_catalog.gd")
 const Progress = preload("res://game/player/campaign_progress.gd")
 const Session = preload("res://features/story/story_session.gd")
@@ -546,8 +547,20 @@ func start_battle() -> void:
 
 func _show_tutorial() -> void:
 	tutorial_seen = true
+	battle_scene.battle.set_paused(true)
+	battle_scene.refresh()
+	var shade := ColorRect.new()
+	shade.color = Color(0.0, 0.0, 0.0, 0.72)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	shade.z_index = 100
+	battle_scene.hud.add_child(shade)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_STOP
+	shade.add_child(center)
 	tutorial = PanelContainer.new()
-	tutorial.position = Vector2(190, 96)
+	tutorial.custom_minimum_size.x = 600
 	tutorial.mouse_filter = Control.MOUSE_FILTER_STOP
 	var style: StyleBox = battle_scene.hud.battle_panel_style()
 	style.content_margin_left = 18; style.content_margin_right = 18
@@ -555,20 +568,33 @@ func _show_tutorial() -> void:
 	tutorial.add_theme_stylebox_override("panel", style)
 	var column := VBoxContainer.new(); tutorial.add_child(column)
 	column.add_theme_constant_override("separation", 10)
-	var title := Label.new(); title.text = "行动提示"
-	title.add_theme_font_size_override("font_size", 20)
+	var title := Label.new(); title.text = "关卡提示"
+	title.add_theme_font_size_override("font_size", 24)
 	title.add_theme_color_override("font_color", Color("b5dfed"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
+	var screenshot := TextureRect.new()
+	screenshot.texture = FirstBattleHintImage
+	screenshot.custom_minimum_size = Vector2(564, 250)
+	screenshot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	screenshot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	screenshot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	column.add_child(screenshot)
 	var label := Label.new()
-	label.text = "部署大星守住正面。\n小黄费用低，撤退后能很快再次部署。"
+	label.text = "按住角色卡拖到战场，松开后选择朝向进行部署。\n角色会阻挡并攻击敌人；阻止敌人进入蓝色基地。\n部署消耗费用，费用会随时间恢复。"
 	label.add_theme_font_size_override("font_size", 18)
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(label)
-	var close := Button.new(); close.text = "知道了"
+	var close := Button.new(); close.text = "确认"
 	battle_scene.hud.style_battle_button(close)
-	close.custom_minimum_size.y = 36
-	close.pressed.connect(func(): tutorial.hide())
+	close.custom_minimum_size.y = 42
+	close.pressed.connect(func():
+		tutorial = null
+		shade.queue_free()
+		battle_scene.battle.set_paused(false)
+		battle_scene.refresh())
 	column.add_child(close)
-	battle_scene.hud.add_child(tutorial)
+	center.add_child(tutorial)
 
 func _leave_result() -> void:
 	if battle_scene and battle_scene.last_state.phase == "victory": _continue_campaign()
@@ -591,7 +617,9 @@ func _observe_battle(state: Dictionary, _events: Array) -> void:
 		_save_progress()
 	if return_button:
 		return_button.visible = state.phase == "defeat"
-	if tutorial and state.phase in ["victory", "defeat"]: tutorial.hide()
+	if is_instance_valid(tutorial) and state.phase in ["victory", "defeat"]:
+		tutorial.get_parent().get_parent().queue_free()
+		tutorial = null
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and page in ["levels", "settings"]:

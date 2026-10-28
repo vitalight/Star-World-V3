@@ -14,7 +14,7 @@ var side: StandardMaterial3D
 func surface_height(cell: Vector2i) -> float:
 	if not cells.is_empty(): return float(cells.get(cell, {}).get("height", 0.0))
 	if cell.y < 0 or cell.y >= layout.size() or cell.x < 0 or cell.x >= layout[cell.y].length(): return 0.0
-	return 0.42 if layout[cell.y][cell.x] in ["H", "G"] else 0.0
+	return 0.42 if layout[cell.y][cell.x] in ["H", "G", "B"] else 0.0
 
 func material(color: Color) -> StandardMaterial3D:
 	var result := StandardMaterial3D.new()
@@ -75,6 +75,8 @@ func _ready() -> void:
 			if symbol == "R": tile = 4 + (x + z) % 4
 			if symbol == "G": tile = 10
 			if symbol == "W": tile = 12
+			if symbol == "B": tile = 15
+			if symbol == "D": tile = 11
 			var top := MeshInstance3D.new()
 			var plane := PlaneMesh.new()
 			plane.size = Vector2(0.93, 0.93)

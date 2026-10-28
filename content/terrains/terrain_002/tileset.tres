@@ -1,6 +1,6 @@
-[gd_resource type="TileSet" format=3]
+[gd_resource type="TileSet" format=3 uid="uid://de1aa3jibewyy"]
 
-[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/editor_palette.png" id="1_1yolc"]
+[ext_resource type="Texture2D" uid="uid://buv5xi6upfm7v" path="res://content/terrains/terrain_002/editor_palette_blocked_v2.png" id="1_1yolc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_errn3"]
 texture = ExtResource("1_1yolc")
@@ -20,6 +20,13 @@ texture_region_size = Vector2i(64, 64)
 0:3/0 = 0
 0:3/0/custom_data_0 = "W"
 0:3/0/custom_data_2 = "none"
+1:3/0 = 0
+1:3/0/custom_data_0 = "B"
+1:3/0/custom_data_1 = 0.42
+1:3/0/custom_data_2 = "none"
+2:3/0 = 0
+2:3/0/custom_data_0 = "D"
+2:3/0/custom_data_2 = "none"
 
 [resource]
 tile_size = Vector2i(64, 64)

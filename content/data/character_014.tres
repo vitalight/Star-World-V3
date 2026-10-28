@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://d2c16qsot7m0"]
 
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="appearance_1"]
-[ext_resource type="Texture2D" path="res://content/characters/character_011/atlas.png" id="appearance_atlas"]
+[ext_resource type="Texture2D" uid="uid://b0gl61e1xb20w" path="res://content/characters/character_011/atlas.png" id="appearance_atlas"]
 [ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="class_atlas"]
 [ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="script"]
 [ext_resource type="Resource" path="res://content/data/skill_004.tres" id="skill"]

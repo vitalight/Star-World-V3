@@ -8,7 +8,7 @@ static func operator_ids(id: String) -> Array:
 	return result
 
 static func deployments(id: String) -> Array:
-	if id == "scene_0101B": return [["character_011", Vector2i(4, 1), 2], ["character_012", Vector2i(5, 3), 2]]
+	if id == "scene_0101B": return [["character_011", Vector2i(2, 1), 3], ["character_012", Vector2i(3, 3), 2]]
 	if id == "scene_0102B": return [["character_011", Vector2i(4, 1), 2], ["character_014", Vector2i(5, 3), 2], ["character_013", Vector2i(5, 2), 2]]
 	var lower := 4 if id == "scene_0103B" else 5
 	var result := [["character_011", Vector2i(5, 1), 2], ["character_014", Vector2i(5, lower), 2], ["character_013", Vector2i(5, 2), 2]]
@@ -17,15 +17,17 @@ static func deployments(id: String) -> Array:
 
 static func replay(battle: RefCounted, id: String) -> Array:
 	var rejected: Array = []
-	for args in deployments(id):
-		var result: Dictionary = battle.callv("deploy", args)
-		if not result.ok: rejected.append(result)
+	var pending := deployments(id)
 	battle.start()
 	for second in 300:
+		while not pending.is_empty() and battle.snapshot().cost >= battle.configuration().roster[pending[0][0]].cost:
+			var result: Dictionary = battle.callv("deploy", pending.pop_front())
+			if not result.ok: rejected.append(result)
 		if id == "scene_0101B" and second == 100:
-			battle.retreat(2)
+			for unit in battle.snapshot().units:
+				if unit.roster_id == "character_012": battle.retreat(unit.id)
 		if id == "scene_0101B" and second == 108:
-			var result: Dictionary = battle.deploy("character_012", Vector2i(5, 3), 2)
+			var result: Dictionary = battle.deploy("character_012", Vector2i(3, 3), 2)
 			if not result.ok: rejected.append(result)
 		if second % 3 == 0:
 			for unit in battle.snapshot().units:

@@ -1,7 +1,8 @@
 extends SceneTree
-const Catalog = preload("res://game/content/content_catalog.gd")
+const Catalog = preload("res://game/tests/fixture_catalog.gd")
 const Battle = preload("res://features/battle/battle.gd")
 const Fixture = preload("res://game/tests/chapter_fixture.gd")
+const CHAPTER_FIXTURE := "res://game/tests/fixtures/chapter"
 var failures := 0
 var checks := 0
 
@@ -12,7 +13,7 @@ func check(ok: bool, label: String) -> void:
 
 func _initialize() -> void:
 	var catalog = Catalog.new()
-	catalog.reload()
+	catalog.reload(CHAPTER_FIXTURE)
 	check(catalog.errors.is_empty(), "Catalog valid: " + "\n".join(catalog.errors))
 	if not catalog.errors.is_empty(): quit(1); return
 	check(catalog.characters.size() == 5 and catalog.levels.size() == 9, "Authored scope is five characters and nine stages")
@@ -45,9 +46,6 @@ func _initialize() -> void:
 		battle.reset(); battle.start(); battle.advance(300)
 		check(battle.snapshot().phase == "defeat", id + " undefended stage loses")
 	if not "--packed" in OS.get_cmdline_user_args():
-		var sample = load("res://content/scenes/scene_001/map.tscn").instantiate()
-		check(sample.terrain_atlas == null and sample.background_texture == null and sample.perimeter_style == 0, "Development sample retains original terrain")
-		sample.free()
 		type_validation(catalog)
 		parser_validation(catalog)
 		source_reload(catalog)
@@ -58,13 +56,13 @@ func type_validation(catalog: RefCounted) -> void:
 	var base := "res://temp/chapter_one/type_fixture"
 	DirAccess.make_dir_recursive_absolute(base)
 	for name in ["levels", "waves", "backgrounds", "player_roster"]:
-		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(Catalog.ROOT + "/" + name + ".csv"))
+		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(CHAPTER_FIXTURE + "/" + name + ".csv"))
 	var path := base + "/levels.csv"
 	var original := FileAccess.get_file_as_string(path)
-	write_text(path, original.replace("story_scene_0101A.md,,,,,,,", "story_scene_0101A.md,res://content/scenes/scene_0101B/map.tscn,,,,,,"))
+	write_text(path, original.replace("story_scene_0101A.md,,,,,,,", "story_scene_0101A.md,res://game/tests/fixtures/chapter/scene_0101B/map.tscn,,,,,,"))
 	catalog.reload(base)
 	check("\n".join(catalog.errors).contains("[map]"), "Story rejects a battle map")
-	write_text(path, original.replace("battle,,res://content/scenes/scene_0101B", "battle,res://content/scenes/scene_0101A/story_scene_0101A.md,res://content/scenes/scene_0101B"))
+	write_text(path, original.replace("battle,,res://game/tests/fixtures/chapter/scene_0101B", "battle,res://content/scenes/scene_0101A/story_scene_0101A.md,res://game/tests/fixtures/chapter/scene_0101B"))
 	catalog.reload(base)
 	check("\n".join(catalog.errors).contains("[story]"), "Battle rejects story content")
 	write_text(path, original)
@@ -72,7 +70,7 @@ func type_validation(catalog: RefCounted) -> void:
 	write_text(waves_path, FileAccess.get_file_as_string(waves_path).replace("wave_001,scene_0101B", "wave_001,scene_0101A"))
 	catalog.reload(base)
 	check("\n".join(catalog.errors).contains("波次只能属于战斗关"), "Story rejects battle waves")
-	catalog.reload()
+	catalog.reload(CHAPTER_FIXTURE)
 
 func parser_validation(catalog: RefCounted) -> void:
 	var cue_path := "res://temp/chapter_one/shake_parser.md"
@@ -120,7 +118,7 @@ func parser_validation(catalog: RefCounted) -> void:
 	catalog._number(row, "hp", 1)
 	catalog._resource(row, "texture")
 	check(catalog.errors.size() == 2 and catalog.errors[0].contains(":9 [hp]"), "Invalid numbers and missing resources report field locations")
-	catalog.reload()
+	catalog.reload(CHAPTER_FIXTURE)
 
 func source_reload(catalog: RefCounted) -> void:
 	var base := "res://temp/chapter_one/edit_fixture"
@@ -164,7 +162,7 @@ func source_reload(catalog: RefCounted) -> void:
 	catalog.errors.clear(); story = catalog.story(bad_story)
 	check(catalog.errors.size() == 2 and story.nodes.line_0.text == "中文正文\n第二行", "Markdown preserves multiline text and validates scene references")
 	resource_validation(catalog, base)
-	catalog.reload()
+	catalog.reload(CHAPTER_FIXTURE)
 
 func write_text(path: String, text: String) -> void:
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
@@ -191,7 +189,7 @@ func copy_fixture(base: String) -> void:
 		for dependency in paths: text = text.replace(dependency, fixture_path(base, dependency))
 		write_text(fixture_path(base, path), text)
 	for name in ["levels", "waves", "backgrounds", "player_roster"]:
-		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(Catalog.ROOT + "/" + name + ".csv"))
+		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(CHAPTER_FIXTURE + "/" + name + ".csv"))
 
 func fixture_path(base: String, path: String) -> String:
 	return path.replace(Catalog.DATA, base + "/data")

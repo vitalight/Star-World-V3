@@ -1,25 +1,22 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://cxpa051q2wap2"]
 
-[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
-
-[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_j4dnl"]
-
+[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="1_j4dnl"]
+[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="actor_type"]
 [ext_resource type="Resource" path="res://content/data/skill_009.tres" id="skill"]
-
-
-[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="view_2_r1ajd"]
-
-
-[ext_resource type="Texture2D" path="res://content/ui/class_icons/atlas.png" id="view_class_atlas"]
-
-[ext_resource type="Texture2D" path="res://content/characters/character_011/atlas.png" id="view_hero_atlas"]
-
+[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="view_2_r1ajd"]
+[ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="view_class_atlas"]
+[ext_resource type="Texture2D" uid="uid://b0gl61e1xb20w" path="res://content/characters/character_011/atlas.png" id="view_hero_atlas"]
 
 [sub_resource type="AtlasTexture" id="view_ClassIcon"]
 atlas = ExtResource("view_class_atlas")
-region = Rect2(0.0, 627.0, 313.5, 313.5)
+region = Rect2(0, 627, 313.5, 313.5)
 filter_clip = true
 
+[sub_resource type="Resource" id="Appearance"]
+script = ExtResource("view_2_r1ajd")
+atlas = ExtResource("view_hero_atlas")
+atlas_row = 4
+class_icon = SubResource("view_ClassIcon")
 
 [sub_resource type="Resource" id="Stats"]
 script = ExtResource("1_j4dnl")
@@ -31,16 +28,7 @@ damage_type = "arts"
 role = "ranged"
 block = 0
 range_cells = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, -1), Vector2i(2, 0), Vector2i(2, 1)])
-
 skill_spec = ExtResource("skill")
-
-[sub_resource type="Resource" id="Appearance"]
-script = ExtResource("view_2_r1ajd")
-atlas = ExtResource("view_hero_atlas")
-atlas_row = 4
-
-
-class_icon = SubResource("view_ClassIcon")
 
 [resource]
 script = ExtResource("actor_type")

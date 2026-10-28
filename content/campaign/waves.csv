@@ -2,9 +2,9 @@
 wave_001,scene_0101B,3,3,7,enemy_001,main,1
 wave_002,scene_0101B,40,4,8,enemy_001,main,2
 wave_003,scene_0101B,82,3,9,enemy_001,main,3
-wave_004,scene_0101B,112,2,12,enemy_002,breach,4
+wave_004,scene_0101B,112,2,12,enemy_002,main,4
 wave_005,scene_0101B,142,3,8,enemy_001,main,5
-wave_006,scene_0101B,185,1,1,enemy_002,breach,6
+wave_006,scene_0101B,185,1,1,enemy_002,main,6
 wave_007,scene_0103B,3,4,8,enemy_001,upper,1
 wave_008,scene_0103B,18,4,9,enemy_001,lower,2
 wave_009,scene_0103B,57,4,7,enemy_002,upper,3

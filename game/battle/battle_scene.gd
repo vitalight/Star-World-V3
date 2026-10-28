@@ -137,6 +137,7 @@ func reload_level() -> void:
 	hud.replay_requested.connect(reset)
 	hud.roster_selected.connect(select_roster)
 	hud.roster_drag_started.connect(select_roster)
+	hud.roster_drag_ended.connect(update_overlays)
 	hud.roster_drag_hovered.connect(preview_drag)
 	hud.roster_dropped.connect(drop_roster)
 	hud.drop_hit_test = func(_key: String, point: Vector2):
@@ -368,12 +369,12 @@ func _unhandled_input(event: InputEvent) -> void:
 				if direction_chosen: confirm_deployment()
 				get_viewport().set_input_as_handled()
 				return
-			if selected_roster.is_empty():
-				var unit_id := pick_unit(event.position)
-				if unit_id != -1:
-					selected_unit = unit_id
-					refresh()
-					return
+			if not selected_roster.is_empty(): cancel_selection()
+			var unit_id := pick_unit(event.position)
+			if unit_id != -1:
+				selected_unit = unit_id
+				refresh()
+				return
 			var cell := pick_cell(event.position)
 			if cell != Vector2i(-99, -99): select_cell(cell)
 
@@ -413,14 +414,15 @@ func set_debug(grid: bool, routes: bool, ranges: bool) -> void:
 func update_overlays() -> void:
 	if not is_instance_valid(overlays): return
 	var deployable := {}
-	if not selected_roster.is_empty():
+	var dragging: bool = hud != null and not hud.dragged_roster.is_empty()
+	if not selected_roster.is_empty() and (dragging or deployment_pending):
 		for cell in configuration.terrain:
 			if battle.deployment_check(selected_roster, cell, facing).ok: deployable[cell] = true
 	var inspected: Dictionary = {}
 	if selected_roster.is_empty():
 		for unit in last_state.units:
 			if unit.id == selected_unit: inspected = unit
-	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, deployment_pending, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
+	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, deployment_pending, dragging, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
 	if signature == overlay_signature: return
 	overlay_signature = signature
 	for child in overlays.get_children(): child.free()
@@ -433,11 +435,11 @@ func update_overlays() -> void:
 				var a: Vector2 = route[i - 1]; var b: Vector2 = route[i]
 				var steps := ceili(a.distance_to(b))
 				for j in range(steps + 1): _outline(Vector2i(a.lerp(b, float(j) / steps).round()), Color("eb9864"))
-	if not selected_roster.is_empty():
+	if dragging and not selected_roster.is_empty():
 		for cell in deployable:
 			_cell_highlight(cell, Color(0.08, 0.84, 0.34, 0.36), Color("6cf0a0"), "deployable")
 	var selected: Dictionary = inspected
-	if candidate != Vector2i(-99, -99) and not selected_roster.is_empty():
+	if candidate != Vector2i(-99, -99) and not selected_roster.is_empty() and (dragging or deployment_pending):
 		var matches: bool = deployable.has(candidate)
 		if matches:
 			selected = configuration.roster[selected_roster].duplicate(true)

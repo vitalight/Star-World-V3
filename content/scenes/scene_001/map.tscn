@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_8m3hf"]
 [ext_resource type="Resource" path="res://content/scenes/scene_001/level.tres" id="2_n8xx3"]
 [ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="3_hlsk4"]
-[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas.png" id="city_atlas"]
+[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas_blocked_v2.png" id="city_atlas"]
 [ext_resource type="Texture2D" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
 
 [sub_resource type="Curve2D" id="Curve2D_s5yyo"]

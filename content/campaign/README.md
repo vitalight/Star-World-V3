@@ -61,9 +61,9 @@ speaker:
 
 用 Godot 打开对应 `map.tscn`：在 Terrain 的 TileMapLayer 刷图，在 Routes 下编辑 Path2D。格子64像素，格心偏移32；路径手柄为零，线段沿格子轴向。地形、部署类型、路线仍只来自地图，不在表格另存一份。地图设置 `external_level=true`，正式关卡／波次数值从 CSV 读取，单位从 .tres 读取。`tint` 调整该地图的地表配色。
 
-第一章四张战斗地图和 Game Test 默认开发样例共用 `content/terrains/terrain_002` 城市地形。地图的 `terrain_atlas` 指定运行时 4×4 图集，`background_texture` 指定战场外围背景，`perimeter_style` 指定外围样式；选关预览和战斗读取同一配置。背景仅作装饰，不改变地图或路线，未指定时沿用原背景。城市 TileSet 保留原有 R/H/G/W 的高度、部署与通行属性，不能仅凭贴图改变规则。
+第一章四张战斗地图和 Game Test 默认开发样例共用 `content/terrains/terrain_002` 城市地形。地图的 `terrain_atlas` 指定运行时 4×4 图集，`background_texture` 指定战场外围背景，`perimeter_style` 指定外围样式；选关预览和战斗读取同一配置。背景仅作装饰，不改变地图或路线，未指定时沿用原背景。城市 TileSet 的 R/H/G/W/B/D 分别配置外观、高度、部署与通行属性，不能仅凭贴图改变规则。
 
-1-2B 当前沿用 1-1B 的地图路线和波次；这是现有内容安排，后续关卡玩法设计时再评估。
+城市 TileSet 的 (1,3) 是不可部署高台（B）：浅色高台地面配黄黑警示边，保持高台高度；(2,3) 是不可部署地面（D），使用深色盖板并保持地面高度。两者均不可部署、不可通行，运行时分别使用 `atlas_blocked_v2.png` 第四行第四格与第三行第四格。1-1B 使用 6×4 地图，第一列下方三格采用不可部署高台；敌人从左上进入，沿地面前往右下目标。1-2B 保留原地图和波次，后续关卡玩法设计时再评估。
 
 新增剧情关时，在独立目录（如 `scene_0101A`）添加同编号文件 `story_scene_0101A.md`，在 levels.csv 添加 type=story 的行，只填写 story，不填写地图和战斗数值。新增战斗关时，复制地图到独立目录（如 `scene_0101B`），在 levels.csv 添加 type=battle 的行并配置地图和战斗数值，在 waves.csv 添加至少一组波次；story 留空。行序决定解锁顺序。背景贴图在 backgrounds.csv 注册，不要引用 Human 或 temp。
 
@@ -81,11 +81,12 @@ speaker:
 ```powershell
 $env:APPDATA = Join-Path $PWD 'temp/chapter_one/user'
 & $env:GODOT_PATH --headless --path . --script res://game/tests/chapter_content_test.gd
+& $env:GODOT_PATH --headless --path . --script res://game/tests/chapter_authoring_test.gd
 & $env:GODOT_PATH --headless --path . --script res://game/tests/content_tools_test.gd
 & $env:GODOT_PATH --path . --script res://game/tests/player_flow_test.gd -- --capture
 ```
 
-首次运行前创建 `temp/chapter_one` 和 `temp/.gdignore`。最后一项使用真实窗口输入验证并保存截图。四关参考部署与技能命令在 `game/tests/chapter_fixture.gd`；它只在测试中使用，不控制正式游戏。
+首次运行前创建 `temp/chapter_one` 和 `temp/.gdignore`。最后一项使用真实窗口输入验证并保存截图。章节内容测试的地图、波次和回放使用 `game/tests/fixtures/chapter/` 与 `game/tests/chapter_fixture.gd` 中的固定夹具，不随正式关卡编辑变化；章节内容检查则检查当前正式关卡和路线是否合法，不限定具体布局。编辑正式关卡后仍需在 Game Test 实际检查。
 
 `.tres` 通过资源索引显式关联，随资源一起导出；`export_presets.cfg` 另显式包含 CSV／MD。生成验证 PCK 时，把 `TEMP` 和 `TMP` 指向 `temp/chapter_one/export_tmp`，再运行 `--headless --export-pack "Windows Desktop" temp/chapter_one/chapter.pck`。编辑内容后需重新导出。既有三场战斗的历史回放约3分11秒、3分23秒和3分30秒；新增家中清理战斗后章节总时长需重新体验评估，阅读及部署时间因人而异。
 

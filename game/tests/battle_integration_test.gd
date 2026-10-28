@@ -27,11 +27,14 @@ func run() -> void:
 	check(map.terrain_atlas == chapter_map.terrain_atlas and map.background_texture == chapter_map.background_texture and map.perimeter_style == chapter_map.perimeter_style, "Test map uses chapter battlefield art")
 	chapter_map.free()
 	var cell := Vector2i(0, 0)
-	for pair in [[Vector2i(0, 1), "ground", 0.0], [Vector2i(0, 0), "high", 0.42], [Vector2i(2, 2), "high", 0.42], [Vector2i(0, 3), "none", 0.0]]:
+	for pair in [[Vector2i(0, 1), "ground", 0.0], [Vector2i(0, 0), "high", 0.42], [Vector2i(2, 2), "high", 0.42], [Vector2i(0, 3), "none", 0.0], [Vector2i(1, 3), "none", 0.42]]:
 		tiles.set_cell(cell, 0, pair[0])
 		var config: Dictionary = map.configuration()
 		check(config.terrain.get(cell, "none") == pair[1], "Tile edit changes deployment: " + str(pair[0]))
 		check(is_equal_approx(map.cells()[cell].height, pair[2]), "Tile edit changes elevation")
+	check(map.cells()[cell].appearance == "B" and not map.cells()[cell].walkable, "Blocked elevated tile has distinct appearance and blocks routes")
+	tiles.set_cell(cell, 0, Vector2i(2, 3))
+	check(map.cells()[cell].appearance == "D" and is_zero_approx(map.cells()[cell].height) and map.cells()[cell].deployment == "none" and not map.cells()[cell].walkable, "Blocked ground is level with ground and rejects deployment and routes")
 	tiles.erase_cell(cell)
 	check(not map.cells().has(cell) and not map.configuration().terrain.has(cell), "Erasing tile removes both visual and deployment data")
 	tiles.set_cell(cell, 0, Vector2i(0, 0))
