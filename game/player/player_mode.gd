@@ -3,6 +3,11 @@ extends Control
 const BattleScene = preload("res://game/battle/battle_scene.tscn")
 const Background = preload("res://content/ui/player/background.png")
 const Atlas = preload("res://content/ui/player/atlas.png")
+const MainBackground = preload("res://content/ui/player/main_background_v2.png")
+const MainEmblem = preload("res://content/ui/player/main_emblem_v2.png")
+const MainButtonLight = preload("res://content/ui/player/main_button_light_v2.png")
+const MainButtonDark = preload("res://content/ui/player/main_button_dark_v2.png")
+const MainSettings = preload("res://content/ui/player/main_settings_v2.png")
 const Preview = preload("res://game/player/map_preview.gd")
 const Catalog = preload("res://game/content/content_catalog.gd")
 const Progress = preload("res://game/player/campaign_progress.gd")
@@ -92,7 +97,7 @@ func _menu_page(kind: String, shade: float) -> void:
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(menu)
 	var background := TextureRect.new()
-	background.texture = Background
+	background.texture = MainBackground if kind == "main" else Background
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -118,14 +123,52 @@ func _fit_menu() -> void:
 func show_main() -> void:
 	_menu_page("main", 0.0)
 	_play_music("music_main")
-	_image(canvas, Rect2(74, 50, 170, 230), _region(Rect2(675, 685, 215, 235)))
-	_button(canvas, "开始游戏", Rect2(85, 307, 450, 78), resume_game, true)
-	var resume := _button(canvas, "读取存档", Rect2(85, 420, 450, 78), resume_game)
+	_image(canvas, Rect2(528, 95, 616, 427), MainEmblem)
+	var title := _text(canvas, "星世界", Rect2(570, 226, 532, 172), 110, Color("f8f9ff"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_shadow_color", Color("253d79"))
+	title.add_theme_constant_override("shadow_offset_x", 4)
+	title.add_theme_constant_override("shadow_offset_y", 6)
+	title.add_theme_constant_override("shadow_outline_size", 3)
+	_main_button("开始游戏", Rect2(641, 514, 390, 69), resume_game)
+	var resume := _main_button("读取存档", Rect2(641, 601, 390, 69), resume_game)
 	resume.disabled = not has_progress
-	_button(canvas, "退出游戏", Rect2(85, 533, 450, 78), func(): get_tree().quit())
-	_button(canvas, "设置", Rect2(1370, 50, 220, 70), show_settings)
-	_image(canvas, Rect2(57, 659, 350, 35), _region(Rect2(35, 780, 275, 40)))
-	if not has_progress: _text(canvas, "暂无存档", Rect2(90, 621, 430, 30), 19, Color("8fa8b7"))
+	_main_button("退出游戏", Rect2(641, 688, 390, 69), func(): get_tree().quit())
+	var settings := _level_button(canvas, "设置", Rect2(1538, 42, 64, 64), show_settings, false)
+	settings.tooltip_text = "设置"
+	for state in ["normal", "hover", "pressed"]:
+		var style := StyleBoxTexture.new()
+		style.texture = MainSettings
+		style.modulate_color = Color("b9e5ff") if state == "hover" else (Color("88afca") if state == "pressed" else Color.WHITE)
+		settings.add_theme_stylebox_override(state, style)
+	for color_name in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		settings.add_theme_color_override(color_name, Color.TRANSPARENT)
+	if not has_progress:
+		var notice := _text(canvas, "暂无存档", Rect2(641, 768, 390, 30), 17, Color("e4edf4"))
+		notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func _main_button(value: String, rect: Rect2, action: Callable) -> Button:
+	var button := Button.new()
+	button.text = value; button.position = rect.position; button.size = rect.size
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_font_size_override("font_size", 29)
+	button.add_theme_color_override("font_color", Color("edf3f9"))
+	button.add_theme_color_override("font_hover_color", Color("203c60"))
+	button.add_theme_color_override("font_pressed_color", Color("203c60"))
+	button.add_theme_color_override("font_disabled_color", Color("a3afbe"))
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var style := StyleBoxTexture.new()
+		style.texture = MainButtonLight if state in ["hover", "pressed"] else MainButtonDark
+		style.modulate_color = Color(1, 1, 1, 0.65) if state == "disabled" else Color.WHITE
+		button.add_theme_stylebox_override(state, style)
+	var focus := StyleBoxFlat.new()
+	focus.bg_color = Color.TRANSPARENT; focus.border_color = Color("fff1c9")
+	focus.set_border_width_all(2)
+	button.add_theme_stylebox_override("focus", focus)
+	button.pressed.connect(func(): _play_ui("sfx_ui_click"))
+	button.pressed.connect(action)
+	canvas.add_child(button)
+	return button
 
 func show_settings() -> void:
 	_menu_page("settings", 0.67)
