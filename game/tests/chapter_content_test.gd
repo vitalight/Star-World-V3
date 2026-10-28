@@ -17,7 +17,7 @@ func _initialize() -> void:
 	check(catalog.errors.is_empty(), "Catalog valid: " + "\n".join(catalog.errors))
 	if not catalog.errors.is_empty(): quit(1); return
 	check(catalog.characters.size() == 5 and catalog.levels.size() == 9, "Authored scope is five characters and nine stages")
-	check(catalog.enemies.size() == 4 and catalog.skills.size() == 5, "All authored enemies and skills registered")
+	check(catalog.enemies.size() == 6 and catalog.skills.size() == 5, "All authored enemies and skills registered")
 	check(catalog.skill_icons("scene_0101B").character_011.resource_path == "res://content/ui/skill_icons/icon_01.tres", "Formal skill icon comes from skill resource")
 	check(not catalog.characters.character_011.stats.skill.has("icon"), "Battle configuration excludes skill texture")
 	check(catalog.appearances("scene_0101B").character_011.get("skill_icon") == null, "Actor appearance has no skill icon property")
@@ -151,6 +151,10 @@ func source_reload(catalog: RefCounted) -> void:
 	catalog.reload(base, base + "/data")
 	check(catalog.appearances("scene_0101B").character_011 != appearances.character_011, "Reload also bypasses nested appearance cache")
 	check(is_equal_approx(catalog.appearances("scene_0101B").character_011.height, 1.75), "Saving character file reloads its embedded appearance")
+	var flying_map = load(catalog.levels.scene_0101B.map).instantiate()
+	flying_map.get_node("Routes/main").set_meta("flying", true)
+	check("\n".join(catalog.map_errors("scene_0101B", flying_map)).contains("不能使用飞行路线"), "Ground enemies reject routes marked as flying")
+	flying_map.free()
 	path = base + "/waves.csv"
 	write_text(path, FileAccess.get_file_as_string(path).replace(",main,", ",missing_route,"))
 	catalog.reload(base, base + "/data")

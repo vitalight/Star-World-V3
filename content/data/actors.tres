@@ -17,9 +17,11 @@
 [ext_resource type="Resource" path="res://content/data/enemy_002.tres" id="enemy_002"]
 [ext_resource type="Resource" path="res://content/data/enemy_003.tres" id="enemy_003"]
 [ext_resource type="Resource" path="res://content/data/enemy_004.tres" id="enemy_004"]
+[ext_resource type="Resource" path="res://content/data/enemy_005.tres" id="enemy_005"]
+[ext_resource type="Resource" path="res://content/data/enemy_006.tres" id="enemy_006"]
 
 [resource]
 script = ExtResource("script")
 skills = Array[ExtResource("skill_type")]([ExtResource("skill_001"), ExtResource("skill_002"), ExtResource("skill_003"), ExtResource("skill_004"), ExtResource("skill_005")])
 characters = Array[ExtResource("actor_type")]([ExtResource("character_011"), ExtResource("character_012"), ExtResource("character_013"), ExtResource("character_014"), ExtResource("character_015")])
-enemies = Array[ExtResource("actor_type")]([ExtResource("enemy_001"), ExtResource("enemy_002"), ExtResource("enemy_003"), ExtResource("enemy_004")])
+enemies = Array[ExtResource("actor_type")]([ExtResource("enemy_001"), ExtResource("enemy_002"), ExtResource("enemy_003"), ExtResource("enemy_004"), ExtResource("enemy_005"), ExtResource("enemy_006")])

@@ -32,6 +32,13 @@ func routes() -> Dictionary:
 		result[str(path.name)] = points
 	return result
 
+func flying_routes() -> PackedStringArray:
+	var result := PackedStringArray()
+	for path in get_node("Routes").get_children():
+		if path is Path2D and path.has_meta("flying") and bool(path.get_meta("flying")):
+			result.append(str(path.name))
+	return result
+
 func errors(check_level := true) -> PackedStringArray:
 	var result := PackedStringArray()
 	var data := cells()
@@ -45,7 +52,10 @@ func errors(check_level := true) -> PackedStringArray:
 	if paths.is_empty(): result.append("Routes: 至少需要一条路线")
 	for key in paths:
 		var points: Array = paths[key]
-		var curve: Curve2D = get_node("Routes").get_node(NodePath(key)).curve
+		var route: Path2D = get_node("Routes").get_node(NodePath(key))
+		var curve: Curve2D = route.curve
+		# Flying routes may leave walkable ground: their spawn can sit on a high platform.
+		var flying: bool = route.has_meta("flying") and bool(route.get_meta("flying"))
 		if curve:
 			for i in curve.point_count:
 				if not curve.get_point_in(i).is_zero_approx() or not curve.get_point_out(i).is_zero_approx():
@@ -55,7 +65,7 @@ func errors(check_level := true) -> PackedStringArray:
 			var point: Vector2 = points[i]
 			if not point.is_equal_approx(point.round()): result.append("Route %s[%d]: 控制点需对齐格心" % [key, i])
 			if i == 0:
-				_check_route_cell(result, data, key, Vector2i(point.round()))
+				_check_route_cell(result, data, key, Vector2i(point.round()), flying)
 				continue
 			var previous: Vector2 = points[i - 1]
 			var delta := point - previous
@@ -64,14 +74,14 @@ func errors(check_level := true) -> PackedStringArray:
 				continue
 			var steps := ceili(maxf(absf(delta.x), absf(delta.y)))
 			for step in range(steps + 1):
-				_check_route_cell(result, data, key, Vector2i((previous + delta * float(step) / steps).round()))
+				_check_route_cell(result, data, key, Vector2i((previous + delta * float(step) / steps).round()), flying)
 	if check_level and not external_level:
 		if level: result.append_array(level.errors(paths))
 		else: result.append("Level: 未指定关卡资源")
 	return result
 
-func _check_route_cell(result: PackedStringArray, data: Dictionary, route: String, cell: Vector2i) -> void:
-	if not bounds.has_point(cell) or not data.has(cell) or not data[cell].walkable:
+func _check_route_cell(result: PackedStringArray, data: Dictionary, route: String, cell: Vector2i, flying := false) -> void:
+	if not bounds.has_point(cell) or not data.has(cell) or (not flying and not data[cell].walkable):
 		result.append("Route %s: %s 越界、断路或不可通行" % [route, cell])
 
 func configuration() -> Dictionary:

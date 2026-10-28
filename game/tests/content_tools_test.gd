@@ -40,8 +40,8 @@ func run() -> void:
 	check(standalone.configuration.roster == reference.roster, "Standalone battle scene uses the same official operators")
 	standalone.free()
 	var picker: OptionButton = workspace.debug_window.level_picker
-	check(picker.item_count == 5, "Game Test offers sample plus chapter")
-	for index in [1, 2, 3, 4, 0]:
+	check(picker.item_count == 6, "Game Test offers sample plus chapter")
+	for index in [1, 2, 3, 4, 5, 0]:
 		picker.select(index); picker.item_selected.emit(index)
 		check(workspace.game.battle != null and workspace.game.validation_errors.is_empty(), "Game Test selection loads valid battle " + str(index))
 		workspace.game.reload_level()

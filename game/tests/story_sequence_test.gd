@@ -13,7 +13,7 @@ func run() -> void:
 	var catalog = Catalog.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "Campaign sources load")
-	check(catalog.levels.size() == 9, "Nine independent chapter stages")
+	check(catalog.levels.size() == 10, "Ten independent chapter stages")
 	var scripts: Array = []
 	for id in catalog.levels:
 		if catalog.levels[id].type != "story": continue
@@ -21,7 +21,7 @@ func run() -> void:
 		check(script.errors().is_empty(), "Valid story: " + id)
 		scripts.append(script)
 	check(text(scripts[0]).contains("存档啊") and not text(scripts[0]).contains("钻了进去"), "Cat stays through first battle")
-	check(text(scripts[1]).contains("一猫一怪撞入空洞") and text(scripts[1]).contains("房间深处传来怪物叫声"), "Cat disappears before control team battle")
+	check(text(scripts[1]).contains("小黄猛扑怪物，一起撞入空洞") and text(scripts[1]).contains("房间深处传来怪物叫声"), "Cat disappears before control team battle")
 	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("先救人"), "Tracking leads to doctor rescue")
 	check(text(scripts[3]).contains("我是医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
 	check(text(scripts[4]).contains("济州岛") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")

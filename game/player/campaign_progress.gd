@@ -54,6 +54,11 @@ func load_progress(path: String, ids: Array) -> void:
 		var old_index := old_ids.find(selection)
 		if old_index >= 0: selection = "scene_01%02dA" % (old_index + 1)
 	if saved is Array:
+		saved = saved.duplicate()
+		# Chapter one gained 1-4C before the epilogue; old finished saves keep
+		# their completed chapter instead of falling back to the new battle.
+		if saved.has("scene_0105A") and not saved.has("scene_0104C"):
+			saved.insert(saved.find("scene_0105A"), "scene_0104C")
 		for id in ids:
 			if not saved.has(id): break
 			completed.append(id)

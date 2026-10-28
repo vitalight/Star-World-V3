@@ -25,5 +25,5 @@ func run() -> void:
 			failures += 1; push_error(id + ": " + "\n".join(game.validation_errors))
 		game.queue_free()
 		await process_frame
-	print("PACKED CONTENT: four battles, four stories and chapter epilogue, %d failures" % failures)
+	print("PACKED CONTENT: five battles, four stories and chapter epilogue, %d failures" % failures)
 	quit(1 if failures else 0)

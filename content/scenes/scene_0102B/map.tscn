@@ -1,41 +1,51 @@
 [gd_scene format=4]
 
-[ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_7ssyb"]
-[ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="2_5njth"]
+[ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_map"]
+[ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="2_tiles"]
 
 [ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas_blocked_v2.png" id="city_atlas"]
 
 [ext_resource type="Texture2D" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
 
-[sub_resource type="Curve2D" id="Curve2D_48ky1"]
+[sub_resource type="Curve2D" id="Curve2D_main"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 480, 96)
-}
-point_count = 2
-
-[sub_resource type="Curve2D" id="Curve2D_m1nvf"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 224, 0, 0, 0, 0, 416, 224, 0, 0, 0, 0, 416, 96, 0, 0, 0, 0, 480, 96)
+"points": PackedVector2Array(0, 0, 0, 0, 32, 160, 0, 0, 0, 0, 480, 160, 0, 0, 0, 0, 480, 224, 0, 0, 0, 0, 608, 224)
 }
 point_count = 4
 
-[node name="EditableMap" type="Node2D" unique_id=914044048]
-script = ExtResource("1_7ssyb")
-bounds = Rect2i(0, 0, 8, 5)
+[sub_resource type="Curve2D" id="Curve2D_breach"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 352, 0, 0, 0, 0, 480, 352, 0, 0, 0, 0, 480, 288, 0, 0, 0, 0, 480, 224, 0, 0, 0, 0, 608, 224)
+}
+point_count = 5
+
+[sub_resource type="Curve2D" id="Curve2D_air"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 608, 32, 0, 0, 0, 0, 608, 96, 0, 0, 0, 0, 608, 160, 0, 0, 0, 0, 608, 224)
+}
+point_count = 5
+
+[node name="EditableMap" type="Node2D" unique_id=1200087109]
+script = ExtResource("1_map")
+bounds = Rect2i(0, 0, 10, 7)
 tint = Color(1, 1, 1, 1)
 terrain_atlas = ExtResource("city_atlas")
 background_texture = ExtResource("city_bg")
 perimeter_style = 1
 external_level = true
 
-[node name="Terrain" type="TileMapLayer" parent="." unique_id=735756813]
-tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAABAAEAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAEAAAAHAAIAAAAAAAAAAAAAAAMAAAAAAAEAAAABAAMAAAAAAAEAAAACAAMAAAAAAAEAAAADAAMAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAMAAAAAAAEAAAAGAAMAAAAAAAEAAAAHAAMAAAAAAAEAAAAAAAQAAAAAAAAAAAABAAQAAAAAAAAAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAA=")
-tile_set = ExtResource("2_5njth")
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=1301152019]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAAAAAEAAAADAAEAAAAAAAAAAAAEAAEAAAABAAMAAAAFAAEAAAAAAAAAAAAGAAEAAAAAAAAAAAAHAAEAAAAAAAEAAAAIAAEAAAAAAAAAAAAJAAEAAAAAAAAAAAAAAAIAAAAAAAEAAAABAAIAAAAAAAEAAAACAAIAAAAAAAEAAAADAAIAAAAAAAEAAAAEAAIAAAAAAAEAAAAFAAIAAAAAAAEAAAAGAAIAAAAAAAEAAAAHAAIAAAAAAAEAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAABAAMAAAAAAAAAAAACAAMAAAAAAAAAAAADAAMAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAAAAAAHAAMAAAAAAAEAAAAIAAMAAAAAAAEAAAAJAAMAAAAAAAEAAAAAAAQAAAAAAAAAAAABAAQAAAABAAMAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAEAAAAIAAQAAAAAAAAAAAAJAAQAAAAAAAAAAAAAAAUAAAAAAAEAAAABAAUAAAAAAAEAAAACAAUAAAAAAAEAAAADAAUAAAAAAAEAAAAEAAUAAAAAAAEAAAAFAAUAAAAAAAEAAAAGAAUAAAAAAAEAAAAHAAUAAAAAAAEAAAAIAAUAAAAAAAAAAAAJAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAABAAYAAAAAAAAAAAACAAYAAAAAAAAAAAADAAYAAAAAAAAAAAAEAAYAAAAAAAAAAAAFAAYAAAAAAAAAAAAGAAYAAAAAAAAAAAAHAAYAAAAAAAAAAAAIAAYAAAAAAAAAAAAJAAYAAAAAAAAAAAA=")
+tile_set = ExtResource("2_tiles")
 
-[node name="Routes" type="Node2D" parent="." unique_id=541382906]
+[node name="Routes" type="Node2D" parent="." unique_id=1414296799]
 
-[node name="main" type="Path2D" parent="Routes" unique_id=2121803209]
-curve = SubResource("Curve2D_48ky1")
+[node name="main" type="Path2D" parent="Routes" unique_id=1500086977]
+curve = SubResource("Curve2D_main")
 
-[node name="breach" type="Path2D" parent="Routes" unique_id=806221111]
-curve = SubResource("Curve2D_m1nvf")
+[node name="breach" type="Path2D" parent="Routes" unique_id=1500086978]
+curve = SubResource("Curve2D_breach")
+
+[node name="air" type="Path2D" parent="Routes" unique_id=1500086979]
+curve = SubResource("Curve2D_air")
+metadata/flying = true

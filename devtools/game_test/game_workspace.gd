@@ -9,6 +9,8 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	game = Game.instantiate()
 	game.operator_roster = operator_roster
+	# Chapter previews use the full Game Test squad, including anti-air operators.
+	game.operator_ids.assign(operator_roster.actors.keys())
 	add_child(game)
 	game.exit_requested.connect(_return_to_hub)
 	var layer := CanvasLayer.new()

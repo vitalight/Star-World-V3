@@ -185,7 +185,8 @@ func verify_roster(game: Node3D) -> void:
 	var snapshot: Dictionary = game.last_state.duplicate(true)
 	snapshot.cost = 0
 	game.hud.update_state(snapshot, "", -1, 1.0, game.configuration.deploy_limit)
-	check(game.hud.cards.guard.button.visible and game.hud.cards.guard.button.disabled, "Available roster still respects insufficient cost")
+	check(game.hud.cards.guard.button.visible and not game.hud.cards.guard.button.disabled, "Unaffordable operator remains selectable")
+	check(game.hud.cards.guard.portrait.modulate == Color(0.5, 0.5, 0.5), "Unaffordable operator is dimmed")
 	# Exercise a real death event using a deliberately fragile test-only unit.
 	var fragile: Dictionary = game.configuration.duplicate(true)
 	fragile.roster.guard.max_hp = 1.0

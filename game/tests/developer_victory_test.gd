@@ -8,15 +8,15 @@ func run() -> void:
 	if FileAccess.file_exists(DEBUG_SAVE): DirAccess.remove_absolute(DEBUG_SAVE)
 	await spawn(DEBUG_SAVE)
 	await click("开始游戏")
-	for id in ["scene_0101B", "scene_0102B", "scene_0103B", "scene_0104B"]:
-		if player.page == "levels": await click("开始行动   ›")
+	for id in ["scene_0101B", "scene_0102B", "scene_0103B", "scene_0104B", "scene_0104C"]:
 		player.developer_mode = true
-		await click("跳过剧情")
+		if player.page == "levels": await click("开始行动   ›")
+		if player.page == "story": await click("跳过剧情")
 		player.developer_mode = false
 		var game = player.battle_scene
 		game.set_process(false)
-		if id == "scene_0101B": await click("知道了")
-		if id == "scene_0104B":
+		if id == "scene_0101B": await click("确认")
+		if id == "scene_0104C":
 			game.start()
 			await settle()
 			var point: Vector2 = game.hud.pause_button.get_global_rect().get_center()
@@ -44,8 +44,9 @@ func run() -> void:
 			await click("读取存档")
 			check(player.page == "story" and player.story_kind == "story" and player.story_level == "scene_0102A", "Developer victory resumes next merged story across restart")
 		else: await click("继续")
-		if id == "scene_0104B": await click("跳过剧情")
 		check(player.progress.completed.has(id), "Developer win commits progress through normal continuation")
+	check(player.page == "story" and player.story_level == "scene_0105A", "Final victory opens epilogue")
+	await click("跳过剧情")
 	check(player.completed, "Developer skips can complete the chapter")
 	await dispose()
 	print("DEVELOPER VICTORY: %d checks, %d failures" % [checks, failures])

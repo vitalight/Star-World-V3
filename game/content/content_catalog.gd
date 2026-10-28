@@ -156,9 +156,13 @@ func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionar
 func map_errors(id: String, map: Node) -> PackedStringArray:
 	var result := diagnostics(id)
 	for message in map.errors(false): result.append("%s:1 [geometry] %s" % [levels[id].map, message])
+	var flying: PackedStringArray = map.flying_routes() if map.has_method("flying_routes") else PackedStringArray()
 	for row in waves:
-		if row.level == id and not map.routes().has(row.route):
+		if row.level != id: continue
+		if not map.routes().has(row.route):
 			result.append("%s:%s [route] 未知路线 %s" % [row._file, row._line, row.route])
+		elif flying.has(row.route) and not enemies.get(row.enemy, {}).get("stats", {}).get("flying", false):
+			result.append("%s:%s [route] 地面敌人 %s 不能使用飞行路线 %s" % [row._file, row._line, row.enemy, row.route])
 	return result
 
 func operator_configuration(operator_ids: Array) -> Dictionary:

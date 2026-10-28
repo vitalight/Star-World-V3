@@ -36,9 +36,17 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
     - [ ] 干员技能树（消耗金币）
     - [ ] 存档系统：支持多个存档   
 
-从头更新
-- 正式的第一章战斗
+参考图片，更新第一章战斗关卡。
+- 第二关："C:\Users\vital\Desktop\level0-3.png"。需要支持飞行敌人的出生点（飞行敌人从高台出生，考虑制作新素材）
+- 第三关："C:\Users\vital\Desktop\level0-4.png"
+boss战增加至两场。（第四关和第五关）
+- 第四关："C:\Users\vital\Desktop\level-tr-11.png"
+- 第五关："C:\Users\vital\Desktop\level0-6.png"
 
-第一章 正式资产
-- 角色
-- 地图
+使用imagegen，更新地形标识：
+- 第一行：地面1，地面2，不可部署地面1,不可部署地面2
+- 第二行：高台1，高台2，不可部署高台1，不可部署高台2
+- 第三行：特殊地面1，特殊地面2，特殊地面3，特殊地面4
+- 第四行：特殊高台1，特殊高台2，特殊高台3，特殊高台4
+（地面和高台，应该使用不同的色系进行区分）
+（特殊：后续会加特殊效果，比如持续治疗、持续伤害、增加防御）
