@@ -22,22 +22,32 @@ func cells() -> Dictionary:
 func routes() -> Dictionary:
 	var result := {}
 	var tiles := get_node("Terrain") as TileMapLayer
-	for path in get_node("Routes").get_children():
-		if not path is Path2D: continue
-		var points: Array[Vector2] = []
-		if path.curve:
-			for i in path.curve.point_count:
-				var local := tiles.to_local(path.to_global(path.curve.get_point_position(i)))
-				points.append((local - Vector2(tiles.tile_set.tile_size) / 2.0) / Vector2(tiles.tile_set.tile_size))
-		result[str(path.name)] = points
+	for path in _route_paths():
+		result[str(path.name)] = _route_points(path, tiles)
 	return result
 
 func flying_routes() -> PackedStringArray:
 	var result := PackedStringArray()
-	for path in get_node("Routes").get_children():
-		if path is Path2D and path.has_meta("flying") and bool(path.get_meta("flying")):
-			result.append(str(path.name))
+	for path in _route_paths():
+		if _route_flying(path): result.append(str(path.name))
 	return result
+
+func _route_paths() -> Array[Path2D]:
+	var result: Array[Path2D] = []
+	for path in get_node("Routes").get_children():
+		if path is Path2D: result.append(path)
+	return result
+
+func _route_points(path: Path2D, tiles: TileMapLayer) -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	if path.curve:
+		for i in path.curve.point_count:
+			var local := tiles.to_local(path.to_global(path.curve.get_point_position(i)))
+			points.append((local - Vector2(tiles.tile_set.tile_size) / 2.0) / Vector2(tiles.tile_set.tile_size))
+	return points
+
+func _route_flying(path: Path2D) -> bool:
+	return path.has_meta("flying") and bool(path.get_meta("flying"))
 
 func errors(check_level := true) -> PackedStringArray:
 	var result := PackedStringArray()
@@ -48,14 +58,20 @@ func errors(check_level := true) -> PackedStringArray:
 		if not bounds.has_point(cell): result.append("Terrain %s: 超出 bounds" % cell)
 		if data[cell].appearance not in ["R", "H", "G", "W", "B", "D"] or data[cell].deployment not in ["ground", "high", "none"] or data[cell].height < 0:
 			result.append("Terrain %s: TileSet 自定义数据无效" % cell)
-	var paths := routes()
-	if paths.is_empty(): result.append("Routes: 至少需要一条路线")
-	for key in paths:
-		var points: Array = paths[key]
-		var route: Path2D = get_node("Routes").get_node(NodePath(key))
-		var curve: Curve2D = route.curve
-		# Flying routes may leave walkable ground: their spawn can sit on a high platform.
-		var flying: bool = route.has_meta("flying") and bool(route.get_meta("flying"))
+	var tiles := get_node("Terrain") as TileMapLayer
+	var paths := {}
+	var routes_data: Array[Dictionary] = []
+	for path in _route_paths():
+		var key := str(path.name)
+		var points := _route_points(path, tiles)
+		paths[key] = points
+		routes_data.append({"name": key, "path": path, "points": points, "flying": _route_flying(path)})
+	if routes_data.is_empty(): result.append("Routes: 至少需要一条路线")
+	for entry in routes_data:
+		var key: String = entry["name"]
+		var points: Array = entry["points"]
+		var flying: bool = entry["flying"]
+		var curve: Curve2D = entry["path"].curve
 		if curve:
 			for i in curve.point_count:
 				if not curve.get_point_in(i).is_zero_approx() or not curve.get_point_out(i).is_zero_approx():
@@ -102,8 +118,8 @@ func _process(_delta: float) -> void:
 
 func _draw() -> void:
 	if not Engine.is_editor_hint() or not has_node("Terrain") or not has_node("Routes"): return
-	for path in get_node("Routes").get_children():
-		if not path is Path2D or not path.curve: continue
+	for path in _route_paths():
+		if not path.curve: continue
 		var points := PackedVector2Array()
 		for i in path.curve.point_count: points.append(to_local(path.to_global(path.curve.get_point_position(i))))
 		if points.size() >= 2:

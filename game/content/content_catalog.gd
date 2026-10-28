@@ -18,11 +18,13 @@ var returns := {}
 var _level_errors := {}
 var _appearances := {}
 var _skill_icons := {}
+var _flying_enemies := {}
 
 func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 	errors.clear(); characters.clear(); skills.clear(); enemies.clear(); levels.clear(); waves.clear(); backgrounds.clear(); _level_errors.clear()
 	_appearances.clear()
 	_skill_icons.clear()
+	_flying_enemies.clear()
 	starting_operators.clear(); recruits.clear(); departures.clear(); returns.clear()
 	_load_actors(data_base + "/actors.tres")
 	for row in _table(base + "/backgrounds.csv", "id,texture"):
@@ -130,6 +132,7 @@ func _register_actor(actor, enemy: bool, path: String, skill_paths: Dictionary) 
 	config.content_id = stats.content_id
 	collection[stats.content_id] = {"stats": config, "appearance": appearance.resource_path,
 		"identity": actor.identity, "class": actor.profession}
+	if enemy: _flying_enemies[stats.content_id] = bool(config.get("flying", false))
 	_appearances[stats.content_id] = appearance
 
 func diagnostics(id: String) -> PackedStringArray:
@@ -156,12 +159,13 @@ func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionar
 func map_errors(id: String, map: Node) -> PackedStringArray:
 	var result := diagnostics(id)
 	for message in map.errors(false): result.append("%s:1 [geometry] %s" % [levels[id].map, message])
+	var routes: Dictionary = map.routes()
 	var flying: PackedStringArray = map.flying_routes() if map.has_method("flying_routes") else PackedStringArray()
 	for row in waves:
 		if row.level != id: continue
-		if not map.routes().has(row.route):
+		if not routes.has(row.route):
 			result.append("%s:%s [route] 未知路线 %s" % [row._file, row._line, row.route])
-		elif flying.has(row.route) and not enemies.get(row.enemy, {}).get("stats", {}).get("flying", false):
+		elif flying.has(row.route) and not _flying_enemies.get(row.enemy, false):
 			result.append("%s:%s [route] 地面敌人 %s 不能使用飞行路线 %s" % [row._file, row._line, row.enemy, row.route])
 	return result
 
