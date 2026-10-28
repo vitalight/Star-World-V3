@@ -161,57 +161,144 @@ func _set_sfx_volume(value: float) -> void:
 	audio_settings.save(audio_settings_path)
 
 func show_levels() -> void:
-	_menu_page("levels", 0.67)
+	_menu_page("levels", 0.72)
 	_play_music("music_main")
-	_button(canvas, "‹", Rect2(30, 28, 90, 62), show_main)
-	_text(canvas, "第一章 · 上海", Rect2(145, 27, 820, 75), 42)
-	_text(canvas, "寻找失踪的小黄", Rect2(50, 128, 900, 48), 28, Color("b9d9e4"))
-	_line(Vector2(50, 187), Vector2(1020, 187))
+	# A quiet chapter header keeps the route and selected-stage detail prominent.
+	var back := _level_button(canvas, "‹", Rect2(52, 49, 60, 54), show_main, false)
+	back.add_theme_font_size_override("font_size", 34)
+	back.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_text(canvas, "CHAPTER 01  /  SHANGHAI", Rect2(139, 44, 650, 23), 16, Color("8bb6c4"))
+	_text(canvas, "第一章  ·  上海", Rect2(136, 70, 670, 63), 39, Color("f5f3eb"))
+	_text(canvas, "寻找失踪的小黄", Rect2(139, 137, 650, 35), 21, Color("abc4cc"))
+	_level_fill(canvas, Rect2(52, 192, 968, 1), Color("49636a"))
 	if catalog.levels.is_empty():
-		var issues := _text(canvas, "内容配置错误\n" + "\n".join(catalog.errors), Rect2(100, 250, 1400, 450), 22)
+		var issues := _text(canvas, "内容配置错误\n" + "\n".join(catalog.errors), Rect2(90, 250, 1400, 450), 22)
 		issues.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		return
 	var ids: Array = catalog.levels.keys()
+	_text(canvas, "行动路线", Rect2(58, 213, 400, 42), 24, Color("e7edea"))
+	_text(canvas, "%02d  /  %02d  已完成" % [progress.completed.size(), ids.size()], Rect2(755, 216, 260, 35), 17, Color("8aa8ad")).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	for i in ids.size():
 		var id: String = ids[i]
 		if not progress.unlocked(id, ids): continue
-		var x := 60.0 + (i % 5) * 195.0
-		var y := 245.0 + int(i / 5) * 220.0
-		var node := _button(canvas, "✓" if progress.completed.has(id) else str(catalog.levels[id].name).get_slice(" ", 0), Rect2(x, y, 170, 75), _select_level.bind(id), id == progress.selected)
-		node.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		var label := _text(canvas, catalog.levels[id].name, Rect2(x - 5, y + 85, 180, 75), 19)
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_line(Vector2(30, 815), Vector2(1020, 815))
-	if completed: _text(canvas, "第一章完成 · 小黄的信号来自济州岛", Rect2(80, 710, 940, 60), 28, Color("dfc49b"))
+		var x := 58.0 + (i % 3) * 320.0
+		var y := 270.0 + int(i / 3) * 160.0
+		_level_card(id, Rect2(x, y, 300, 138))
+	if completed:
+		_text(canvas, "章节完成  ·  信号已锁定", Rect2(60, 781, 820, 42), 20, Color("dec995"))
+	else:
+		_text(canvas, "选择已解锁的关卡，继续追寻小黄。", Rect2(60, 781, 820, 42), 20, Color("91aaae"))
 	var level: Dictionary = catalog.levels[progress.selected]
-	var detail := Panel.new()
-	detail.position = Vector2(1090, 112); detail.size = Vector2(553, 777)
-	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.035, 0.075, 0.11, 0.90)
-	panel_style.border_color = Color("83afc3"); panel_style.set_border_width_all(1)
-	detail.add_theme_stylebox_override("panel", panel_style)
-	canvas.add_child(detail)
+	var detail := _level_panel(canvas, Rect2(1060, 52, 560, 837), Color("0a1c27ed"), Color("627f85"))
+	_text(detail, "当前关卡", Rect2(28, 19, 250, 30), 18, Color("a9c9ce"))
+	var type_label := "剧情" if level.type == "story" else "战斗"
+	var type_color := Color("e4c88d") if level.type == "story" else Color("8ad9df")
+	var badge := _level_panel(detail, Rect2(423, 18, 106, 31), Color("1c3941"), Color("49676a"))
+	_text(badge, type_label, Rect2(0, 0, 106, 31), 16, type_color).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_level_fill(detail, Rect2(28, 61, 504, 1), Color("415e62"))
 	if level.type == "battle": _add_preview(detail)
-	else: _text(detail, "剧情关卡", Rect2(40, 125, 450, 60), 32, Color("b9d9e4"))
-	_text(detail, level.name, Rect2(27, 295, 500, 65), 30)
-	var description := _text(detail, level.description, Rect2(28, 375, 490, 95), 23, Color("b9d9e4"))
+	else: _add_story_preview(detail, level)
+	var code: String = str(level.name).get_slice(" ", 0)
+	var title: String = str(level.name).trim_prefix(code).strip_edges()
+	_text(detail, code, Rect2(30, 341, 500, 34), 21, type_color)
+	var title_label := _text(detail, title, Rect2(30, 382, 500, 60), 33, Color("f4f2e8"))
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var description_text: String = level.description if level.type == "battle" or level.description != "剧情" else "阅读剧情，推进章节故事。"
+	var description := _text(detail, description_text, Rect2(30, 453, 500, 82), 20, Color("abc2c4"))
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_level_fill(detail, Rect2(30, 551, 500, 1), Color("334f54"))
 	if level.type == "battle":
-		_text(detail, "出战干员", Rect2(28, 505, 450, 32), 22, Color("a7c3d1"))
+		_text(detail, "出战干员", Rect2(30, 566, 450, 27), 17, Color("9eb8bc"))
 		var roster: Array = catalog.battle_operator_ids(progress.selected, progress.available_operators())
-		for i in roster.size():
+		for i in mini(roster.size(), 5):
 			var appearance = catalog.appearances(progress.selected, roster)[roster[i]]
-			_image(detail, Rect2(28 + i * 99, 550, 86, 83), appearance.portrait)
-			_text(detail, catalog.characters[roster[i]].stats.name, Rect2(28 + i * 99, 633, 86, 28), 18).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var action := _button(detail, "开始行动   ›", Rect2(25, 689, 505, 65), begin_action, true)
+			_image(detail, Rect2(30 + i * 95, 600, 75, 67), appearance.portrait)
+			_text(detail, catalog.characters[roster[i]].stats.name, Rect2(25 + i * 95, 670, 85, 25), 15, Color("c8d5d2")).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	else:
+		_text(detail, "剧情回顾" if progress.completed.has(progress.selected) else "故事即将展开", Rect2(30, 580, 480, 32), 19, Color("d0d9d2"))
+		_text(detail, "已完成" if progress.completed.has(progress.selected) else "完成后继续前往下一关", Rect2(30, 620, 480, 28), 16, Color("8ba9aa"))
+	var action := _level_button(detail, "开始行动   ›", Rect2(30, 737, 500, 66), begin_action, true)
 	action.name = "StartAction"
 	var issues: PackedStringArray = catalog.diagnostics(progress.selected)
 	action.disabled = not issues.is_empty()
 	if not issues.is_empty():
-		var error_label := _text(canvas, "\n".join(issues), Rect2(60, 670, 960, 120), 16, Color("ffbd9b"))
+		var error_label := _text(canvas, "\n".join(issues), Rect2(58, 825, 960, 90), 16, Color("ffbd9b"))
 		error_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	if not save_notice.is_empty(): _text(canvas, save_notice, Rect2(660, 865, 350, 28), 20, Color("ffbd9b"))
+	if not save_notice.is_empty(): _text(canvas, save_notice, Rect2(670, 856, 350, 28), 18, Color("ffbd9b"))
+
+func _level_style(color: Color, border: Color, radius := 7) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.border_color = border
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(radius)
+	return style
+
+func _level_panel(parent: Control, rect: Rect2, color: Color, border: Color) -> Panel:
+	var panel := Panel.new()
+	panel.position = rect.position; panel.size = rect.size
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", _level_style(color, border))
+	parent.add_child(panel)
+	return panel
+
+func _level_fill(parent: Control, rect: Rect2, color: Color) -> void:
+	var fill := ColorRect.new()
+	fill.position = rect.position; fill.size = rect.size; fill.color = color
+	fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(fill)
+
+func _level_button(parent: Control, label: String, rect: Rect2, action: Callable, primary: bool) -> Button:
+	var button := Button.new()
+	button.text = label; button.position = rect.position; button.size = rect.size
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_font_size_override("font_size", 25 if primary else 20)
+	button.add_theme_color_override("font_color", Color("122f32") if primary else Color("e7f2ef"))
+	button.add_theme_color_override("font_disabled_color", Color("758988"))
+	button.add_theme_stylebox_override("normal", _level_style(Color("a4dbd1") if primary else Color("122d37dd"), Color("c4f1e5") if primary else Color("72959b")))
+	button.add_theme_stylebox_override("hover", _level_style(Color("c2eee0") if primary else Color("234854"), Color("c4f1e5")))
+	button.add_theme_stylebox_override("pressed", _level_style(Color("79beb5") if primary else Color("1a3a42"), Color("a6d9d3")))
+	button.add_theme_stylebox_override("disabled", _level_style(Color("354d4d"), Color("516a69")))
+	var focus := _level_style(Color(0, 0, 0, 0), Color("e6d39c")); focus.set_border_width_all(2)
+	button.add_theme_stylebox_override("focus", focus)
+	button.pressed.connect(func(): _play_ui("sfx_ui_click"))
+	button.pressed.connect(action)
+	parent.add_child(button)
+	return button
+
+func _level_card(id: String, rect: Rect2) -> void:
+	var level: Dictionary = catalog.levels[id]
+	var selected: bool = id == progress.selected
+	var done: bool = progress.completed.has(id)
+	var story: bool = level.type == "story"
+	var accent := Color("e6c88b") if story else Color("83d7d7")
+	var button := _level_button(canvas, "", rect, _select_level.bind(id), false)
+	button.tooltip_text = level.name
+	button.add_theme_stylebox_override("normal", _level_style(Color("173a43ee") if selected else Color("0b1e28e8"), accent if selected else Color("39555a")))
+	button.add_theme_stylebox_override("hover", _level_style(Color("214954"), accent))
+	button.add_theme_stylebox_override("pressed", _level_style(Color("193d46"), accent))
+	_level_fill(button, Rect2(0, 18, 4, 102), accent if selected else Color("52777a"))
+	var code: String = str(level.name).get_slice(" ", 0)
+	var title: String = str(level.name).trim_prefix(code).strip_edges()
+	_text(button, code, Rect2(19, 13, 140, 32), 22, Color("e9f0e9"))
+	var status := _text(button, "已完成" if done else "可行动", Rect2(187, 17, 93, 25), 15, Color("a5c3bc") if done else accent)
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var title_label := _text(button, title, Rect2(19, 50, 260, 47), 19, Color("d9e6e1"))
+	title_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_level_fill(button, Rect2(19, 105, 260, 1), Color("36545a"))
+	_text(button, "剧情  /  STORY" if story else "战斗  /  BATTLE", Rect2(19, 110, 240, 20), 14, accent)
+
+func _add_story_preview(parent: Control, level: Dictionary) -> void:
+	var frame := _level_panel(parent, Rect2(24, 76, 512, 242), Color("142b31"), Color("54777b"))
+	frame.clip_contents = true
+	var script = catalog.story(level.story)
+	var opening: Dictionary = script.nodes.get(script.start, {})
+	var texture_path: String = catalog.backgrounds.get(opening.get("background", ""), "")
+	if not texture_path.is_empty():
+		var image := _image(frame, Rect2(0, 0, 512, 242), load(texture_path))
+		image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_level_fill(frame, Rect2(0, 190, 512, 52), Color(0.02, 0.06, 0.07, 0.72))
+	_text(frame, "上海  /  剧情记录", Rect2(17, 199, 430, 28), 16, Color("e6e2cc"))
 
 func _select_level(id: String) -> void:
 	if not progress.unlocked(id, catalog.levels.keys()): return
@@ -281,8 +368,9 @@ func _focus_action() -> void:
 	canvas.find_child("StartAction", true, false).grab_focus()
 
 func _add_preview(parent: Control) -> void:
+	_level_panel(parent, Rect2(24, 76, 512, 242), Color("142b31"), Color("54777b"))
 	var container := SubViewportContainer.new()
-	container.position = Vector2(22, 32); container.size = Vector2(510, 248)
+	container.position = Vector2(25, 76); container.size = Vector2(510, 242)
 	container.stretch = true
 	container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(container)
@@ -294,6 +382,7 @@ func _add_preview(parent: Control) -> void:
 	var preview = Preview.new()
 	preview.map_source = load(catalog.levels[progress.selected].map)
 	viewport.add_child(preview)
+	_level_fill(parent, Rect2(25, 76, 510, 242), Color(0.02, 0.10, 0.12, 0.35))
 
 func start_battle() -> void:
 	if not progress.unlocked(progress.selected, catalog.levels.keys()): return
