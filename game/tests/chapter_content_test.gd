@@ -40,7 +40,7 @@ func _initialize() -> void:
 		var state: Dictionary = battle.snapshot()
 		print(id, " phase=", state.phase, " life=", state.life, " time=", state.time, " killed=", state.killed, " units=", state.units.size())
 		check(state.phase == "victory", id + " replay wins")
-		if id == "scene_0104B": check(state.time >= 210, "Repair time gates victory")
+		if id == "scene_0104B": check(state.time >= 210, "Fixture defend duration gates victory")
 		if id != "scene_0101B": check(not config.roster.has("character_012"), "Missing cat is not deployable")
 		if id == "scene_0103B": check(not config.roster.has("character_015"), "Doctor joins after rescue")
 		battle.reset(); battle.start(); battle.advance(300)
