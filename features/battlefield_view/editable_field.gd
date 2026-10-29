@@ -22,7 +22,7 @@ func build_perimeter() -> void:
 	# Broken outpost ruins frame the terrain without enclosing it like a board.
 	var stone := material(Color("96998c"))
 	if not graybox:
-		stone.albedo_texture = tops[14].albedo_texture
+		stone.albedo_texture = tops[perimeter_texture_index()].albedo_texture
 		stone.uv1_triplanar = true
 		stone.uv1_world_triplanar = true
 		stone.uv1_scale = Vector3(0.65, 0.65, 0.65)
@@ -44,7 +44,7 @@ func build_city_perimeter() -> void:
 	# Low concrete curbs frame the map without covering deployable cells.
 	var concrete := material(Color("a4a8a8"))
 	if not graybox:
-		concrete.albedo_texture = tops[14].albedo_texture
+		concrete.albedo_texture = tops[perimeter_texture_index()].albedo_texture
 		concrete.uv1_triplanar = true
 		concrete.uv1_world_triplanar = true
 	var width := layout[0].length()

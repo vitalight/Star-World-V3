@@ -16,6 +16,11 @@ func surface_height(cell: Vector2i) -> float:
 	if cell.y < 0 or cell.y >= layout.size() or cell.x < 0 or cell.x >= layout[cell.y].length(): return 0.0
 	return 0.42 if layout[cell.y][cell.x] in ["H", "G", "B"] else 0.0
 
+func perimeter_texture_index() -> int:
+	for data in cells.values():
+		if int(data.get("atlas_index", -1)) >= 0: return 4
+	return 14
+
 func material(color: Color) -> StandardMaterial3D:
 	var result := StandardMaterial3D.new()
 	result.albedo_color = color
@@ -77,6 +82,8 @@ func _ready() -> void:
 			if symbol == "W": tile = 12
 			if symbol == "B": tile = 15
 			if symbol == "D": tile = 11
+			var atlas_index := int(cells.get(Vector2i(x, z), {}).get("atlas_index", -1))
+			if atlas_index >= 0 and atlas_index < tops.size(): tile = atlas_index
 			var top := MeshInstance3D.new()
 			var plane := PlaneMesh.new()
 			plane.size = Vector2(0.93, 0.93)
@@ -84,7 +91,7 @@ func _ready() -> void:
 			top.material_override = tops[tile]
 			top.position = Vector3(x, elevation + 0.002, z)
 			add_child(top)
-			top.rotation.y = (x + z) % 4 * PI / 2
+			if atlas_index < 0: top.rotation.y = (x + z) % 4 * PI / 2
 			if symbol == "G" and not graybox:
 				grass(Vector3(x, elevation + 0.04, z))
 	var rubble := material(Color("4a4d48"))
@@ -92,7 +99,7 @@ func _ready() -> void:
 		var at := decorations[i]
 		var stone := block(at, Vector3(0.45 + (i % 3) * 0.17, 0.35 + (i % 4) * 0.16, 0.6), rubble)
 		stone.rotation = Vector3(0.08 * (i % 3), i * 0.72, 0.06 * (i % 2))
-		var cap := block(at + Vector3(0, 0.19 + (i % 4) * 0.08, 0), Vector3(0.43 + (i % 3) * 0.17, 0.04, 0.58), tops[14])
+		var cap := block(at + Vector3(0, 0.19 + (i % 4) * 0.08, 0), Vector3(0.43 + (i % 3) * 0.17, 0.04, 0.58), tops[perimeter_texture_index()])
 		cap.rotation = stone.rotation
 		if i % 5 == 0:
 			var column := MeshInstance3D.new()

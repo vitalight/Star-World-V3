@@ -15,8 +15,9 @@ func cells() -> Dictionary:
 	for cell in tiles.get_used_cells():
 		var tile := tiles.get_cell_tile_data(cell)
 		if tile:
+			var atlas_index := int(tile.get_custom_data("atlas_index")) if tiles.tile_set.get_custom_data_layer_by_name("atlas_index") >= 0 else -1
 			result[cell] = {"appearance": tile.get_custom_data("appearance"), "height": tile.get_custom_data("height"),
-				"deployment": tile.get_custom_data("deployment"), "walkable": tile.get_custom_data("walkable")}
+				"deployment": tile.get_custom_data("deployment"), "walkable": tile.get_custom_data("walkable"), "atlas_index": atlas_index}
 	return result
 
 func routes() -> Dictionary:
