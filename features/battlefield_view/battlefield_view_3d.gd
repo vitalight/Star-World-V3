@@ -18,7 +18,7 @@ func surface_height(cell: Vector2i) -> float:
 
 func perimeter_texture_index() -> int:
 	for data in cells.values():
-		if int(data.get("atlas_index", -1)) >= 0: return 4
+		if int(data.get("atlas_index", -1)) >= 0: return 0
 	return 14
 
 func material(color: Color) -> StandardMaterial3D:

@@ -27,7 +27,7 @@ func run() -> void:
 				await process_frame
 			check(game.last_state.paused, "Final stage skip starts from a paused running battle")
 		var air_markers: Array = game.markers.get_children().filter(func(marker): return marker.get_meta("is_air", false))
-		check(air_markers.size() == (1 if id in ["scene_0102B", "scene_0104C"] else 0), "Flying routes use a distinct aerial entry marker")
+		check(air_markers.size() == (1 if id in ["scene_0102B", "scene_0103B", "scene_0104C"] else 0), "Flying routes use a distinct aerial entry marker")
 		if not air_markers.is_empty():
 			var air = air_markers[0]
 			check(air.get_children().any(func(child): return child is Sprite3D) and air.get_meta("endpoint_cell") == Vector2i(0, 0), "Aerial marker uses its texture at the flying route start")

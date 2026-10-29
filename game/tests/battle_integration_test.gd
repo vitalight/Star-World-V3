@@ -26,23 +26,24 @@ func run() -> void:
 	check(tiles.tile_set.resource_path == "res://content/terrains/terrain_003/tileset.tres", "Test map uses marker TileSet")
 	check(map.terrain_atlas.resource_path == "res://content/terrains/terrain_003/atlas.png" and map.background_texture == chapter_map.background_texture and map.perimeter_style == chapter_map.perimeter_style, "Test map uses marker atlas and chapter setting")
 	chapter_map.free()
-	var cell := Vector2i(0, 0)
-	for pair in [[Vector2i(0, 0), "ground", 0.0], [Vector2i(0, 1), "high", 0.42], [Vector2i(1, 1), "high", 0.42], [Vector2i(2, 0), "none", 0.0], [Vector2i(2, 1), "none", 0.42]]:
+	var cell := Vector2i(3, 0)
+	var original_atlas: Vector2i = tiles.get_cell_atlas_coords(cell)
+	for pair in [[Vector2i(0, 1), "ground", 0.0], [Vector2i(0, 0), "high", 0.42], [Vector2i(2, 0), "high", 0.42], [Vector2i(3, 1), "none", 0.0], [Vector2i(3, 0), "none", 0.42]]:
 		tiles.set_cell(cell, 0, pair[0])
 		var config: Dictionary = map.configuration()
 		check(config.terrain.get(cell, "none") == pair[1], "Tile edit changes deployment: " + str(pair[0]))
 		check(is_equal_approx(map.cells()[cell].height, pair[2]), "Tile edit changes elevation")
 	check(map.cells()[cell].appearance == "B" and not map.cells()[cell].walkable, "Blocked elevated tile has distinct appearance and blocks routes")
-	tiles.set_cell(cell, 0, Vector2i(2, 0))
+	tiles.set_cell(cell, 0, Vector2i(3, 1))
 	check(map.cells()[cell].appearance == "D" and is_zero_approx(map.cells()[cell].height) and map.cells()[cell].deployment == "none" and not map.cells()[cell].walkable, "Blocked ground is level with ground and rejects deployment and routes")
 	tiles.erase_cell(cell)
 	check(not map.cells().has(cell) and not map.configuration().terrain.has(cell), "Erasing tile removes both visual and deployment data")
-	tiles.set_cell(cell, 0, Vector2i(0, 0))
+	tiles.set_cell(cell, 0, original_atlas)
 	tiles.erase_cell(Vector2i(2, 1))
 	check(not map.errors().is_empty(), "Route hole rejected")
-	tiles.set_cell(Vector2i(2, 1), 0, Vector2i(3, 0))
+	tiles.set_cell(Vector2i(2, 1), 0, Vector2i(3, 1))
 	check(not map.errors().is_empty(), "Water on route rejected")
-	tiles.set_cell(Vector2i(2, 1), 0, Vector2i(0, 0))
+	tiles.set_cell(Vector2i(2, 1), 0, Vector2i(0, 1))
 	var path: Path2D = map.get_node("Routes/upper")
 	path.curve = path.curve.duplicate()
 	path.curve.set_point_position(1, Vector2(608, 100))
@@ -59,6 +60,12 @@ func run() -> void:
 	var game = Scene.instantiate()
 	root.add_child(game)
 	game.set_process(false)
+	for points in game.configuration.routes.values():
+		for endpoint in [points[0], points[-1]]:
+			var endpoint_cell := Vector2i(endpoint.round())
+			check(not game.configuration.terrain.has(endpoint_cell), "Route endpoint is absent from deployable terrain")
+			for roster_id in game.configuration.roster:
+				check(not game.battle.deployment_check(roster_id, endpoint_cell).ok, "Deployment is rejected at every route endpoint")
 	var air_markers: Array = game.markers.get_children().filter(func(marker): return marker.get_meta("is_air", false))
 	check(air_markers.size() == 1 and air_markers[0].get_meta("endpoint_cell") == Vector2i(0, 0), "Game Test shows the flying marker at the sample air route")
 	check(air_markers.size() == 1 and air_markers[0].get_child_count() == 3, "Flying marker includes two planar frames and the air icon")
@@ -148,8 +155,8 @@ func run() -> void:
 	authored.level.life = 5
 	authored.level.waves[0].count = 2
 	var authored_tiles: TileMapLayer = authored.get_node("Terrain")
-	authored_tiles.set_cell(Vector2i(0, 0), 0, Vector2i(0, 0))
-	authored_tiles.set_cell(Vector2i(1, 0), 0, Vector2i(3, 0))
+	authored_tiles.set_cell(Vector2i(0, 0), 0, Vector2i(0, 1))
+	authored_tiles.set_cell(Vector2i(1, 0), 0, Vector2i(3, 1))
 	authored_tiles.erase_cell(Vector2i(9, 5))
 	var edited := PackedScene.new()
 	check(edited.pack(authored) == OK, "Edited map packs")
@@ -159,7 +166,7 @@ func run() -> void:
 	game.reload_level(); game.set_process(false)
 	check(game.validation_errors.is_empty(), "Reload accepts edited level")
 	check(game.last_state.life == 5 and game.configuration.waves[0].count == 2, "Inspector life and wave edits reach simulation")
-	check(game.configuration.terrain[Vector2i(0, 0)] == "ground" and game.field.surface_height(Vector2i(0, 0)) == 0, "Saved terrain changes both simulation and 3D elevation")
+	check(not game.configuration.terrain.has(Vector2i(0, 0)) and game.field.surface_height(Vector2i(0, 0)) == 0, "Saved terrain changes 3D elevation while the route endpoint remains unavailable")
 	check(not game.configuration.terrain.has(Vector2i(1, 0)) and game.field.cells[Vector2i(1, 0)].appearance == "D", "Saved blocked ground renders and is not deployable")
 	check(not game.field.cells.has(Vector2i(9, 5)) and not game.configuration.terrain.has(Vector2i(9, 5)), "Saved empty cell has no tile or deployment")
 	authored_tiles.erase_cell(Vector2i(2, 1))
@@ -210,7 +217,7 @@ func verify_roster(game: Node3D) -> void:
 	fragile.roster.guard.defense = 0.0
 	game.battle = Battle.new(fragile)
 	game.reset()
-	game.command("deploy", ["guard", Vector2i(0, 1), 2])
+	game.command("deploy", ["guard", Vector2i(2, 1), 2])
 	game.start()
 	var died := false
 	for tick in 200:

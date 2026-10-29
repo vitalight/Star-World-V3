@@ -13,6 +13,12 @@ func _initialize() -> void:
 		if not scene is PackedScene: continue
 		var map = scene.instantiate()
 		errors.append_array(catalog.map_errors(id, map))
+		var config: Dictionary = catalog.configuration(id, map)
+		for points in config.routes.values():
+			if points.size() >= 2:
+				for point in [points[0], points[-1]]:
+					if config.terrain.has(Vector2i(point.round())):
+						errors.append("%s: route endpoint is deployable" % id)
 		map.free()
 	for message in errors: push_error(message)
 	print("CHAPTER AUTHORING: %d stages, %d errors" % [catalog.levels.size(), errors.size()])

@@ -1,8 +1,8 @@
 [gd_scene format=4 uid="uid://ct8olvnn3h8wg"]
 
 [ext_resource type="Script" uid="uid://bisvoo3t28cx3" path="res://features/battlefield_view/editable_map.gd" id="1_7ssyb"]
-[ext_resource type="TileSet" uid="uid://de1aa3jibewyy" path="res://content/terrains/terrain_002/tileset.tres" id="2_5njth"]
-[ext_resource type="Texture2D" uid="uid://cnvxtga0xfvpm" path="res://content/terrains/terrain_002/atlas_blocked_v2.png" id="city_atlas"]
+[ext_resource type="TileSet" path="res://content/terrains/terrain_003/tileset.tres" id="2_5njth"]
+[ext_resource type="Texture2D" uid="uid://bkp6jn3unlaka" path="res://content/terrains/terrain_003/atlas.png" id="city_atlas"]
 [ext_resource type="Texture2D" uid="uid://bynwgtqpfr21h" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
 
 [sub_resource type="Curve2D" id="Curve2D_q6e7n"]
@@ -20,7 +20,7 @@ perimeter_style = 1
 external_level = true
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=735756813]
-tile_map_data = PackedByteArray("AAABAAEAAAAAAAEAAAABAAIAAAAAAAAAAAABAAMAAAAAAAAAAAACAAEAAAAAAAEAAAACAAIAAAAAAAEAAAACAAMAAAAAAAAAAAADAAEAAAAAAAEAAAADAAIAAAAAAAEAAAADAAMAAAAAAAEAAAAEAAEAAAAAAAAAAAAEAAIAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAEAAAAAAAAAAAAFAAIAAAAAAAAAAAAFAAMAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAEAAAADAAAAAAAAAAEAAAAEAAAAAAAAAAAAAAAFAAAAAAABAAMAAAAAAAAAAAAAAAEAAAAAAAEAAAABAAMAAAAAAAIAAAABAAMAAAAAAAMAAAABAAMAAAA=")
+tile_map_data = PackedByteArray("AAABAAEAAAAAAAEAAAABAAIAAAAAAAAAAAABAAMAAAAAAAAAAAACAAEAAAAAAAEAAAACAAIAAAAAAAEAAAACAAMAAAAAAAAAAAADAAEAAAAAAAEAAAADAAIAAAAAAAEAAAADAAMAAAAAAAEAAAAEAAEAAAAAAAAAAAAEAAIAAAAAAAEAAAAEAAMAAAAAAAEAAAAFAAEAAAAAAAAAAAAFAAIAAAAAAAAAAAAFAAMAAAAAAAEAAAABAAAAAAAAAAEAAAACAAAAAAAAAAEAAAADAAAAAAAAAAEAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAA=")
 tile_set = ExtResource("2_5njth")
 
 [node name="Routes" type="Node2D" parent="." unique_id=541382906]

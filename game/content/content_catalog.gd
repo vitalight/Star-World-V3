@@ -148,11 +148,7 @@ func battle_operator_ids(id: String, operator_ids: Array = []) -> Array:
 func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionary:
 	var result: Dictionary = levels[id].duplicate(true)
 	result.roster = operator_configuration(battle_operator_ids(id, operator_ids))
-	result.terrain = {}
-	var cells: Dictionary = map.cells()
-	for cell in cells:
-		var data: Dictionary = cells[cell]
-		if data.deployment in ["ground", "high"]: result.terrain[cell] = data.deployment
+	result.terrain = map.deployment_terrain()
 	result.routes = map.routes()
 	return result
 

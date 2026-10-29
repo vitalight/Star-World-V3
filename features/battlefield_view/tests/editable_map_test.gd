@@ -16,6 +16,10 @@ func _initialize() -> void:
 	var map = MAP.instantiate()
 	root.add_child(map)
 	check(map.errors().is_empty(), "Sample map validates: " + str(map.errors()))
+	var terrain_config: Dictionary = map.deployment_terrain()
+	for points in map.routes().values():
+		check(not terrain_config.has(Vector2i(points[0].round())) and not terrain_config.has(Vector2i(points[-1].round())), "Route endpoints cannot be deployed on")
+	check(terrain_config.has(Vector2i(3, 0)), "Ordinary deployable terrain remains available")
 
 	# A ground route may not cross high platforms.
 	var ground := route(map, "ground_over_high", [Vector2i(0, 0), Vector2i(2, 0), Vector2i(2, 2)])
@@ -27,6 +31,7 @@ func _initialize() -> void:
 	flying.set_meta("flying", true)
 	check(map.errors().is_empty(), "Flying route may start on a high platform: " + str(map.errors()))
 	check(map.flying_routes().has("air_over_high"), "Flying routes expose their metadata to content checks")
+	check(not map.deployment_terrain().has(Vector2i(2, 2)), "Flying route endpoints cannot be deployed on")
 	flying.free()
 
 	# Flying routes may also cross blocked ground such as water.

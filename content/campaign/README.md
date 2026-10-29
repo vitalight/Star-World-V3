@@ -26,6 +26,7 @@ CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` �
 - `type=story` 只填写 story；`type=battle` 填写 map 与战斗数值，story 留空。
 - `waves.csv` 的 `time` 为绝对战斗时刻（秒），`number` 只用于显示，`interval` 为同组出怪间隔；每关至少一组波次。
 - `defend_duration=0` 表示普通清怪关；大于 0 时需计时结束、清空敌人并守住基地才能获胜。
+- 敌人路线的起点和终点不可部署干员，包括飞行路线；其他格子仍按地块的部署属性判定。
 - backgrounds.csv 只登记正式贴图，不要引用 Human 或 temp。
 
 ## 玩家队伍
@@ -87,4 +88,4 @@ $env:APPDATA = Join-Path $PWD 'temp/chapter_one/user'
 - `chapter_content_test` 使用 `game/tests/fixtures/chapter/` 的固定夹具回放，不随正式关卡变化；`chapter_authoring_test` 校验当前正式内容。最后一项使用真实窗口输入。
 - `.tres` 随资源索引导出；CSV／MD 由 `export_presets.cfg` 显式包含。编辑内容后需重新导出验证。
 
-- 可选地形图集 terrain_003：地图的 Terrain 使用 `content/terrains/terrain_003/tileset.tres`，同时将 `terrain_atlas` 指向同目录 `atlas.png`。按行依次为普通地面、普通高台、特殊地面、特殊高台；前两行各为可部署两格、不可部署两格。特殊格目前只有对应地面／高台的部署与通行规则，图案不产生战斗效果。旧图集和旧地图保持原有规则。
+- 城市地形图集 terrain_003：地图的 Terrain 使用 `content/terrains/terrain_003/tileset.tres`，同时将 `terrain_atlas` 指向同目录 `atlas.png`。图集和编辑器面板均由 `Human/StarterContent/terrain/terrain_markers_v3.png` 整图缩放，保留原图全部 16 格。按行依次为普通高台、普通地面、特殊高台、特殊地面；前两行各为可部署三格、不可部署一格。特殊格目前只有对应地面／高台的部署与通行规则，图案不产生战斗效果。第一章战斗地图和开发样例均使用此图集。

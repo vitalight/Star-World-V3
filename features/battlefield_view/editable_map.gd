@@ -107,12 +107,19 @@ func _check_route_cell(result: PackedStringArray, data: Dictionary, route: Strin
 	if not bounds.has_point(cell) or not data.has(cell) or (not flying and not data[cell].walkable):
 		result.append("Route %s: %s 越界、断路或不可通行" % [route, cell])
 
-func configuration() -> Dictionary:
+func deployment_terrain() -> Dictionary:
 	var terrain := {}
 	var data := cells()
 	for cell in data:
 		if data[cell].deployment in ["ground", "high"]: terrain[cell] = data[cell].deployment
-	return level.configuration(terrain, routes())
+	for points in routes().values():
+		if points.size() >= 2:
+			terrain.erase(Vector2i(points[0].round()))
+			terrain.erase(Vector2i(points[-1].round()))
+	return terrain
+
+func configuration() -> Dictionary:
+	return level.configuration(deployment_terrain(), routes())
 
 func _get_configuration_warnings() -> PackedStringArray:
 	if not has_node("Terrain") or not has_node("Routes"): return PackedStringArray(["需要 Terrain 和 Routes 节点"])

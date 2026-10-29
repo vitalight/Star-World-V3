@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ckuhvdap70vxc"
-path="res://.godot/imported/terrain_markers_v2.png-fbccafd3c73e43027f96790088db2e22.ctex"
+uid="uid://buvvxnhuawdwl"
+path="res://.godot/imported/terrain_markers_v3.png-bf1d2dcdc3d948182f0abcc88cc19521.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Human/StarterContent/terrain/terrain_markers_v2.png"
-dest_files=["res://.godot/imported/terrain_markers_v2.png-fbccafd3c73e43027f96790088db2e22.ctex"]
+source_file="res://Human/StarterContent/terrain/terrain_markers_v3.png"
+dest_files=["res://.godot/imported/terrain_markers_v3.png-bf1d2dcdc3d948182f0abcc88cc19521.ctex"]
 
 [params]
 

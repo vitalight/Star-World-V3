@@ -1,35 +1,37 @@
-[gd_scene format=4]
+[gd_scene format=4 uid="uid://cd775c1yh6e1g"]
 
-[ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_map"]
-[ext_resource type="TileSet" path="res://content/terrains/terrain_002/tileset.tres" id="2_tiles"]
-
-[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/atlas_blocked_v2.png" id="city_atlas"]
-
-[ext_resource type="Texture2D" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
+[ext_resource type="Script" uid="uid://bisvoo3t28cx3" path="res://features/battlefield_view/editable_map.gd" id="1_map"]
+[ext_resource type="TileSet" uid="uid://cn1bd02rhmp8k" path="res://content/terrains/terrain_003/tileset.tres" id="2_tiles"]
+[ext_resource type="Texture2D" uid="uid://bkp6jn3unlaka" path="res://content/terrains/terrain_003/atlas.png" id="city_atlas"]
+[ext_resource type="Texture2D" uid="uid://bynwgtqpfr21h" path="res://content/terrains/terrain_002/city_backdrop_v2.png" id="city_bg"]
 
 [sub_resource type="Curve2D" id="Curve2D_upper"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 544, 96, 0, 0, 0, 0, 544, 160, 0, 0, 0, 0, 544, 224, 0, 0, 0, 0, 608, 224)
+"points": PackedVector2Array(0, 0, 0, 0, 32, 224, 0, 0, 0, 0, 160, 224, 0, 0, 0, 0, 160, 96, 0, 0, 0, 0, 416, 96, 0, 0, 0, 0, 416, 160, 0, 0, 0, 0, 544, 160, 0, 0, 0, 0, 544, 224, 0, 0, 0, 0, 608, 224)
 }
-point_count = 5
+point_count = 8
 
 [sub_resource type="Curve2D" id="Curve2D_lower"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 288, 0, 0, 0, 0, 416, 288, 0, 0, 0, 0, 416, 224, 0, 0, 0, 0, 608, 224)
+"points": PackedVector2Array(0, 0, 0, 0, 32, 224, 0, 0, 0, 0, 96, 224, 0, 0, 0, 0, 96, 160, 0, 0, 0, 0, 224, 160, 0, 0, 0, 0, 224, 96, 0, 0, 0, 0, 480, 96, 0, 0, 0, 0, 480, 224, 0, 0, 0, 0, 608, 224)
+}
+point_count = 8
+
+[sub_resource type="Curve2D" id="Curve2D_air"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 480, 32, 0, 0, 0, 0, 480, 224, 0, 0, 0, 0, 608, 224)
 }
 point_count = 4
 
 [node name="EditableMap" type="Node2D" unique_id=1200087109]
 script = ExtResource("1_map")
-bounds = Rect2i(0, 0, 10, 6)
-tint = Color(1, 1, 1, 1)
 terrain_atlas = ExtResource("city_atlas")
 background_texture = ExtResource("city_bg")
 perimeter_style = 1
 external_level = true
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=1301152019]
-tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAABAAEAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAIAAEAAAAAAAEAAAAJAAEAAAAAAAAAAAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAABAAMAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAAAAAAAAAAIAAIAAAAAAAEAAAAJAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAABAAMAAAAAAAAAAAACAAMAAAAAAAAAAAADAAMAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAAAAAEAAAAHAAMAAAAAAAEAAAAIAAMAAAAAAAEAAAAJAAMAAAAAAAEAAAAAAAQAAAAAAAEAAAABAAQAAAAAAAEAAAACAAQAAAAAAAEAAAADAAQAAAAAAAEAAAAEAAQAAAAAAAEAAAAFAAQAAAAAAAEAAAAGAAQAAAAAAAEAAAAHAAQAAAAAAAEAAAAIAAQAAAAAAAAAAAAJAAQAAAAAAAAAAAAAAAUAAAAAAAAAAAABAAUAAAAAAAAAAAACAAUAAAAAAAAAAAADAAUAAAAAAAAAAAAEAAUAAAAAAAAAAAAFAAUAAAAAAAAAAAAGAAUAAAAAAAAAAAAHAAUAAAAAAAAAAAAIAAUAAAAAAAAAAAAJAAUAAAAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAAAAAAAAADAAAAAAAAAAEAAAADAAAAAAABAAAAAAADAAAAAAABAAEAAAADAAAAAAACAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAACAAAAAAAIAAEAAAACAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAADAAMAAAACAAAAAAAEAAMAAAACAAAAAAAFAAMAAAACAAAAAAAGAAMAAAACAAAAAAACAAQAAAAAAAAAAAADAAQAAAAAAAAAAAAEAAQAAAAAAAAAAAAFAAQAAAAAAAAAAAAGAAQAAAAAAAAAAAAHAAQAAAAAAAAAAAAIAAQAAAAAAAAAAAAJAAAAAAADAAAAAAAJAAEAAAADAAAAAAAJAAIAAAADAAAAAAAJAAQAAAADAAAAAAAAAAQAAAADAAAAAAABAAQAAAADAAAAAAAAAAIAAAADAAAAAAAAAAMAAAAAAAEAAAABAAMAAAAAAAEAAAACAAMAAAAAAAEAAAABAAIAAAAAAAEAAAACAAIAAAAAAAEAAAADAAIAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAGAAIAAAAAAAEAAAAHAAIAAAAAAAEAAAAIAAIAAAAAAAEAAAAHAAMAAAAAAAEAAAAIAAMAAAAAAAEAAAAJAAMAAAAAAAEAAAA=")
 tile_set = ExtResource("2_tiles")
 
 [node name="Routes" type="Node2D" parent="." unique_id=1414296799]
@@ -39,3 +41,7 @@ curve = SubResource("Curve2D_upper")
 
 [node name="lower" type="Path2D" parent="Routes" unique_id=1500086978]
 curve = SubResource("Curve2D_lower")
+
+[node name="air" type="Path2D" parent="Routes"]
+curve = SubResource("Curve2D_air")
+metadata/flying = true

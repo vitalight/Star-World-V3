@@ -9,6 +9,7 @@ wave_007,scene_0103B,3,4,8,enemy_001,upper,1
 wave_008,scene_0103B,18,3,9,enemy_001,lower,2
 wave_009,scene_0103B,57,4,7,enemy_002,upper,3
 wave_010,scene_0103B,72,3,8,enemy_001,lower,4
+wave_042,scene_0103B,90,2,10,enemy_005,air,4
 wave_011,scene_0103B,105,2,15,enemy_003,upper,5
 wave_012,scene_0103B,122,4,7,enemy_001,lower,6
 wave_013,scene_0103B,158,2,8,enemy_002,upper,7
