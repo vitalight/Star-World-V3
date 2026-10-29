@@ -1,37 +1,37 @@
-[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://cpb2i6gk4agxy"]
+[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://ba740lao08acr"]
 
-[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="appearance_1"]
-[ext_resource type="Texture2D" uid="uid://b0gl61e1xb20w" path="res://content/characters/character_011/atlas.png" id="appearance_atlas"]
-[ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="class_atlas"]
-[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="script"]
-[ext_resource type="Resource" path="res://content/data/skill_001.tres" id="skill"]
-[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="stats_type"]
+[ext_resource type="Texture2D" uid="uid://b0gl61e1xb20w" path="res://content/characters/character_011/atlas.png" id="1_xe225"]
+[ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="2_0a01o"]
+[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="3_cqbna"]
+[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="4_4rfd4"]
+[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="5_o4m4v"]
+[ext_resource type="Resource" uid="uid://bvt6ll2ypsvcd" path="res://content/data/skill_001.tres" id="6_unmrp"]
 
 [sub_resource type="AtlasTexture" id="ClassIcon"]
-atlas = ExtResource("class_atlas")
+atlas = ExtResource("2_0a01o")
 region = Rect2(940.5, 0, 313.5, 313.5)
 filter_clip = true
 
 [sub_resource type="Resource" id="Appearance"]
-script = ExtResource("appearance_1")
-atlas = ExtResource("appearance_atlas")
+script = ExtResource("3_cqbna")
+atlas = ExtResource("1_xe225")
 class_icon = SubResource("ClassIcon")
 
 [sub_resource type="Resource" id="Stats"]
-script = ExtResource("stats_type")
+script = ExtResource("5_o4m4v")
 content_id = "character_011"
 display_name = "大星"
-max_hp = 1600.0
-attack = 90.0
-defense = 45.0
+max_hp = 1200.0
+attack = 110.0
+defense = 40.0
 resistance = 5.0
 interval = 1.0
-cost = 15.0
-redeploy_time = 20.0
-skill_spec = ExtResource("skill")
+cost = 16.0
+redeploy_time = 45.0
+skill_spec = ExtResource("6_unmrp")
 
 [resource]
-script = ExtResource("script")
+script = ExtResource("4_4rfd4")
 stats = SubResource("Stats")
 appearance = SubResource("Appearance")
 identity = "主角"

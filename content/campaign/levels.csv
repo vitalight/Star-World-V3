@@ -1,8 +1,8 @@
 id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,roster_mode,fixed_roster,music
 scene_0101A,1-1A 长夜忽至,剧情,story,res://content/scenes/scene_0101A/story_scene_0101A.md,,,,,,,,,,music_tension
-scene_0101B,1-1B 长夜忽至,守住家门，击退来袭的敌人。,battle,,res://content/scenes/scene_0101B/map.tscn,5,10,99,1,2,0,fixed,character_011|character_012,
+scene_0101B,1-1B 长夜忽至,守住家门，击退来袭的敌人。,battle,,res://content/scenes/scene_0101B/map.tscn,3,0,99,1,2,0,fixed,character_011|character_012,
 scene_0102A,1-2A 逐光而来,剧情,story,res://content/scenes/scene_0102A/story_scene_0102A.md,,,,,,,,,,music_tension
-scene_0102B,1-2B 逐光而来,与阿五和胡胡清除家中的残余怪物。,battle,,res://content/scenes/scene_0102B/map.tscn,5,10,99,1,3,0,fixed,character_011|character_013|character_014,
+scene_0102B,1-2B 逐光而来,与阿五和胡胡清除家中的残余怪物。,battle,,res://content/scenes/scene_0102B/map.tscn,3,5,99,1,3,0,fixed,character_011|character_013|character_014,
 scene_0103A,1-3A 余响未绝,剧情,story,res://content/scenes/scene_0103A/story_scene_0103A.md,,,,,,,,,,music_tension
 scene_0103B,1-3B 余响未绝,追踪根节点，救援被怪物包围的月月。,battle,,res://content/scenes/scene_0103B/map.tscn,5,10,99,1,3,0,fixed,character_011|character_013|character_014,
 scene_0104A,1-4A 明珠失辉,剧情,story,res://content/scenes/scene_0104A/story_scene_0104A.md,,,,,,,,,,music_tension

@@ -30,6 +30,7 @@ signal debug_victory_requested
 signal continue_requested
 signal ui_sound_requested(id: String)
 var developer_tools_enabled := false
+var replay_mode := false
 ## Optional nine-slice panel art supplied by the game composition layer.
 var panel_texture: Texture2D
 var dragged_roster := ""
@@ -100,6 +101,9 @@ func _ready() -> void:
 	add_child(top)
 	var menu_button := _button(top, "☰", func(): game_menu.visible = not game_menu.visible)
 	menu_button.accessibility_name = "战斗菜单"
+	if replay_mode:
+		var replay_label := _label(top, "回放中", 20)
+		replay_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -340,7 +344,7 @@ func _ready() -> void:
 	var menu_items := VBoxContainer.new()
 	game_menu.add_child(menu_items)
 	_button(menu_items, "退出战斗", func(): menu_requested.emit())
-	_button(menu_items, "重新开始", func(): game_menu.hide(); replay_requested.emit())
+	if not replay_mode: _button(menu_items, "重新开始", func(): game_menu.hide(); replay_requested.emit())
 	game_menu.hide()
 	developer_panel = _panel_container()
 	developer_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
@@ -355,14 +359,14 @@ func _ready() -> void:
 	developer_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	debug_victory_button = _button(developer_items, "跳过战斗并胜利", func():
 		debug_victory_requested.emit())
-	developer_panel.visible = developer_tools_enabled
+	developer_panel.visible = developer_tools_enabled and not replay_mode
 	end_panel = _panel_container()
 	end_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	var ending := VBoxContainer.new()
 	end_panel.add_child(ending)
 	end_label = _label(ending, "", 32)
 	result_button = _button(ending, "重新挑战", func():
-		if result_victory: continue_requested.emit()
+		if result_victory or replay_mode: continue_requested.emit()
 		else: replay_requested.emit())
 	end_panel.hide()
 	resized.connect(_fit)
@@ -546,7 +550,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	economy.text = "◇ %d" % floori(state.cost)
 	deployment_count.text = "可部署干员：%d" % maxi(0, deploy_limit - state.units.size())
 	set_playback(state.paused, speed)
-	pause_button.disabled = finished
+	pause_button.disabled = finished or replay_mode
 	speed_button.disabled = finished
 	debug_victory_button.disabled = finished
 	if finished: developer_panel.hide()
@@ -560,7 +564,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	for key in cards:
 		var cooldown: float = state.redeploy[key]
 		cards[key].button.visible = not deployed.has(key)
-		cards[key].button.disabled = finished or cooldown > 0
+		cards[key].button.disabled = finished or replay_mode or cooldown > 0
 		cards[key].portrait.modulate = Color(0.5, 0.5, 0.5) if state.cost < roster[key].cost else Color.WHITE
 		cards[key].cooldown.visible = cooldown > 0
 		cards[key].timer.text = "%.1f" % cooldown
@@ -603,7 +607,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		_position_operator_actions()
 	end_panel.visible = finished
 	result_victory = state.phase == "victory"
-	result_button.text = "继续" if result_victory else "重新挑战"
+	result_button.text = "返回关卡" if replay_mode else ("继续" if result_victory else "重新挑战")
 	if finished:
 		deployment_cancel_button.hide()
 		end_label.text = "防守成功" if state.phase == "victory" else "基地失守"

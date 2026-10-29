@@ -1,32 +1,31 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://b02w7430n5y25"]
 
 [ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="script"]
 
 [ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="stats_type"]
-[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance_2_fly"]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance_2_hayiw"]
 
 [ext_resource type="Texture2D" path="res://content/enemies/enemy_001/atlas.png" id="formal_atlas"]
 
 [sub_resource type="Resource" id="Stats"]
 script = ExtResource("stats_type")
 content_id = "enemy_005"
-display_name = "浮空裂隙"
-max_hp = 300
-attack = 0
-defense = 8
-resistance = 10
+display_name = "节点重影"
+max_hp = 650
+attack = 95
+defense = 25
+resistance = 5
 interval = 1.5
-windup = 0.2
-speed = 1.0
+windup = 0.3
+speed = 0.3
 ranged = false
-flying = true
-leak_damage = 1
+leak_damage = 2
 attack_range = 0
 
 [sub_resource type="Resource" id="Appearance"]
-script = ExtResource("appearance_2_fly")
+script = ExtResource("appearance_2_hayiw")
 atlas = ExtResource("formal_atlas")
-atlas_row = 3
+atlas_row = 4
 height = 1.02
 
 [resource]

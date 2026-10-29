@@ -18,8 +18,10 @@ const AudioDirector = preload("res://features/audio/audio_director.gd")
 const AudioSettings = preload("res://features/audio/audio_settings.gd")
 const Cues = preload("res://content/audio/cues.tres")
 const DESIGN_SIZE := Vector2(1672, 941)
+const SAVE_SLOT_COUNT := 3
 @export var save_path := "user://player_progress.cfg"
 @export var audio_settings_path := "user://audio_settings.cfg"
+@export var replay_directory := "user://battle_replays"
 @export var developer_mode := false
 var page := ""
 var menu: Control
@@ -42,6 +44,8 @@ var tutorial: PanelContainer
 var tutorial_seen := false
 var selected_squad: Array[String] = []
 var squad_level := ""
+var selected_slot := 1
+var slot_notice := ""
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -69,7 +73,7 @@ func _play_ui(id: String) -> void:
 func _load_progress() -> void:
 	progress = Progress.new()
 	if not developer_mode:
-		progress.load_progress(save_path, catalog.levels.keys())
+		progress.load_progress(_slot_path(selected_slot), catalog.levels.keys())
 	elif not catalog.levels.is_empty():
 		progress.selected = str(catalog.levels.keys()[0])
 	progress.configure_operators(catalog.starting_operators, catalog.recruits, catalog.characters.keys(), catalog.departures, catalog.returns)
@@ -77,7 +81,7 @@ func _load_progress() -> void:
 	completed = progress.completed.size() == catalog.levels.size() and not catalog.levels.is_empty()
 
 func _save_progress() -> void:
-	var result: Error = OK if developer_mode else progress.save(save_path)
+	var result: Error = OK if developer_mode else progress.save(_slot_path(selected_slot))
 	save_notice = "" if result == OK else "进度未能保存"
 	has_progress = progress.started
 	completed = progress.completed.size() == catalog.levels.size() and not catalog.levels.is_empty()
@@ -120,7 +124,7 @@ func _menu_page(kind: String, shade: float) -> void:
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(menu)
 	var background := TextureRect.new()
-	background.texture = MainBackground if kind == "main" else (LevelsBackground if kind == "levels" else Background)
+	background.texture = MainBackground if kind == "main" else (LevelsBackground if kind in ["levels", "saves"] else Background)
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -153,9 +157,9 @@ func show_main() -> void:
 	title.add_theme_constant_override("shadow_offset_x", 4)
 	title.add_theme_constant_override("shadow_offset_y", 6)
 	title.add_theme_constant_override("shadow_outline_size", 3)
-	_main_button("开始游戏", Rect2(641, 514, 390, 69), new_game)
-	var resume := _main_button("读取存档", Rect2(641, 601, 390, 69), resume_game)
-	resume.disabled = not has_progress
+	_main_button("开始游戏", Rect2(641, 514, 390, 69), new_game if developer_mode else show_save_slots)
+	var resume := _main_button("读取存档", Rect2(641, 601, 390, 69), resume_game if developer_mode else show_save_slots)
+	resume.disabled = not has_progress if developer_mode else not _any_save_exists()
 	if developer_mode: _text(canvas, "开发者模式", Rect2(48, 42, 250, 35), 19, Color("ffe2a0"))
 	_main_button("退出游戏", Rect2(641, 688, 390, 69), func(): get_tree().quit())
 	var settings := _level_button(canvas, "设置", Rect2(1538, 42, 64, 64), show_settings, false)
@@ -167,6 +171,125 @@ func show_main() -> void:
 		settings.add_theme_stylebox_override(state, style)
 	for color_name in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		settings.add_theme_color_override(color_name, Color.TRANSPARENT)
+
+func _slot_path(slot: int) -> String:
+	if slot == 1: return save_path
+	return save_path.get_basename() + "_slot_%d." % slot + save_path.get_extension() if not save_path.get_extension().is_empty() else save_path + "_slot_%d" % slot
+
+func _any_save_exists() -> bool:
+	for slot in range(1, SAVE_SLOT_COUNT + 1):
+		if FileAccess.file_exists(_slot_path(slot)): return true
+	return false
+
+func show_save_slots() -> void:
+	_menu_page("saves", 0.48)
+	_play_music("music_main")
+	var back := _level_button(canvas, "‹", Rect2(48, 50, 60, 58), show_main, false)
+	back.add_theme_font_size_override("font_size", 36)
+	_image(canvas, Rect2(130, 30, 95, 100), MainEmblem)
+	_text(canvas, "选择存档", Rect2(230, 47, 400, 56), 34, Color("f4f3f4"))
+	_level_fill(canvas, Rect2(75, 174, 1520, 1), Color("7288a2"))
+	if not slot_notice.is_empty(): _text(canvas, slot_notice, Rect2(82, 754, 1000, 40), 21, Color("ffbd9b"))
+	for slot in range(1, SAVE_SLOT_COUNT + 1):
+		var path := _slot_path(slot)
+		var exists := FileAccess.file_exists(path)
+		var saved = Progress.new()
+		if exists: saved.load_progress(path, catalog.levels.keys())
+		var playable: bool = saved.started or not saved.pending_after.is_empty()
+		var panel := _level_panel(canvas, Rect2(75 + (slot - 1) * 510, 224, 490, 480), Color("101f36ed"), Color("536a89"))
+		panel.name = "SaveSlot%d" % slot
+		_level_fill(panel, Rect2(0, 0, 5, 480), Color("ffe1a1") if playable else Color("526b86"))
+		_text(panel, "%02d" % slot, Rect2(30, 25, 90, 64), 43, Color("ffe1a1") if playable else Color("7890ad"))
+		_text(panel, "存档 %d" % slot, Rect2(113, 33, 220, 42), 27, Color("f7f4ef"))
+		_text(panel, "已有进度" if playable else ("无法读取" if exists else "空存档"), Rect2(32, 103, 370, 34), 20, Color("a9bed5") if not exists or playable else Color("ffbd9b"))
+		_level_fill(panel, Rect2(30, 155, 430, 1), Color("536a89"))
+		if playable:
+			_text(panel, "当前关卡", Rect2(32, 180, 180, 30), 18, Color("8fa8c7"))
+			var level_name: String = catalog.levels.get(saved.selected, {}).get("name", saved.selected)
+			_text(panel, level_name, Rect2(32, 215, 420, 43), 26, Color("f7f4ef"))
+			_text(panel, "章节进度", Rect2(32, 285, 200, 30), 18, Color("8fa8c7"))
+			var count := _text(panel, "%d / %d" % [saved.completed.size(), catalog.levels.size()], Rect2(300, 285, 150, 30), 18, Color("cbd9e9"))
+			count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			_level_fill(panel, Rect2(32, 325, 420, 4), Color("3a4d66"))
+			if not catalog.levels.is_empty(): _level_fill(panel, Rect2(32, 325, 420.0 * saved.completed.size() / catalog.levels.size(), 4), Color("ffe1a1"))
+		if not exists:
+			_save_slot_button(panel, "新建", Rect2(30, 386, 430, 62), func(): _start_slot(slot), true)
+		elif playable:
+			_save_slot_button(panel, "继续", Rect2(30, 386, 275, 62), func(): _resume_slot(slot), true)
+		if exists:
+			_save_slot_button(panel, "删除", Rect2(325 if playable else 30, 386, 135 if playable else 430, 62), func(): _confirm_delete_slot(slot), false)
+
+func _save_slot_button(parent: Control, label: String, rect: Rect2, action: Callable, primary: bool) -> Button:
+	var button := _level_button(parent, label, rect, action, primary)
+	button.add_theme_font_size_override("font_size", 22)
+	button.add_theme_color_override("font_color", Color("26364a") if primary else Color("d8dfea"))
+	button.add_theme_color_override("font_hover_color", Color("26364a") if primary else Color("fff1d0"))
+	button.add_theme_color_override("font_pressed_color", Color("26364a") if primary else Color("fff1d0"))
+	button.add_theme_color_override("font_focus_color", Color("26364a") if primary else Color("fff1d0"))
+	button.add_theme_stylebox_override("normal", _level_style(Color("f3d9a5") if primary else Color("1b304a"), Color("ffe9bb") if primary else Color("687d95")))
+	button.add_theme_stylebox_override("hover", _level_style(Color("ffeac0") if primary else Color("35485d"), Color("fff1d0")))
+	button.add_theme_stylebox_override("pressed", _level_style(Color("d8bd89") if primary else Color("202f42"), Color("d6c59e")))
+	return button
+
+func _start_slot(slot: int) -> void:
+	if FileAccess.file_exists(_slot_path(slot)): return
+	selected_slot = slot
+	new_game()
+	progress.started = true
+	_save_progress()
+	if not save_notice.is_empty():
+		slot_notice = save_notice
+		show_save_slots()
+	else: slot_notice = ""
+
+func _resume_slot(slot: int) -> void:
+	selected_slot = slot
+	slot_notice = ""
+	resume_game()
+
+func _confirm_delete_slot(slot: int) -> void:
+	if canvas.find_child("DeleteSaveConfirmation", true, false): return
+	var dialog := Control.new()
+	dialog.name = "DeleteSaveConfirmation"
+	dialog.size = DESIGN_SIZE
+	dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+	dialog.z_index = 100
+	canvas.add_child(dialog)
+	var shade := ColorRect.new()
+	shade.position = -DESIGN_SIZE * 4
+	shade.size = DESIGN_SIZE * 9
+	shade.color = Color(0.01, 0.02, 0.04, 0.75)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	dialog.add_child(shade)
+	var panel := _level_panel(dialog, Rect2(526, 315, 620, 310), Color("15263efb"), Color("7185a0"))
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_level_fill(panel, Rect2(0, 0, 5, 310), Color("ffe1a1"))
+	_text(panel, "删除存档", Rect2(38, 29, 460, 48), 30, Color("f7f4ef"))
+	_level_fill(panel, Rect2(38, 91, 544, 1), Color("536a89"))
+	_text(panel, "确定删除存档 %d？" % slot, Rect2(38, 116, 520, 44), 25, Color("f7f4ef"))
+	_text(panel, "删除后无法恢复", Rect2(38, 164, 520, 32), 19, Color("e7a69b"))
+	var cancel := _save_slot_button(panel, "取消", Rect2(38, 226, 252, 56), dialog.queue_free, true)
+	cancel.name = "CancelDelete"
+	var confirm := _save_slot_button(panel, "删除", Rect2(310, 226, 272, 56), func(): _delete_slot(slot), false)
+	confirm.name = "ConfirmDelete"
+	confirm.add_theme_color_override("font_color", Color("ffd7ce"))
+	confirm.add_theme_color_override("font_hover_color", Color("fff0eb"))
+	confirm.add_theme_stylebox_override("normal", _level_style(Color("4b292f"), Color("b57475")))
+	confirm.add_theme_stylebox_override("hover", _level_style(Color("71383e"), Color("e4a19b")))
+	confirm.add_theme_stylebox_override("pressed", _level_style(Color("3d222a"), Color("b57475")))
+	cancel.focus_next = cancel.get_path_to(confirm)
+	cancel.focus_previous = cancel.get_path_to(confirm)
+	confirm.focus_next = confirm.get_path_to(cancel)
+	confirm.focus_previous = confirm.get_path_to(cancel)
+	cancel.grab_focus()
+
+func _delete_slot(slot: int) -> void:
+	var path := _slot_path(slot)
+	var result := DirAccess.remove_absolute(ProjectSettings.globalize_path(path)) if FileAccess.file_exists(path) else ERR_FILE_NOT_FOUND
+	slot_notice = "存档已删除" if result == OK else "存档删除失败"
+	if result == OK and slot == selected_slot: _load_progress()
+	show_save_slots()
+
 func _main_button(value: String, rect: Rect2, action: Callable) -> Button:
 	var button := Button.new()
 	button.text = value; button.position = rect.position; button.size = rect.size
@@ -477,9 +600,10 @@ func begin_action() -> void:
 	if not _level_unlocked(progress.selected): return
 	if not catalog.diagnostics(progress.selected).is_empty(): return
 	if catalog.levels[progress.selected].get("roster_mode", "") == "player" and (squad_level != progress.selected or selected_squad.is_empty()): return
-	progress.started = true
-	_save_progress()
-	if catalog.levels[progress.selected].type == "story": show_story(progress.selected, "story")
+	if catalog.levels[progress.selected].type == "story":
+		progress.started = true
+		_save_progress()
+		show_story(progress.selected, "story")
 	else: start_battle()
 
 func show_story(id: String, kind: String) -> void:
@@ -541,19 +665,51 @@ func start_battle() -> void:
 	if catalog.levels[progress.selected].roster_mode == "player":
 		selected_squad.assign(selected_squad.filter(func(id): return progress.available_operators().has(id)))
 		if squad_level != progress.selected or selected_squad.is_empty(): show_levels(); return
-	progress.started = true
-	_save_progress()
+	if developer_mode and FileAccess.file_exists(_replay_path(progress.selected)):
+		var dialog := ConfirmationDialog.new()
+		dialog.title = "战斗回放"
+		dialog.dialog_text = "播放该关卡的战斗回放？"
+		dialog.ok_button_text = "播放回放"
+		dialog.cancel_button_text = "开始战斗"
+		dialog.confirmed.connect(func(): dialog.queue_free(); _start_battle(true))
+		dialog.canceled.connect(func(): dialog.queue_free(); _start_battle(false))
+		add_child(dialog)
+		dialog.popup_centered()
+		return
+	_start_battle(false)
+
+func _replay_path(level: String) -> String:
+	return replay_directory.path_join(level + ".replay")
+
+func _start_battle(play_replay: bool) -> void:
+	var recorded: Dictionary = {}
+	if play_replay:
+		var file := FileAccess.open(_replay_path(progress.selected), FileAccess.READ)
+		var data = file.get_var() if file else null
+		if data is not Dictionary or data.get("level", "") != progress.selected or data.get("operators", null) is not Array or data.get("actions", null) is not Array or not data.operators.all(func(id): return id is String):
+			save_notice = "回放文件无法读取"
+			show_levels()
+			return
+		recorded = data
+	if not play_replay:
+		progress.started = true
+		_save_progress()
 	_clear_page()
 	page = "battle"
 	_play_music("music_battle")
 	result_recorded = false
 	battle_scene = BattleScene.instantiate()
 	battle_scene.developer_tools_enabled = developer_mode
+	battle_scene.developer_speed_enabled = developer_mode
+	battle_scene.replay_mode = play_replay
+	battle_scene.replay_data = recorded
+	battle_scene.replay_path = _replay_path(progress.selected) if developer_mode else ""
 	battle_scene.audio = audio
 	battle_scene.campaign_level = progress.selected
 	if catalog.levels[progress.selected].roster_mode == "player" and squad_level == progress.selected:
 		battle_scene.operator_ids.assign(selected_squad)
 	else: battle_scene.operator_ids.assign(progress.available_operators())
+	if play_replay: battle_scene.operator_ids.assign(recorded.operators)
 	battle_scene.exit_requested.connect(func(): show_levels.call_deferred())
 	battle_scene.continue_requested.connect(func(): _leave_result.call_deferred())
 	battle_scene.observed.connect(_observe_battle)
@@ -562,6 +718,7 @@ func start_battle() -> void:
 		var back := Button.new(); back.text = "返回关卡"
 		back.position = Vector2(30, 35); back.pressed.connect(show_levels)
 		battle_scene.hud.add_child(back); return
+	if play_replay: return
 	return_button = Button.new()
 	return_button.text = "返回关卡"
 	battle_scene.hud.style_battle_button(return_button)
@@ -623,6 +780,7 @@ func _show_tutorial() -> void:
 	center.add_child(tutorial)
 
 func _leave_result() -> void:
+	if battle_scene and battle_scene.replay_mode: show_levels(); return
 	if battle_scene and battle_scene.last_state.phase == "victory": _continue_campaign()
 	else: show_levels()
 
@@ -636,6 +794,7 @@ func _continue_campaign() -> void:
 	else: show_levels()
 
 func _observe_battle(state: Dictionary, _events: Array) -> void:
+	if battle_scene and battle_scene.replay_mode: return
 	if state.phase == "ready": result_recorded = false
 	if state.phase == "victory" and not result_recorded:
 		result_recorded = true
@@ -648,6 +807,12 @@ func _observe_battle(state: Dictionary, _events: Array) -> void:
 		tutorial = null
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE and page == "saves":
+		var dialog := canvas.find_child("DeleteSaveConfirmation", true, false)
+		if dialog:
+			dialog.queue_free()
+			get_viewport().set_input_as_handled()
+			return
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE and page in ["levels", "settings"]:
 		show_main()
 		get_viewport().set_input_as_handled()

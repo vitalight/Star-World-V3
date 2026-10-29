@@ -46,15 +46,12 @@ func click(text: String) -> void:
 		root.push_input(event, true)
 	await settle()
 
-func click_story_blank() -> void:
-	var point: Vector2 = player.story_view.get_global_rect().position + Vector2(40, 200)
-	for click_index in 2:
-		for pressed in [true, false]:
-			var event := InputEventMouseButton.new()
-			event.position = point; event.global_position = point
-			event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
-			root.push_input(event, true)
-		await process_frame
+func click_story_blank(point: Vector2) -> void:
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = point; event.global_position = point
+		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+		root.push_input(event, true)
 	await settle()
 
 func spawn(path := SAVE) -> void:
@@ -73,6 +70,7 @@ func run() -> void:
 	check(button(player, "读取存档").disabled, "Fresh progress disables resume")
 	await capture("main")
 	await click("开始游戏")
+	await click("新建")
 	check(player.page == "levels" and player.progress.selected == "scene_0101A", "Fresh chapter opens first stage")
 	check(not player.progress.unlocked("scene_0102A", player.catalog.levels.keys()), "Second stage initially locked")
 	for dimensions in [Vector2i(1280, 800), Vector2i(960, 600), Vector2i(1600, 900)]:
@@ -84,8 +82,18 @@ func run() -> void:
 		await click("返回关卡")
 	root.size = Vector2i(1280, 800); await settle()
 	await click("进入故事")
-	await click_story_blank()
+	player.story_view.set_process(false)
+	var blank: Vector2 = player.story_view.get_global_rect().position + Vector2(40, 200)
+	await click_story_blank(blank)
+	check(player.session.snapshot().history.size() == 1 and not player.story_view.is_typing() and player.story_view.dialogue.visible_characters == -1, "First click reveals the current dialogue without advancing")
+	await click_story_blank(blank)
 	check(player.session.snapshot().history.size() == 2, "Story continue advances shared session")
+	player.story_view.set_process(false)
+	var dialogue_area: Vector2 = player.story_view.dialogue.get_parent().get_global_rect().position + Vector2(10, 10)
+	await click_story_blank(dialogue_area)
+	check(player.session.snapshot().history.size() == 2 and not player.story_view.is_typing(), "Clicking the dialogue area reveals text without advancing")
+	await click_story_blank(dialogue_area)
+	check(player.session.snapshot().history.size() == 3, "Second click in dialogue area advances")
 	await capture("story_cat")
 	await click("跳过剧情")
 	check(player.page == "battle" and player.battle_scene.validation_errors.is_empty(), "Skip enters shared chapter battle")
@@ -128,6 +136,7 @@ func run() -> void:
 			await dispose(); await spawn()
 			check(player.progress.pending_after == id, "Pending victory survives restart")
 			await click("读取存档")
+			await click("继续")
 		else: await click("继续")
 		check(player.progress.completed.has(id) and player.progress.pending_after.is_empty(), "Victory transition commits progress")
 	check(player.page == "levels" and player.progress.selected == "scene_0104C", "Root node victory unlocks final boss")

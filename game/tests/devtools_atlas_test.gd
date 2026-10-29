@@ -32,9 +32,9 @@ func run() -> void:
   var appearance = load("res://content/data/character_%03d.tres" % (11 + index)).appearance
   var source = "hero-atlas-101-v2.png" if index < 4 else "hero-atlas-102-v2.png"
   check(appearance.atlas.get_image().get_data() == load("res://Human/StarterContent/character/" + source).get_image().get_data() and appearance.atlas_row == [1, 2, 3, 4, 1][index], "Formal actor identity matches supplied atlas: " + str(11 + index))
- for index in 4:
+ for index in 5:
   var appearance = load("res://content/data/enemy_%03d.tres" % (1 + index)).appearance
-  check(appearance.atlas.get_image().get_data() == load("res://Human/StarterContent/character/enemy-atlas-101.png").get_image().get_data() and appearance.atlas_row == [1, 2, 4, 3][index], "Formal enemy matches supplied role: " + str(1 + index))
+  check(appearance.atlas.get_image().get_data() == load("res://Human/StarterContent/character/enemy-atlas-101.png").get_image().get_data() and appearance.atlas_row == [1, 2, 3, 3, 4][index], "Formal enemy matches supplied role: " + str(1 + index))
  var catalog = preload("res://game/content/content_catalog.gd").new()
  catalog.reload()
  var filenames = ["chapter01_01_home_anomaly_v1.png", "chapter01_02_roadside_rescue_v2.png", "chapter01_03_oriental_pearl_node_v2.png"]

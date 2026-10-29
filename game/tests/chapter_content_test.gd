@@ -134,13 +134,15 @@ func source_reload(catalog: RefCounted) -> void:
 	var story = catalog.story(catalog.levels.scene_0101A.story)
 	check(story.nodes.line_2.speaker == "测试大星，中文\n第二行", "Story speakers resolve updated display name by stable ID")
 	var previous: Dictionary = catalog.characters.character_011.stats.duplicate(true)
+	var previous_multiplier: float = previous.skill.multiplier
+	var edited_multiplier := previous_multiplier + 0.5
 	path = base + "/data/skill_001.tres"
-	edit_resource(path, "multiplier", 2.4)
+	edit_resource(path, "multiplier", edited_multiplier)
 	edit_resource(path, "description", "测试技能，中文\n第二行")
 	catalog.reload(base, base + "/data")
-	check(is_equal_approx(catalog.characters.character_011.stats.skill.multiplier, 2.4), "Saved nested skill edit reaches battle configuration after reload")
+	check(is_equal_approx(catalog.characters.character_011.stats.skill.multiplier, edited_multiplier), "Saved nested skill edit reaches battle configuration after reload")
 	check(catalog.skills.skill_001.description == "测试技能，中文\n第二行", "Skill resource preserves multiline Chinese description")
-	check(is_equal_approx(previous.skill.multiplier, 1.8), "Reload does not mutate a previously assembled battle configuration")
+	check(is_equal_approx(previous.skill.multiplier, previous_multiplier), "Reload does not mutate a previously assembled battle configuration")
 	edit_resource(path, "icon", load("res://content/ui/skill_icons/icon_16.tres"))
 	catalog.reload(base, base + "/data")
 	check(catalog.skill_icons("scene_0101B").character_011.resource_path == "res://content/ui/skill_icons/icon_16.tres", "Saved skill icon edit reloads independently of actor appearance")
@@ -192,9 +194,12 @@ func copy_fixture(base: String) -> void:
 	for actor in library.characters + library.enemies:
 		paths.append(actor.resource_path)
 	for skill in library.skills: paths.append(skill.resource_path)
+	var uid_pattern := RegEx.new()
+	uid_pattern.compile(' uid="uid://[^"]+"')
 	for path in paths:
 		var text := FileAccess.get_file_as_string(path)
 		for dependency in paths: text = text.replace(dependency, fixture_path(base, dependency))
+		text = uid_pattern.sub(text, "", true)
 		write_text(fixture_path(base, path), text)
 	for name in ["levels", "waves", "backgrounds", "player_roster"]:
 		write_text(base + "/" + name + ".csv", FileAccess.get_file_as_string(CHAPTER_FIXTURE + "/" + name + ".csv"))

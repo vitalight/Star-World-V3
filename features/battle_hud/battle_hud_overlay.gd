@@ -108,7 +108,7 @@ func set_playback(paused: bool, speed: float) -> void:
 		pause_button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		pause_button.accessibility_name = "继续" if paused else "暂停"
 		pause_button.add_theme_constant_override("icon_max_width", 26)
-		speed_button.text = "%d×" % int(speed)
+		speed_button.text = "%.2f×" % speed if speed < 1.0 else "%d×" % int(speed)
 
 func set_readout(values: Dictionary) -> void:
 	readout.merge(values, true)

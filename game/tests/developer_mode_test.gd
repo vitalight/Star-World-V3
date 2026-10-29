@@ -34,11 +34,13 @@ func run() -> void:
 		player.progress.selected = "scene_0101B"
 		player.start_battle()
 		check(player.battle_scene.hud.developer_panel.visible, "Command-line developer mode displays battle panel")
+		check_speed_cycle(player.battle_scene, true)
 	else:
 		check(not player.developer_mode, "Normal launch is not developer mode")
 		player.progress.selected = "scene_0101B"
 		player.start_battle()
 		check(not player.battle_scene.hud.developer_panel.visible, "Normal player battle hides developer panel")
+		check_speed_cycle(player.battle_scene, false)
 		await settle()
 		saved.save(SAVE)
 		player.new_game()
@@ -54,12 +56,21 @@ func run() -> void:
 		player.begin_action()
 		check(player.page == "battle" and player.battle_scene.campaign_level == "scene_0104B", "Developer can enter a later battle")
 		check(player.battle_scene.hud.developer_panel.visible, "Developer player battle displays panel")
+		check_speed_cycle(player.battle_scene, true)
 		player.battle_scene.reset()
 		check(player.battle_scene.hud.developer_panel.visible, "Restart keeps developer panel expanded")
 		var readback := ConfigFile.new()
 		readback.load(SAVE)
 		check(readback.get_value("campaign", "completed") == ["scene_0101A", "scene_0101B"] and readback.get_value("campaign", "selected") == "scene_0102A", "Developer mode does not alter normal save")
 	player.queue_free()
+	await settle()
+	var workspace = preload("res://game/tests/game_workspace_fixture.tscn").instantiate()
+	root.add_child(workspace)
+	await settle()
+	check_speed_cycle(workspace.game, true)
+	workspace.game.set_speed(4.0)
+	check(workspace.game.speed == 4.0, "Game Test debug controls can select 4x")
+	workspace.queue_free()
 	await settle()
 	if not "--developer-mode" in OS.get_cmdline_user_args():
 		for button_name in ["Player Mode", "进入 Player Mode →"]:
@@ -73,6 +84,21 @@ func run() -> void:
 			check(current_scene != hub and current_scene.developer_mode, "Hub entry opens developer mode: " + button_name)
 	print("DEVELOPER MODE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+func check_speed_cycle(game: Node3D, developer: bool) -> void:
+	game.hud.speed_requested.emit()
+	check(game.speed == 2.0 and game.hud.speed_button.text == "2×", "First speed toggle selects 2x")
+	game.hud.speed_requested.emit()
+	check(game.speed == (4.0 if developer else 1.0), "Second speed toggle respects mode")
+	if developer:
+		check(game.hud.speed_button.text == "4×", "Developer sees 4x")
+		game.hud.speed_requested.emit()
+		check(game.speed == 1.0, "Developer speed wraps to 1x")
+	else:
+		check(game.hud.speed_button.text == "1×", "Player speed wraps to 1x")
+		game.set_speed(4.0)
+		check(game.speed == 2.0, "Player cannot set 4x directly")
+	game.reset()
 
 func find_button(node: Node, value: String) -> Button:
 	for child in node.get_children():

@@ -37,12 +37,17 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
     - [ ] 存档系统：支持多个存档   
 
 
-【参考图片，更新第一章战斗关卡】
-- 第二关："C:\Users\vital\Desktop\level0-3.png"。需要支持飞行敌人的出生点（飞行敌人从高台出生，考虑制作新素材）
-- 第三关："C:\Users\vital\Desktop\level0-4.png"
-boss战增加至两场。（第四关和第五关）
-- 第四关："C:\Users\vital\Desktop\level-tr-11.png"
-- 第五关："C:\Users\vital\Desktop\level0-6.png"
-【修正第一章地形、怪物路线】
+【完整来一轮，整理需要改的地方】
+#文案：
+- 改进关卡提示。每一章简要说明规则。
+
+#剧情
+
+#音乐
+
+#战斗
 
 【平衡第一章战斗数值】
+- 强度编辑器
+怪物和角色，显示头像。
+删除不必要的波次数据

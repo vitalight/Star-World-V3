@@ -182,6 +182,7 @@ func run() -> void:
 	check(game.last_state.life == 50 and game.last_state.remaining == 50, "Reload original recovers without retaining edited resources")
 	game.start(); game.set_speed(2.0); game._process(0.5)
 	check(is_equal_approx(game.last_state.time, 1.0), "2x advances shared simulation clock")
+	game.developer_speed_enabled = true
 	game.set_speed(4.0); game._process(0.25)
 	check(is_equal_approx(game.last_state.time, 2.0), "4x advances shared simulation clock")
 	authored.free()

@@ -62,6 +62,31 @@ func run() -> void:
 	await settle()
 	game = current_scene.game
 	game.set_process(false)
+	game.start()
+	game.set_speed(2.0)
+	var slow_point := cell_point(Vector2i(3,1))
+	await begin_drag("guard", slow_point)
+	check(game.hud.speed_button.text == "0.25×", "Dragging shows quarter speed")
+	var slow_start: float = game.last_state.time
+	game._process(0.8)
+	check(is_equal_approx(game.last_state.time - slow_start, 0.2), "Dragging advances simulation at quarter speed even from 2x")
+	game.toggle_pause()
+	var paused_time: float = game.last_state.time
+	game._process(0.8)
+	check(is_equal_approx(game.last_state.time, paused_time), "Dragging does not override pause")
+	game.toggle_pause()
+	await mouse(slow_point, false); await settle()
+	check(game.deployment_pending and game.speed == 2.0 and game.hud.speed_button.text == "2×", "Dropping restores selected speed while choosing facing")
+	slow_start = game.last_state.time
+	game._process(0.2)
+	check(is_equal_approx(game.last_state.time - slow_start, 0.4), "Normal speed resumes after dropping")
+	game.cancel_selection()
+	game.set_speed(4.0)
+	await begin_drag("guard", slow_point)
+	await key(KEY_ESCAPE)
+	await mouse(slow_point, false); await settle()
+	check(game.speed == 4.0 and game.hud.speed_button.text == "4×", "Cancelling drag restores developer speed")
+	game.reset()
 	var original_battle = game.battle
 	var low_cost_config: Dictionary = game.configuration.duplicate(true)
 	low_cost_config.initial_cost = 0.0

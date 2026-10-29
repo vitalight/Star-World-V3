@@ -43,6 +43,6 @@ curve = SubResource("Curve2D_upper")
 [node name="lower" type="Path2D" parent="Routes" unique_id=1500086978]
 curve = SubResource("Curve2D_lower")
 
-[node name="air" type="Path2D" parent="Routes"]
+[node name="air" type="Path2D" parent="Routes" unique_id=1224635053]
 curve = SubResource("Curve2D_air")
 metadata/flying = true

@@ -22,6 +22,23 @@ static func in_range(unit: Dictionary, position: Vector2) -> bool:
 		if absf(offset.x) <= 0.500001 and absf(offset.y) <= 0.500001: return true
 	return false
 
+## A blocked enemy is on the incoming side of its blocker, even when its
+## movement step has crossed the blocker's tile boundary by a small amount.
+static func blocked_target_position(b, enemy: Dictionary, blocker: Dictionary) -> Vector2:
+	var route: Array = b._config.routes[enemy.route]
+	var before := Navigation.point_at(route, maxf(0.0, enemy.distance - 0.001))
+	var direction: Vector2 = enemy.position - before
+	# A spawn already inside a blocker's tile has no incoming side yet.
+	if direction.length_squared() < 0.00000001: return enemy.position
+	direction = direction.normalized()
+	var offset: Vector2 = enemy.position - blocker.position
+	var back := INF
+	if absf(direction.x) > 0.000001:
+		back = minf(back, (offset.x + 0.5 * signf(direction.x)) / direction.x)
+	if absf(direction.y) > 0.000001:
+		back = minf(back, (offset.y + 0.5 * signf(direction.y)) / direction.y)
+	return enemy.position - direction * (maxf(0.0, back) + 0.00001)
+
 static func damage(power: float, target: Dictionary, kind: String) -> float:
 	if kind == "physical":
 		var defense: float = target.defense
@@ -49,7 +66,14 @@ static func unit_target(b, unit: Dictionary) -> Dictionary:
 	var best: Dictionary = {}
 	var best_remaining = INF
 	for target in (b._state.units if unit.role == "healer" else b._state.enemies):
-		if target.hp <= 0 or not in_range(unit, target.position): continue
+		if target.hp <= 0: continue
+		var target_position: Vector2 = target.position
+		var own_blocked := false
+		if unit.role != "healer" and target.blocked_by != -1:
+			own_blocked = target.blocked_by == unit.id
+			var blocker: Dictionary = b._unit(target.blocked_by)
+			if not blocker.is_empty(): target_position = blocked_target_position(b, target, blocker)
+		if not own_blocked and not in_range(unit, target_position): continue
 		if unit.role == "healer":
 			if target.hp >= target.max_hp: continue
 			var ratio: float = target.hp / target.max_hp

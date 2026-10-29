@@ -5,7 +5,7 @@ signal choice_requested(index: int)
 signal ui_sound_requested(id: String)
 const INK = Color("f4f1eb")
 const ACCENT = Color("dfc49b")
-const TYPE_INTERVAL := 0.04
+const TYPE_INTERVAL := 0.05
 const LINE_PAUSE := 0.6
 var background: TextureRect
 var _previous_background: TextureRect
@@ -69,10 +69,12 @@ func _ready() -> void:
 	speaker = _label(34, ACCENT)
 	_dialogue_scroll = ScrollContainer.new()
 	_dialogue_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_dialogue_scroll.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(_dialogue_scroll)
 	dialogue = _label(29, INK, _dialogue_scroll)
 	dialogue.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	choices = VBoxContainer.new()
+	choices.mouse_filter = Control.MOUSE_FILTER_PASS
 	choices.add_theme_constant_override("separation", 12)
 	add_child(choices)
 	ending = _label(19, Color("aaa9a8"))

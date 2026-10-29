@@ -6,6 +6,10 @@ func _initialize() -> void:
 	var catalog = Catalog.new()
 	catalog.reload()
 	var errors: PackedStringArray = catalog.errors.duplicate()
+	if not catalog.enemies.has("enemy_003") or not catalog.enemies.enemy_003.stats.flying or catalog.enemies.enemy_003.stats.name != "浮空裂隙":
+		errors.append("enemy_003 must be the flying enemy 浮空裂隙")
+	if not catalog.enemies.has("enemy_005") or catalog.enemies.enemy_005.stats.flying or catalog.enemies.enemy_005.stats.name != "节点重影":
+		errors.append("enemy_005 must be the ground enemy 节点重影")
 	for id in catalog.levels:
 		errors.append_array(catalog.diagnostics(id))
 		if catalog.levels[id].type != "battle": continue

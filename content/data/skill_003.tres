@@ -1,21 +1,15 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://625x25le78yi"]
 
-[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
-
-[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_03.tres" id="icon"]
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_03.tres" id="1_yrhmc"]
+[ext_resource type="Script" uid="uid://cxmdep82en3r0" path="res://features/content_definitions/skill_definition.gd" id="2_46mbf"]
 
 [resource]
-script = ExtResource("script")
+script = ExtResource("2_46mbf")
+icon = ExtResource("1_yrhmc")
 content_id = "skill_003"
 display_name = "精准连射"
-description = "充能完成后自动强化，10秒内每次攻击造成两次伤害。"
-trigger = "automatic"
-hit_count = 2
+description = "开启技能后，12秒内每次攻击造成两次伤害。"
 recovery = "attack"
-required = 8
-initial_sp = 4
-duration = 10
-multiplier = 1
-interval_multiplier = 1
-cost_gain = 0
-icon = ExtResource("icon")
+required = 12.0
+duration = 12.0
+hit_count = 2

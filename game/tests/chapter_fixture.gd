@@ -18,6 +18,7 @@ static func deployments(id: String) -> Array:
 static func replay(battle: RefCounted, id: String) -> Array:
 	var rejected: Array = []
 	var pending := deployments(id)
+	var redeploy_cat := false
 	battle.start()
 	for second in 300:
 		while not pending.is_empty() and battle.snapshot().cost >= battle.configuration().roster[pending[0][0]].cost:
@@ -26,12 +27,15 @@ static func replay(battle: RefCounted, id: String) -> Array:
 		if id == "scene_0101B" and second == 100:
 			for unit in battle.snapshot().units:
 				if unit.roster_id == "character_012": battle.retreat(unit.id)
-		if id == "scene_0101B" and second == 108:
+			redeploy_cat = true
+		if redeploy_cat and battle.snapshot().redeploy.character_012 <= 0.000001 and battle.snapshot().cost >= battle.configuration().roster.character_012.cost:
 			var result: Dictionary = battle.deploy("character_012", Vector2i(3, 3), 2)
 			if not result.ok: rejected.append(result)
+			redeploy_cat = false
 		if second % 3 == 0:
 			for unit in battle.snapshot().units:
 				if unit.sp + 0.000001 >= unit.skill.required and unit.skill_left <= 0: battle.activate_skill(unit.id)
 		battle.advance(1)
 		if battle.snapshot().phase != "running": break
+	if redeploy_cat: rejected.append({"ok": false, "reason": "redeploy_not_completed"})
 	return rejected

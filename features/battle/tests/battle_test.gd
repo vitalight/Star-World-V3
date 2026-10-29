@@ -9,6 +9,7 @@ func _initialize() -> void:
 	clocks_and_isolation()
 	damage_and_actions()
 	blocking()
+	blocked_target_range()
 	ranged()
 	targeting()
 	healing()
@@ -201,6 +202,30 @@ func blocking() -> void:
 	check(b.snapshot().enemies[0].blocked_by == -1, "flying enemy ignores blocking")
 	b.advance(0.1)
 	check(events(b, "damage", true).is_empty(), "melee without anti-air cannot hit flying enemy")
+
+func blocked_target_range() -> void:
+	for facing in range(4):
+		var c = fixture()
+		var direction: Vector2i = Vector2i(Vector2.RIGHT.rotated(facing * PI / 2).round())
+		c.terrain[direction] = "ground"
+		c.terrain[direction * 2] = "ground"
+		c.routes.r = [Vector2.ZERO, Vector2(direction * 10)]
+		c.enemies.e.speed = 1.0
+		c.roster.g.windup = 0.0
+		c.roster.rear = c.roster.g.duplicate(true)
+		c.roster.rear.skill = {"enabled": true, "required": 1.0, "initial_sp": 1.0, "duration": 5.0, "forward_range": 1}
+		var b = Battle.new(c)
+		var front: int = b.deploy("g", direction, (facing + 2) % 4).id
+		var rear: int = b.deploy("rear", direction * 2, (facing + 2) % 4).id
+		b.start()
+		b.advance(0.8)
+		var enemy: Dictionary = b.snapshot().enemies[0]
+		check(enemy.blocked_by == front, "front unit blocks approaching enemy in direction %d" % facing)
+		check(b.find_unit(front).attack_count > 0, "blocker can attack its own enemy in direction %d" % facing)
+		check(b.find_unit(rear).attack_count == 0, "rear unit cannot attack enemy beyond its range in direction %d" % facing)
+		check(b.activate_skill(rear).ok, "rear range extension activates")
+		b.advance(0.6)
+		check(b.find_unit(rear).attack_count > 0, "extended range reaches blocked enemy in direction %d" % facing)
 
 func ranged() -> void:
 	var c = fixture()

@@ -86,6 +86,8 @@ func _ready() -> void:
 	health_bar = Sprite3D.new()
 	health_bar.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	health_bar.no_depth_test = true
+	# Draw status bars after character billboards, regardless of their depth order.
+	health_bar.render_priority = 11
 	health_bar.pixel_size = 0.010
 	health_bar.position.y = height + 0.02
 	health_image = Image.create(64, 18, false, Image.FORMAT_RGBA8)

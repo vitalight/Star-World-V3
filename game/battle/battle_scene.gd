@@ -13,6 +13,16 @@ const Catalog = preload("res://game/content/content_catalog.gd")
 @export var map_source: PackedScene = preload("res://content/scenes/scene_001/map.tscn")
 @export var campaign_level := ""
 var developer_tools_enabled := false
+var developer_speed_enabled := false
+var replay_data: Dictionary = {}
+var replay_path := ""
+var replay_mode := false
+var replay_actions: Array = []
+var replay_index := 0
+var replay_accumulator := 0.0
+var replay_error := false
+var replay_error_message := ""
+var save_replay_button: Button
 @export var operator_ids: Array[String] = []
 @export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
 var battle: RefCounted
@@ -53,6 +63,7 @@ func _ready() -> void:
 	reload_level()
 
 func reload_level() -> void:
+	replay_actions.clear(); replay_index = 0; replay_accumulator = 0.0; replay_error = false; replay_error_message = ""
 	if presentation: presentation.clear()
 	if world: world.free()
 	if map_data: map_data.free()
@@ -91,6 +102,10 @@ func reload_level() -> void:
 	if catalog == null: configuration.roster = operator_roster.configuration()
 	battle = Battle.new(configuration)
 	configuration = battle.configuration()
+	if replay_mode and (replay_data.get("version", 0) != 1 or replay_data.get("actions", null) is not Array):
+		battle = null
+		_show_error("回放文件无法读取。")
+		return
 	reset_auto_start()
 	field = Field.new()
 	field.atlas = map_data.terrain_atlas if map_data.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
@@ -126,17 +141,20 @@ func reload_level() -> void:
 	hud = Hud.new()
 	hud.panel_texture = preload("res://content/ui/battle/tactical_panel_v2a.png")
 	hud.developer_tools_enabled = developer_tools_enabled
+	hud.replay_mode = replay_mode
 	hud.roster = configuration.roster
 	hud.catalog = appearances
 	hud.skill_icons = skill_icons
 	layer.add_child(hud)
 	leak_warning = LeakWarning.new(configuration.routes, markers, hud)
 	hud.pause_requested.connect(toggle_pause)
-	hud.speed_requested.connect(func(): set_speed(speed * 2.0 if speed < 4.0 else 1.0))
+	hud.speed_requested.connect(func(): set_speed(speed * 2.0 if speed < (4.0 if developer_speed_enabled else 2.0) else 1.0))
 	hud.replay_requested.connect(reset)
 	hud.roster_selected.connect(select_roster)
 	hud.roster_drag_started.connect(select_roster)
-	hud.roster_drag_ended.connect(update_overlays)
+	hud.roster_drag_ended.connect(func():
+		hud.set_playback(last_state.get("paused", false), speed)
+		update_overlays())
 	hud.roster_drag_hovered.connect(preview_drag)
 	hud.roster_dropped.connect(drop_roster)
 	hud.drop_hit_test = func(_key: String, point: Vector2):
@@ -145,6 +163,13 @@ func reload_level() -> void:
 	hud.retreat_requested.connect(func(): command("retreat", [selected_unit]))
 	hud.skill_requested.connect(func(): command("activate_skill", [selected_unit]))
 	hud.debug_victory_requested.connect(debug_victory)
+	if developer_tools_enabled and not replay_mode and not replay_path.is_empty():
+		save_replay_button = Button.new()
+		save_replay_button.text = "保存战斗回放"
+		hud.style_battle_button(save_replay_button)
+		save_replay_button.custom_minimum_size = Vector2(220, 48)
+		save_replay_button.pressed.connect(func(): save_replay_button.text = "已保存" if save_recording() == OK else "保存失败")
+		hud.end_panel.get_child(0).add_child(save_replay_button)
 	if audio: hud.ui_sound_requested.connect(func(id: String): audio.play_sfx(id))
 	hud.continue_requested.connect(func():
 		if not continue_requested.get_connections().is_empty(): continue_requested.emit()
@@ -187,8 +212,13 @@ func reset_auto_start() -> void:
 
 func _process(delta: float) -> void:
 	if not battle: return
-	var elapsed := delta * speed
+	var elapsed := delta * _effective_speed()
 	var state: Dictionary = battle.snapshot()
+	if replay_mode:
+		_advance_replay(elapsed)
+		var visual_delta: float = battle.snapshot().time - state.time
+		refresh(visual_delta, elapsed if state.phase in ["victory", "defeat"] else visual_delta)
+		return
 	if state.phase == "ready" and not state.paused:
 		var waiting := minf(elapsed, auto_start_left)
 		auto_start_left -= waiting
@@ -212,7 +242,7 @@ func refresh(visual_delta := 0.0, feedback_delta := -1.0) -> void:
 		selected_roster = ""; candidate = Vector2i(-99, -99)
 		deployment_pending = false; direction_chosen = false
 		hud.cancel_drag()
-	hud.update_state(last_state, selected_roster, selected_unit, speed, configuration.deploy_limit)
+	hud.update_state(last_state, selected_roster, selected_unit, _effective_speed(), configuration.deploy_limit)
 	leak_warning.sync(last_state, events, visual_delta if feedback_delta < 0.0 else feedback_delta)
 	observed.emit(last_state.duplicate(true), events.duplicate(true))
 	update_overlays()
@@ -229,41 +259,105 @@ func update_operator_anchor() -> void:
 	hud.set_operator_anchor(camera.unproject_position(actor.visual_position() + camera.global_basis.y * actor.display_height() * 0.5))
 
 func command(method: String, args: Array) -> Dictionary:
+	if replay_mode: return {"ok": false, "reason": "replay", "id": -1}
 	if not battle: return {"ok": false, "reason": "invalid_level", "id": -1}
 	var result: Dictionary = battle.callv(method, args)
+	if result.ok and method in ["deploy", "retreat", "activate_skill"]: _record_action(method, args)
 	if hud:
 		hud.set_notice("" if result.ok else reason_text(result.reason))
 	refresh()
 	return result
 
+func _record_action(method: String, args: Array) -> void:
+	if developer_tools_enabled and not replay_mode:
+		replay_actions.append({"tick": roundi(battle.snapshot().time / Battle.STEP), "method": method, "args": args.duplicate(true)})
+
+func save_recording() -> Error:
+	if not developer_tools_enabled or replay_mode or not battle or battle.snapshot().phase not in ["victory", "defeat"] or replay_path.is_empty(): return ERR_UNAVAILABLE
+	var directory := DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(replay_path.get_base_dir()))
+	if directory != OK: return directory
+	var temporary := replay_path + ".tmp"
+	var file := FileAccess.open(temporary, FileAccess.WRITE)
+	if not file: return FileAccess.get_open_error()
+	file.store_var({"version": 1, "level": campaign_level, "operators": operator_ids, "actions": replay_actions})
+	file.flush()
+	var error := file.get_error()
+	file.close()
+	if error != OK:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(temporary))
+		return error
+	return DirAccess.rename_absolute(ProjectSettings.globalize_path(temporary), ProjectSettings.globalize_path(replay_path))
+
+func _replay_actions_at_tick() -> void:
+	var actions: Array = replay_data.actions
+	var tick := roundi(battle.snapshot().time / Battle.STEP)
+	while replay_index < actions.size():
+		var action = actions[replay_index]
+		if action is not Dictionary or action.get("tick", -1) is not int or action.get("method", "") not in ["start", "deploy", "retreat", "activate_skill", "debug_finish_victory"] or action.get("args", null) is not Array:
+			_replay_fail("数据格式错误"); return
+		if action.tick > tick: return
+		if action.tick < tick: _replay_fail("时间顺序错误"); return
+		var valid := false
+		match action.method:
+			"start", "debug_finish_victory": valid = action.args.is_empty()
+			"retreat", "activate_skill": valid = action.args.size() == 1 and action.args[0] is int
+			"deploy": valid = action.args.size() in [2, 3] and action.args[0] is String and action.args[1] is Vector2i and (action.args.size() == 2 or action.args[2] is int)
+		if not valid: _replay_fail("操作参数错误"); return
+		var result = battle.callv(action.method, action.args)
+		if (result is bool and not result) or (result is Dictionary and not result.get("ok", false)):
+			_replay_fail("%s：%s" % [action.method, reason_text(result.get("reason", "")) if result is Dictionary else "操作失败"]); return
+		replay_index += 1
+
+func _replay_fail(reason: String) -> void:
+	replay_error = true
+	replay_error_message = "回放失败：第 %d 条操作，%s" % [replay_index + 1, reason]
+
+func _advance_replay(elapsed: float) -> void:
+	if replay_error: return
+	_replay_actions_at_tick()
+	replay_accumulator += elapsed
+	while not replay_error and replay_accumulator + 0.000001 >= Battle.STEP and battle.snapshot().phase == "running":
+		replay_accumulator -= Battle.STEP
+		battle.advance(Battle.STEP)
+		_replay_actions_at_tick()
+	if battle.snapshot().phase in ["victory", "defeat"] and replay_index < replay_data.actions.size() and not replay_error: _replay_fail("战斗已结束")
+	if battle.snapshot().phase == "ready" and not replay_error: _replay_fail("缺少开始战斗操作")
+	if replay_error: hud.set_notice(replay_error_message)
+
 func start() -> void:
-	if battle:
-		battle.start()
+	if battle and not replay_mode:
+		if battle.start(): _record_action("start", [])
 		hud.set_notice("")
 		refresh()
 
 func debug_victory() -> bool:
-	if not battle or not battle.debug_finish_victory(): return false
+	if replay_mode or not battle or not battle.debug_finish_victory(): return false
+	_record_action("debug_finish_victory", [])
 	refresh()
 	return true
 
 func toggle_pause() -> void:
-	if battle:
+	if battle and not replay_mode:
 		battle.set_paused(not battle.snapshot().paused)
 		refresh()
 
 func set_speed(value: float) -> void:
-	speed = value
+	speed = clampf(value, 1.0, 4.0 if developer_speed_enabled else 2.0)
 	refresh()
 
+func _effective_speed() -> float:
+	return 0.25 if not replay_mode and hud and not hud.dragged_roster.is_empty() else speed
+
 func step() -> void:
-	if battle:
+	if battle and not replay_mode:
 		var previous: float = battle.snapshot().time
 		battle.step()
 		refresh(battle.snapshot().time - previous)
 
 func reset() -> void:
-	if not battle: return
+	if not battle or replay_mode: return
+	replay_actions.clear()
+	if is_instance_valid(save_replay_button): save_replay_button.text = "保存战斗回放"
 	presentation.clear()
 	battle.reset()
 	reset_auto_start()
@@ -276,6 +370,7 @@ func reset() -> void:
 	refresh()
 
 func select_roster(key: String) -> void:
+	if replay_mode: return
 	if last_state.phase not in ["ready", "running"]: return
 	selected_roster = key; selected_unit = -1; candidate = Vector2i(-99, -99)
 	hud.game_menu.hide()
@@ -298,6 +393,7 @@ func deployment_hint(key: String) -> String:
 	return "该干员仅限地面" if configuration.roster[key].terrain == "ground" else "该干员仅限高台"
 
 func select_cell(cell: Vector2i) -> void:
+	if replay_mode: return
 	if not battle or last_state.phase not in ["ready", "running"]: return
 	hud.set_notice("")
 	if not selected_roster.is_empty():
@@ -354,7 +450,7 @@ func aim_deployment(point: Vector2) -> void:
 	update_operator_anchor()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not battle: return
+	if not battle or replay_mode: return
 	if event is InputEventMouseMotion and deployment_pending:
 		aim_deployment(event.position)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
