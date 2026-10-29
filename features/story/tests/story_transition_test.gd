@@ -74,7 +74,7 @@ func run() -> void:
  view.show_snapshot({"type": "end", "text": "", "actors": []})
  check(not view.is_processing() and not view.actor_views[0].visible, "End clears transition")
  view.show_snapshot(solo)
- check(is_equal_approx(center(view.actor_views[0]).x, view.size.x * 0.5) and not view.is_processing(), "No transition from absent actor")
+ check(is_equal_approx(center(view.actor_views[0]).x, view.size.x * 0.5) and view._move_from.is_empty(), "No transition from absent actor")
  view.queue_free()
  await process_frame
  print("STORY TRANSITION: %d checks, %d failures" % [checks, failures])

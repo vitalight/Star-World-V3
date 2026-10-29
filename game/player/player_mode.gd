@@ -516,6 +516,7 @@ func show_story(id: String, kind: String) -> void:
 
 func advance_story() -> void:
 	if page != "story": return
+	if story_view.reveal_dialogue(): return
 	if session.advance():
 		if session.snapshot().finished: finish_story()
 		else: story_view.show_snapshot(session.snapshot())

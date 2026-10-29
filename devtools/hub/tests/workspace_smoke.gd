@@ -128,7 +128,9 @@ func run() -> void:
 				check(current_scene.preview.texture.resource_path.ends_with("concept_b.png"), "Blueprint B selection")
 				if repeat == 0: await capture("blueprint_b")
 			if entry == "Story Test":
+				current_scene.stage.reveal_dialogue()
 				await click_control(current_scene.stage)
+				current_scene.stage.reveal_dialogue()
 				await click_control(current_scene.stage)
 				await settle()
 				check(current_scene.session.snapshot().text.contains("奇怪的空洞") and current_scene.choices.get_child_count() == 0, "Story opens formal linear portal scene")

@@ -26,7 +26,7 @@ func _ready() -> void:
 	theme = UI.make_theme(ACCENT)
 	stage = StoryView.new()
 	add_child(stage)
-	stage.advance_requested.connect(_advance)
+	stage.advance_requested.connect(_request_advance)
 	stage.choice_requested.connect(_choose)
 	speaker = stage.speaker
 	dialogue = stage.dialogue
@@ -142,6 +142,11 @@ func _advance() -> void:
 	if session.advance():
 		_refresh()
 
+func _request_advance() -> void:
+	if modal.visible: return
+	if stage.reveal_dialogue(): return
+	_advance()
+
 func _back() -> void:
 	if modal.visible: return
 	_set_auto(false)
@@ -168,13 +173,13 @@ func _toggle_auto() -> void:
 	_set_auto(not auto_play and state.get("type") == "line")
 
 func _process(delta: float) -> void:
-	if not auto_play or modal.visible:
+	if not auto_play or modal.visible or stage.is_typing():
 		return
 	_elapsed += delta
 	var state: Dictionary = session.snapshot()
 	var delay := maxf(2.5, str(state.get("text", "")).length() * 0.085)
 	if _elapsed >= delay:
-		_advance()
+		_request_advance()
 
 func _skip() -> void:
 	_set_auto(false)
@@ -215,5 +220,5 @@ func _refresh() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept") and not event.is_echo():
-		_advance()
+		_request_advance()
 		get_viewport().set_input_as_handled()

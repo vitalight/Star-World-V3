@@ -5,6 +5,8 @@ signal choice_requested(index: int)
 signal ui_sound_requested(id: String)
 const INK = Color("f4f1eb")
 const ACCENT = Color("dfc49b")
+const TYPE_INTERVAL := 0.04
+const LINE_PAUSE := 0.6
 var background: TextureRect
 var _previous_background: TextureRect
 var _background_base: Texture2D
@@ -21,6 +23,9 @@ var dialogue: Label
 var choices: VBoxContainer
 var ending: Label
 var _dialogue_scroll: ScrollContainer
+var _typing_index := 0
+var _typing_delay := 0.0
+var _typing := false
 var _backgrounds: Dictionary = {}
 var _actors: Dictionary = {}
 var _state: Dictionary = {}
@@ -61,16 +66,16 @@ func _ready() -> void:
 		actor_views.append(actor)
 	_gradient([Color(0, 0, 0, 0.62), Color(0, 0, 0, 0)], [0.0, 1.0], true)
 	_gradient([Color(0, 0, 0, 0), Color(0, 0, 0, 0.78), Color.BLACK], [0.58, 0.82, 1.0], false)
-	speaker = _label(28, ACCENT)
+	speaker = _label(34, ACCENT)
 	_dialogue_scroll = ScrollContainer.new()
 	_dialogue_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(_dialogue_scroll)
-	dialogue = _label(24, INK, _dialogue_scroll)
+	dialogue = _label(29, INK, _dialogue_scroll)
 	dialogue.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	choices = VBoxContainer.new()
 	choices.add_theme_constant_override("separation", 12)
 	add_child(choices)
-	ending = _label(16, Color("aaa9a8"))
+	ending = _label(19, Color("aaa9a8"))
 	ending.text = "— 本段剧情结束 —"
 	ending.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	resized.connect(_layout)
@@ -134,6 +139,11 @@ func show_snapshot(state: Dictionary) -> void:
 	speaker.text = state.get("speaker", "")
 	speaker.visible = not speaker.text.is_empty() and speaker.text != "旁白"
 	dialogue.text = state.get("text", "")
+	_typing_index = 0
+	_typing_delay = TYPE_INTERVAL
+	_typing = state.get("type") == "line" and not dialogue.text.is_empty()
+	dialogue.visible_characters = 0 if _typing else -1
+	if _typing: set_process(true)
 	_dialogue_scroll.scroll_vertical = 0
 	ending.visible = state.get("type") == "end"
 	for child in choices.get_children():
@@ -159,9 +169,31 @@ func _texture(parent: Node = null) -> TextureRect:
 func _process(delta: float) -> void:
 	_effect_time += delta
 	_apply_effects()
+	_advance_typing(delta)
 	var exit_end := ACTOR_EXIT_DELAY + ACTOR_EXIT_DURATION if not _anim_actor_exit_left.is_empty() or not _anim_actor_exit_right.is_empty() else 0.0
-	if _effect_time >= maxf(maxf(SCREEN_SHAKE_DURATION, ACTOR_SHAKE_DURATION), maxf(maxf(ACTOR_FLIP_DURATION, exit_end), maxf(ACTOR_MOVE_DURATION, BACKGROUND_TRANSITION_DURATION))):
+	if not _typing and _effect_time >= maxf(maxf(SCREEN_SHAKE_DURATION, ACTOR_SHAKE_DURATION), maxf(maxf(ACTOR_FLIP_DURATION, exit_end), maxf(ACTOR_MOVE_DURATION, BACKGROUND_TRANSITION_DURATION))):
 		set_process(false)
+
+func is_typing() -> bool:
+	return _typing
+
+func reveal_dialogue() -> bool:
+	if not _typing: return false
+	_typing = false
+	dialogue.visible_characters = -1
+	return true
+
+func _advance_typing(delta: float) -> void:
+	if not _typing: return
+	_typing_delay -= delta
+	while _typing and _typing_delay <= 0.0:
+		var character := dialogue.text.substr(_typing_index, 1)
+		_typing_index += 1
+		dialogue.visible_characters = _typing_index
+		if _typing_index >= dialogue.text.length():
+			_typing = false
+			break
+		_typing_delay += LINE_PAUSE if character == "\n" else TYPE_INTERVAL
 
 func _apply_effects() -> void:
 	var unit := minf(size.x / 1600.0, size.y / 900.0)
@@ -304,7 +336,7 @@ func _button(text: String, parent: Node) -> Button:
 	var button := Button.new()
 	button.text = text
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_font_size_override("font_size", 22)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.02, 0.025, 0.035, 0.83)
 	style.border_color = Color(0.75, 0.72, 0.64, 0.48)
@@ -342,17 +374,17 @@ func _actor_layout_rect(index: int) -> Rect2:
 func _layout() -> void:
 	if not is_node_ready():
 		return
-	var inset := maxf(28, size.x * 0.12)
-	var text_width := size.x - inset * 2
+	var inset := maxf(28, size.x * 0.15)
+	var text_width := size.x - inset - maxf(28, size.x * 0.12)
 	var compact := size.x < 1000 or size.y < 700
-	var speaker_y := size.y * (0.72 if compact else 0.785)
-	var text_y := speaker_y + (40 if compact else 46)
+	var speaker_y := size.y * (0.67 if compact else 0.7275)
+	var text_y := speaker_y + (44 if compact else 50)
 	speaker.position = Vector2(inset, speaker_y)
-	speaker.size = Vector2(text_width, 38)
-	speaker.add_theme_font_size_override("font_size", 25 if size.x < 1000 else 28)
+	speaker.size = Vector2(text_width, 42)
+	speaker.add_theme_font_size_override("font_size", 30 if size.x < 1000 else 34)
 	_dialogue_scroll.position = Vector2(inset, text_y)
-	_dialogue_scroll.size = Vector2(text_width, maxf(38, size.y - 72 - text_y))
-	dialogue.add_theme_font_size_override("font_size", 20 if size.x < 1000 else 24)
+	_dialogue_scroll.size = Vector2(text_width, maxf(38, size.y - 32 - text_y))
+	dialogue.add_theme_font_size_override("font_size", 24 if size.x < 1000 else 29)
 	var choice_width := minf(660, size.x * 0.74)
 	choices.position = Vector2((size.x - choice_width) * 0.5, size.y * 0.49)
 	choices.size.x = choice_width

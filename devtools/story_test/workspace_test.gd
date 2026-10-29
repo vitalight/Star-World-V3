@@ -61,6 +61,7 @@ func run() -> void:
 	check(not workspace.history.text.contains("旁白："), "Formal story transcript omits narrator label")
 	workspace._restart()
 	workspace._toggle_auto()
+	workspace.stage.reveal_dialogue()
 	workspace._process(100)
 	check(workspace.session.snapshot().id == "line_1", "Automatic playback advances formal story")
 	workspace._skip()

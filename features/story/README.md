@@ -28,4 +28,4 @@
 
 节点可选字段：`background`、`actors`（最多两个不重复 ID）、`speaker_actor`、`framing`（`wide`／`left_close`）、`anim_screen_shake`、`anim_actor_shake`、`anim_actor_flip`、`actor_mirror`、`anim_actor_exit_left`／`anim_actor_exit_right`。每个节点提供完整场景状态，不继承上一节点；`actors: []` 表示全部退场。
 
-暂不支持条件分支、变量、存档、脚本事件或打字机。演出过渡与动画细节由视图实现，验证见 `features/story/tests/`。
+对白逐字显示，文本中的换行后停顿 0.6 秒；调用方可用 `is_typing()` 查询状态，并用 `reveal_dialogue()` 立即显示全文（返回是否跳过了动画）。点击或按确认键先显示全文，再推进。暂不支持条件分支、变量、存档或脚本事件。演出过渡与动画细节由视图实现，验证见 `features/story/tests/`。

@@ -48,11 +48,13 @@ func click(text: String) -> void:
 
 func click_story_blank() -> void:
 	var point: Vector2 = player.story_view.get_global_rect().position + Vector2(40, 200)
-	for pressed in [true, false]:
-		var event := InputEventMouseButton.new()
-		event.position = point; event.global_position = point
-		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
-		root.push_input(event, true)
+	for click_index in 2:
+		for pressed in [true, false]:
+			var event := InputEventMouseButton.new()
+			event.position = point; event.global_position = point
+			event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+			root.push_input(event, true)
+		await process_frame
 	await settle()
 
 func spawn(path := SAVE) -> void:

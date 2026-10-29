@@ -45,7 +45,7 @@ func _check_manifest() -> void:
 	check(Cues.errors().is_empty(), "Cue manifest has no structural errors: %s" % [Cues.errors()])
 	check(is_equal_approx(Cues.find("sfx_attack").start_offset, 0.06) and Cues.find("sfx_hit").start_offset == 0.0 and Cues.find("sfx_heal").start_offset == 0.0, "Attack starts earlier without shifting hit or healing cues")
 	check(is_equal_approx(db_to_linear(Cues.find("music_battle").volume_db - Cues.find("music_main").volume_db), 0.8), "Battle music is 80 percent of its previous level")
-	for id in ["music_main", "music_battle", "music_tension"]:
+	for id in ["music_main", "music_battle", "music_tension", "music_calm"]:
 		var cue = Cues.find(id)
 		check(cue != null, "Music cue exists: " + id)
 		if cue == null: continue
@@ -87,7 +87,15 @@ func _check_product_flow() -> void:
 	player.show_story("scene_0101A", "story")
 	await settle()
 	check(player.audio.current_music_id == "music_tension", "First story uses configured music")
-	player.show_story("scene_0102A", "story")
+	for id in ["scene_0102A", "scene_0103A", "scene_0104A"]:
+		player.show_story(id, "story")
+		await settle()
+		check(player.audio.current_music_id == "music_tension", id + " uses tension music")
+	player.show_story("scene_0105A", "story")
+	await settle()
+	check(player.audio.current_music_id == "music_calm", "Final story uses calm music")
+	player.catalog.levels["scene_0105A"].music = ""
+	player.show_story("scene_0105A", "story")
 	await settle()
 	check(player.audio.current_music_id == "music_main", "Unconfigured story uses main music")
 	player.show_main()

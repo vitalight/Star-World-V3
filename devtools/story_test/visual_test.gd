@@ -20,6 +20,8 @@ func capture(name: String) -> void:
 	root.get_texture().get_image().save_png("res://temp/verification/" + name + ".png")
 
 func click(control: Control) -> void:
+	if control == current_scene.stage and current_scene.stage.is_typing():
+		current_scene.stage.reveal_dialogue()
 	var point := control.get_global_rect().get_center()
 	for pressed in [true, false]:
 		var event := InputEventMouseButton.new()
@@ -74,5 +76,16 @@ func run() -> void:
 	check(current_scene.modal.visible, "Toolbar opens history")
 	check(Rect2(Vector2.ZERO, Vector2(root.size)).encloses(current_scene.modal_panel.get_global_rect()), "History panel fits narrow viewport")
 	await capture("story_history_narrow")
+	current_scene.modal.hide()
+	for dimensions in [Vector2i(800, 650), Vector2i(1600, 900)]:
+		root.content_scale_size = dimensions
+		root.size = dimensions
+		await settle()
+		current_scene.stage.show_snapshot({"type": "line", "speaker": "阿五", "text": "定位到了。\n但是……"})
+		await settle()
+		var scroll: ScrollContainer = current_scene.stage.dialogue.get_parent()
+		var bar := scroll.get_v_scroll_bar()
+		check(bar.max_value <= bar.page, "Two-line dialogue fits without clipping at " + str(dimensions))
+		await capture("story_multiline_%dx%d" % [dimensions.x, dimensions.y])
 	print("Story visual/input: %d failures" % failures)
 	quit(1 if failures else 0)

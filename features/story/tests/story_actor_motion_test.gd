@@ -70,7 +70,7 @@ func run() -> void:
 		var facing := quiet.duplicate(true)
 		facing.actor_mirror = ["one"]
 		view.show_snapshot(facing)
-		check(view.actor_views[0].flip_h and not view.is_processing(), "Next beat preserves explicit facing without another turn")
+		check(view.actor_views[0].flip_h and view._anim_actor_flip.is_empty(), "Next beat preserves explicit facing without another turn")
 		var leave := quiet.duplicate(true)
 		leave.anim_actor_exit_left = ["one", "two"]
 		view.show_snapshot(leave)
@@ -114,7 +114,7 @@ func run() -> void:
 		view.set_process(false)
 		view._process(0.06)
 		view.show_snapshot(quiet)
-		check(view.actor_views[0].scale == Vector2.ONE and not view.is_processing(), "Fast advance cancels partial turn")
+		check(view.actor_views[0].scale == Vector2.ONE and view._anim_actor_flip.is_empty(), "Fast advance cancels partial turn")
 		view.show_snapshot(leave)
 		view.set_process(false)
 		view._process(0.2)

@@ -63,7 +63,7 @@ func run() -> void:
 		check(view.actor_views[0].position.distance_to(rest) > 0.1, "Excited actor shakes")
 		check(view.actor_views[1].position == other_rest and view.background.global_position == background_rest, "Actor shake isolates its target")
 		view.show_snapshot(quiet)
-		check(view.actor_views[0].position == rest and not view.is_processing(), "New line cancels old shake")
+		check(view.actor_views[0].position == rest and view._anim_actor_shake.is_empty(), "New line cancels old shake")
 		view.show_snapshot(actor)
 		view.set_process(false)
 		view._process(0.07)
