@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://4u71y0631je3" path="res://features/audio/audio_cue.gd" id="cue"]
 [ext_resource type="Script" uid="uid://dxsd2rhsah3y3" path="res://features/audio/audio_library.gd" id="library"]
 [ext_resource type="AudioStream" uid="uid://dmsys3avkeipr" path="res://content/audio/music/music_battle.mp3" id="music_battle_stream"]
+[ext_resource type="AudioStream" path="res://content/audio/music/music_tension.mp3" id="music_tension_stream"]
 [ext_resource type="AudioStream" uid="uid://ctjicowo22i8f" path="res://content/audio/music/music_main.mp3" id="music_main_stream"]
 [ext_resource type="AudioStream" uid="uid://dpvjxpj5t0br" path="res://content/audio/sfx/sfx_attack.mp3" id="sfx_attack_stream"]
 [ext_resource type="AudioStream" uid="uid://f61u0wl7aiua" path="res://content/audio/sfx/sfx_heal.mp3" id="sfx_heal_stream"]
@@ -22,6 +23,13 @@ script = ExtResource("cue")
 id = "music_battle"
 bus = "Music"
 stream = ExtResource("music_battle_stream")
+volume_db = -5.9382
+
+[sub_resource type="Resource" id="cue_music_tension"]
+script = ExtResource("cue")
+id = "music_tension"
+bus = "Music"
+stream = ExtResource("music_tension_stream")
 volume_db = -4.0
 
 [sub_resource type="Resource" id="cue_sfx_ui_click"]
@@ -138,4 +146,4 @@ volume_db = -2.0
 
 [resource]
 script = ExtResource("library")
-cues = Array[ExtResource("cue")]([SubResource("cue_music_main"), SubResource("cue_music_battle"), SubResource("cue_sfx_ui_click"), SubResource("cue_sfx_attack"), SubResource("cue_sfx_hit"), SubResource("cue_sfx_heal"), SubResource("cue_sfx_notify"), SubResource("cue_sfx_deploy"), SubResource("cue_sfx_retreat"), SubResource("cue_sfx_spawn"), SubResource("cue_sfx_cost_gain"), SubResource("cue_sfx_skill_start"), SubResource("cue_sfx_skill_end"), SubResource("cue_sfx_hurt"), SubResource("cue_sfx_miss"), SubResource("cue_sfx_block"), SubResource("cue_sfx_enemy_death"), SubResource("cue_sfx_unit_death"), SubResource("cue_sfx_escape"), SubResource("cue_sfx_victory"), SubResource("cue_sfx_defeat")])
+cues = Array[ExtResource("cue")]([SubResource("cue_music_main"), SubResource("cue_music_battle"), SubResource("cue_music_tension"), SubResource("cue_sfx_ui_click"), SubResource("cue_sfx_attack"), SubResource("cue_sfx_hit"), SubResource("cue_sfx_heal"), SubResource("cue_sfx_notify"), SubResource("cue_sfx_deploy"), SubResource("cue_sfx_retreat"), SubResource("cue_sfx_spawn"), SubResource("cue_sfx_cost_gain"), SubResource("cue_sfx_skill_start"), SubResource("cue_sfx_skill_end"), SubResource("cue_sfx_hurt"), SubResource("cue_sfx_miss"), SubResource("cue_sfx_block"), SubResource("cue_sfx_enemy_death"), SubResource("cue_sfx_unit_death"), SubResource("cue_sfx_escape"), SubResource("cue_sfx_victory"), SubResource("cue_sfx_defeat")])

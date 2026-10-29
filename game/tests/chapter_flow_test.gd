@@ -46,6 +46,15 @@ func click(text: String) -> void:
 		root.push_input(event, true)
 	await settle()
 
+func click_story_blank() -> void:
+	var point: Vector2 = player.story_view.get_global_rect().position + Vector2(40, 200)
+	for pressed in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.position = point; event.global_position = point
+		event.button_index = MOUSE_BUTTON_LEFT; event.pressed = pressed
+		root.push_input(event, true)
+	await settle()
+
 func spawn(path := SAVE) -> void:
 	player = Player.instantiate(); player.save_path = path
 	root.add_child(player); await settle()
@@ -73,7 +82,7 @@ func run() -> void:
 		await click("返回关卡")
 	root.size = Vector2i(1280, 800); await settle()
 	await click("进入故事")
-	await click("继续 →")
+	await click_story_blank()
 	check(player.session.snapshot().history.size() == 2, "Story continue advances shared session")
 	await capture("story_cat")
 	await click("跳过剧情")

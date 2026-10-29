@@ -2,6 +2,7 @@ extends RefCounted
 ## Source files are authoritative. Builds battle dictionaries and StoryScript resources.
 const StoryScript = preload("res://features/story/story_script.gd")
 const Library = preload("res://features/content_definitions/actor_library.gd")
+const Cues = preload("res://content/audio/cues.tres")
 const ROOT := "res://content/campaign"
 const DATA := "res://content/data"
 var errors := PackedStringArray()
@@ -30,12 +31,15 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 	for row in _table(base + "/backgrounds.csv", "id,texture"):
 		_resource(row, "texture")
 		backgrounds[row.id] = row.texture
-	for row in _table(base + "/levels.csv", "id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,roster_mode,fixed_roster"):
-		var level := {"id": row.id, "name": row.name, "description": row.description, "type": row.type, "story": row.story, "map": row.map,
+	for row in _table(base + "/levels.csv", "id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,roster_mode,fixed_roster,music"):
+		var level := {"id": row.id, "name": row.name, "description": row.description, "type": row.type, "story": row.story, "map": row.map, "music": row.music,
 			"enemies": {}, "waves": [], "route_warning_duration": 2.0}
 		levels[row.id] = level
 		_level_errors[row.id] = PackedStringArray()
 		if row.type == "story":
+			if not row.music.is_empty():
+				var cue = Cues.find(row.music)
+				if cue == null or cue.bus != "Music" or cue.stream == null: _error(row, "music", "必须引用已配置的音乐 cue")
 			for field in ["map", "life", "initial_cost", "cost_cap", "cost_regen", "deploy_limit", "defend_duration", "roster_mode", "fixed_roster"]:
 				if not row[field].is_empty(): _error(row, field, "剧情关不能配置战斗内容")
 			if not row.story.begins_with("res://content/"): _error(row, "story", "剧情必须位于正式内容目录")
@@ -45,6 +49,7 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 			errors.resize(start)
 		elif row.type == "battle":
 			if not row.story.is_empty(): _error(row, "story", "战斗关不能配置剧情")
+			if not row.music.is_empty(): _error(row, "music", "战斗关不能配置剧情音乐")
 			level.roster_mode = row.roster_mode
 			level.fixed_roster = Array(row.fixed_roster.split("|", false))
 			if row.roster_mode not in ["fixed", "player"]: _error(row, "roster_mode", "必须为 fixed 或 player")

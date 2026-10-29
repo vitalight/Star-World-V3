@@ -24,7 +24,7 @@ CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` �
 
 - 正式关卡 ID 使用 `scene_0101A` 格式；levels.csv 行序即解锁顺序。
 - 战斗关的 `roster_mode` 为 `fixed` 或 `player`。固定编队在 `fixed_roster` 中以 `|` 分隔角色 ID；玩家编队留空该字段，由玩家在选关页从当前可出战角色中选择。剧情关两列留空。
-- `type=story` 只填写 story；`type=battle` 填写 map 与战斗数值，story 留空。
+- `type=story` 填写 story，可在 `music` 填写 `content/audio/cues.tres` 中的音乐 cue ID；留空使用主音乐。`type=battle` 填写 map 与战斗数值，story 和 music 留空。
 - `waves.csv` 的 `time` 为绝对战斗时刻（秒），`number` 只用于显示，`interval` 为同组出怪间隔；每关至少一组波次。
 - `defend_duration=0` 表示普通清怪关；大于 0 时需计时结束、清空敌人并守住基地才能获胜。
 - 敌人路线的起点和终点不可部署干员，包括飞行路线；其他格子仍按地块的部署属性判定。

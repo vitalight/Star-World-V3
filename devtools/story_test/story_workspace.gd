@@ -9,7 +9,6 @@ var status: Label
 var speaker: Label
 var dialogue: Label
 var choices: VBoxContainer
-var continue_button: Button
 var history: Label
 var breadcrumb: Control
 var toolbar: HFlowContainer
@@ -32,7 +31,6 @@ func _ready() -> void:
 	speaker = stage.speaker
 	dialogue = stage.dialogue
 	choices = stage.choices
-	continue_button = stage.continue_button
 	breadcrumb = UI.PATH.new()
 	add_child(breadcrumb)
 	breadcrumb.configure(PackedStringArray(["Star World", "Developer Hub", "Story Test"]),
@@ -62,7 +60,6 @@ func _ready() -> void:
 	if source_picker.item_count == 0:
 		status.text = "没有可预览的正式剧情\n" + "\n".join(source_catalog.errors)
 		modal.show()
-		continue_button.disabled = true
 		return
 	_load_source(0)
 

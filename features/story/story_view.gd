@@ -19,7 +19,6 @@ var actor_views: Array[TextureRect] = []
 var speaker: Label
 var dialogue: Label
 var choices: VBoxContainer
-var continue_button: Button
 var ending: Label
 var _dialogue_scroll: ScrollContainer
 var _backgrounds: Dictionary = {}
@@ -71,8 +70,6 @@ func _ready() -> void:
 	choices = VBoxContainer.new()
 	choices.add_theme_constant_override("separation", 12)
 	add_child(choices)
-	continue_button = _button("继续 →", self)
-	continue_button.pressed.connect(func(): advance_requested.emit())
 	ending = _label(16, Color("aaa9a8"))
 	ending.text = "— 本段剧情结束 —"
 	ending.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -138,7 +135,6 @@ func show_snapshot(state: Dictionary) -> void:
 	speaker.visible = not speaker.text.is_empty() and speaker.text != "旁白"
 	dialogue.text = state.get("text", "")
 	_dialogue_scroll.scroll_vertical = 0
-	continue_button.visible = state.get("type") == "line"
 	ending.visible = state.get("type") == "end"
 	for child in choices.get_children():
 		choices.remove_child(child)
@@ -360,8 +356,6 @@ func _layout() -> void:
 	var choice_width := minf(660, size.x * 0.74)
 	choices.position = Vector2((size.x - choice_width) * 0.5, size.y * 0.49)
 	choices.size.x = choice_width
-	continue_button.position = Vector2(size.x - inset - 125, size.y - 58)
-	continue_button.size = Vector2(125, 46)
 	ending.position = Vector2(inset, size.y - 43)
 	ending.size = Vector2(text_width, 28)
 	_apply_effects()

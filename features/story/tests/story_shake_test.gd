@@ -40,7 +40,6 @@ func run() -> void:
 		var other_rest := view.actor_views[1].position
 		var background_rest := view.background.global_position
 		var dialogue_rest := view.dialogue.global_position
-		var button_rest := view.continue_button.global_position
 		var screen := quiet.duplicate(true)
 		screen.anim_screen_shake = true
 		view.show_snapshot(screen)
@@ -50,7 +49,7 @@ func run() -> void:
 		check(movement.length() > 0.1, "Screen shake moves scene")
 		check((view.actor_views[1].global_position - other_rest).distance_to(movement) < 0.001, "Screen shake moves both actors together within subpixel precision")
 		check(view.background.get_global_rect().encloses(view.get_global_rect()), "Overscan covers viewport during shake")
-		check(view.dialogue.global_position == dialogue_rest and view.continue_button.global_position == button_rest, "Dialogue and input stay still")
+		check(view.dialogue.global_position == dialogue_rest, "Dialogue and input stay still")
 		view._process(view.SCREEN_SHAKE_DURATION - 0.0701)
 		check(absf(view.background.offset_left) < 0.01 and absf(view.background.offset_right) < 0.01, "Background overscan approaches zero continuously before shake ends")
 		check(view.background.get_global_rect().encloses(view.get_global_rect()), "Tapered overscan still covers viewport before shake ends")

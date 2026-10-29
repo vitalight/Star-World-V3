@@ -486,7 +486,7 @@ func show_story(id: String, kind: String) -> void:
 	if not catalog.diagnostics(id).is_empty(): show_levels(); return
 	_clear_page()
 	page = "story"
-	_play_music("music_main")
+	_play_music(catalog.levels[id].music if not catalog.levels[id].music.is_empty() else "music_main")
 	story_level = id; story_kind = kind
 	menu = Control.new()
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
