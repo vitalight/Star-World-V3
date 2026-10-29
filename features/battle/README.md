@@ -46,7 +46,7 @@ battle.reset()
 
 敌人额外字段：`speed`、`ranged`、`range`（连续距离）、`flying`、`leak_damage`。飞行只改变受击资格和阻挡，仍沿配置路线前进。
 
-`skill` 支持 `recovery`（auto／attack／hit）、`required`、`initial_sp`、`duration`、`multiplier`、`defense_multiplier`、`interval_multiplier`、`cost_gain`；倍率只在技能持续期间生效。
+`skill` 支持 `recovery`（auto／attack／hit）、`required`、`initial_sp`、`duration`、`multiplier`、`defense_multiplier`、`interval_multiplier`、`cost_gain`；倍率只在技能持续期间生效。`trigger` 为 manual（默认）或 automatic；自动技能充满后自行释放，持续期不充能。`duration=0` 为瞬发。`forward_range` 按朝向延伸最前列，`hit_count` 为每次攻击的独立伤害次数；后续命中在前一次命中后发射，目标死亡或消失时取消，整个连击只计一次攻击和充能，`heal_damage_reduction` 和 `heal_buff_duration` 指定治疗后附加的减伤及持续时间；重复治疗刷新效果。
 
 ## 状态与事件
 

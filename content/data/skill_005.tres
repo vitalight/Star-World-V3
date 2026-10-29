@@ -8,12 +8,15 @@
 script = ExtResource("script")
 content_id = "skill_005"
 display_name = "安心处方"
-description = "治疗量提升至180%，持续10秒。"
+description = "充能完成后自动强化，10秒内治疗的友军获得30%减伤，持续3秒。"
+trigger = "automatic"
+heal_damage_reduction = 0.3
+heal_buff_duration = 3.0
 recovery = "auto"
 required = 20
 initial_sp = 12
 duration = 10
-multiplier = 1.8
+multiplier = 1
 interval_multiplier = 1
 cost_gain = 0
 icon = ExtResource("icon")

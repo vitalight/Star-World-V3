@@ -572,12 +572,18 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 	if not selected.is_empty():
 		operator_name.text = selected.name
 		selection.text = "攻击 %d\n防御 %d\n法抗 %d\n阻挡 %d" % [selected.attack, selected.defense, selected.resistance, selected.block]
-		var ready: bool = deployed_selection and selected.skill.enabled and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
+		var ready: bool = deployed_selection and selected.skill.enabled and selected.skill.get("trigger", "manual") == "manual" and selected.sp + 0.000001 >= selected.skill.required and selected.skill_left <= 0
 		skill_button.disabled = not ready or state.phase != "running"
 		var appearance = catalog[selected.roster_id if deployed_selection else chosen_roster]
 		operator_portrait.texture = appearance.portrait
 		operator_class_icon.texture = appearance.class_icon
-		range_preview.cells = selected.range
+		range_preview.cells = selected.range.duplicate()
+		if deployed_selection:
+			range_preview.cells.clear()
+			for cell in selected.range_cells:
+				var offset: Vector2i = cell - selected.cell
+				for turn in range(selected.facing): offset = Vector2i(offset.y, -offset.x)
+				range_preview.cells.append(offset)
 		range_preview.queue_redraw()
 		skill_button.icon = skill_icons.get(selected.roster_id if deployed_selection else chosen_roster, appearance.portrait)
 		skill_portrait.texture = skill_button.icon

@@ -85,14 +85,19 @@ func activate_skill(unit_id: int) -> Dictionary:
 	if unit.is_empty(): return _result(false, "unknown_unit")
 	if unit.skill_left > 0.0: return _result(false, "skill_active")
 	if not unit.skill.enabled: return _result(false, "no_skill")
+	if unit.skill.trigger != "manual": return _result(false, "automatic_skill")
 	if unit.sp + 0.000001 < unit.skill.required: return _result(false, "insufficient_sp")
+	_start_skill(unit)
+	return _result(true)
+
+func _start_skill(unit: Dictionary) -> void:
 	unit.sp = 0.0
 	unit.skill_left = unit.skill.duration
 	var gain: float = minf(unit.skill.cost_gain, _config.cost_cap - _state.cost)
 	_state.cost += gain
 	if gain > 0: emit("cost_gain", {"source": unit.id, "amount": gain})
 	emit("skill_start", {"source": unit.id, "duration": unit.skill_left})
-	return _result(true)
+	if unit.skill_left <= 0: emit("skill_end", {"source": unit.id})
 
 func start() -> bool:
 	if _state.phase != "ready": return false

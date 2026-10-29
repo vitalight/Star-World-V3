@@ -8,7 +8,8 @@
 script = ExtResource("script")
 content_id = "skill_001"
 display_name = "守家之刃"
-description = "攻击提升至180%，持续8秒。"
+description = "攻击范围向前延伸1格，攻击提升至180%，持续8秒。"
+forward_range = 1
 recovery = "auto"
 required = 18
 initial_sp = 10

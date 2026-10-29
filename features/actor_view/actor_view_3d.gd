@@ -174,7 +174,7 @@ func apply_state(state: Dictionary, is_enemy: bool) -> void:
 	var skill: Dictionary = state.get("skill", {})
 	var sp_ratio := clampf(float(state.get("sp", 0.0)) / maxf(0.001, float(skill.get("required", 1.0))), 0.0, 1.0)
 	var left: float = state.get("skill_left", 0.0)
-	var ready: bool = not is_enemy and state.get("skill_hint_allowed", true) and not state.get("preview", false) and skill.get("enabled", false) and left <= 0 and float(state.get("sp", 0.0)) + 0.000001 >= float(skill.get("required", 1.0))
+	var ready: bool = not is_enemy and state.get("skill_hint_allowed", true) and not state.get("preview", false) and skill.get("enabled", false) and skill.get("trigger", "manual") == "manual" and left <= 0 and float(state.get("sp", 0.0)) + 0.000001 >= float(skill.get("required", 1.0))
 	if ready != skill_ready:
 		skill_ready = ready
 		readiness_phase = 0.0

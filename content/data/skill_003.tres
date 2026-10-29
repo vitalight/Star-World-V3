@@ -8,12 +8,14 @@
 script = ExtResource("script")
 content_id = "skill_003"
 display_name = "精准连射"
-description = "攻击间隔缩短至55%，持续10秒。"
+description = "充能完成后自动强化，10秒内每次攻击造成两次伤害。"
+trigger = "automatic"
+hit_count = 2
 recovery = "attack"
 required = 8
 initial_sp = 4
 duration = 10
 multiplier = 1
-interval_multiplier = 0.55
+interval_multiplier = 1
 cost_gain = 0
 icon = ExtResource("icon")

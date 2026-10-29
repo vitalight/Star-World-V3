@@ -14,6 +14,7 @@ func _initialize() -> void:
 	healing()
 	skills()
 	skill_modifiers()
+	character_skill_rules()
 	boundary_contracts()
 	waves_and_determinism()
 	print("Battle rules: %d checks, %d failures" % [checks, failures])
@@ -526,3 +527,57 @@ func skill_modifiers() -> void:
 		near(attacks[1].time - attacks[0].time,0.3,"Active rapid-fire interval is halved")
 		near(attacks[4].time - attacks[3].time,0.6,"Base attack interval resumes after expiry")
 	near(b.find_unit(id).interval,0.6,"Rapid-fire preserves base interval")
+
+func character_skill_rules() -> void:
+	var c = fixture()
+	c.roster.g.skill = {"enabled": true, "required": 1.0, "initial_sp": 1.0, "duration": 1.0, "forward_range": 1}
+	var b = Battle.new(c)
+	var id = b.deploy("g", Vector2i(1, 0), 2).id
+	b.start()
+	check(not b.snapshot().units[0].range_cells.has(Vector2i(-1, 0)), "base range does not include extended cell")
+	check(b.activate_skill(id).ok and b.snapshot().units[0].range_cells.has(Vector2i(-1, 0)), "skill extends range and rotates with facing")
+	b.advance(1.1)
+	check(not b.snapshot().units[0].range_cells.has(Vector2i(-1, 0)), "range returns after skill")
+	c = fixture()
+	c.roster.g.skill = {"enabled": true, "trigger": "automatic", "required": 1.0, "initial_sp": 1.0, "duration": 2.0, "multiplier": 1.0, "hit_count": 2}
+	b = Battle.new(c)
+	id = b.deploy("g", Vector2i.ZERO).id
+	b.start()
+	check(b.activate_skill(id).reason == "automatic_skill", "automatic skill rejects manual activation")
+	b.advance(0.2)
+	var first_events = b.take_events()
+	var first_hits = first_events.filter(func(e): return e.type == "damage" and e.friendly)
+	check(first_hits.size() == 1 and first_hits[0].amount == 10, "first hit lands before follow-up")
+	b.advance(0.2)
+	var second_events = b.take_events()
+	var second_hits = second_events.filter(func(e): return e.type == "damage" and e.friendly)
+	var shots = first_events.filter(func(e): return e.type == "attack_start" and e.friendly)
+	check(shots.size() == 2 and second_hits.size() == 1 and second_hits[0].amount == 10 and second_hits[0].time > first_hits[0].time, "follow-up launches at first hit and lands later")
+	check(b.find_unit(id).attack_count == 1, "follow-up does not count as another attack or charge SP")
+	c = fixture()
+	c.roster.g.skill = {"enabled": true, "trigger": "automatic", "required": 1.0, "initial_sp": 1.0, "duration": 2.0, "multiplier": 1.0, "hit_count": 2}
+	c.enemies.e.max_hp = 5.0
+	b = Battle.new(c)
+	b.deploy("g", Vector2i.ZERO)
+	b.start(); b.advance(0.5)
+	var lethal_events = b.take_events()
+	check(lethal_events.filter(func(e): return e.type == "attack_start" and e.friendly).size() == 1, "lethal first hit cancels follow-up")
+
+	c = fixture()
+	c.roster.g.skill = {"enabled": true, "required": 1.0, "initial_sp": 1.0, "duration": 0.0, "cost_gain": 12.0}
+	b = Battle.new(c)
+	id = b.deploy("g", Vector2i.ZERO).id
+	b.start()
+	check(b.activate_skill(id).ok and b.find_unit(id).skill_left == 0 and b.snapshot().cost == 52, "instant skill grants cost without duration")
+	c = fixture()
+	c.roster.h.attack = 5.0
+	c.roster.h.skill = {"enabled": true, "trigger": "automatic", "required": 1.0, "initial_sp": 1.0, "duration": 3.0, "multiplier": 1.0, "heal_damage_reduction": 0.3, "heal_buff_duration": 1.0}
+	c.enemies.e.attack = 100.0
+	c.enemies.e.interval = 0.5
+	b = Battle.new(c)
+	b.deploy("g", Vector2i.ZERO)
+	b.deploy("h", Vector2i(0, -1))
+	b.start()
+	b.advance(2.0)
+	var damages = events(b, "damage", false)
+	check(damages.any(func(e): return is_equal_approx(e.amount, 70.0)), "healed ally takes reduced damage")

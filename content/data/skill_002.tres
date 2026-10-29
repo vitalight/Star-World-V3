@@ -8,12 +8,12 @@
 script = ExtResource("script")
 content_id = "skill_002"
 display_name = "猫猫突袭"
-description = "攻击提升至220%，持续5秒。"
+description = "攻击间隔缩短至50%，持续5秒。"
 recovery = "auto"
 required = 10
 initial_sp = 10
 duration = 5
-multiplier = 2.2
-interval_multiplier = 1
+multiplier = 1
+interval_multiplier = 0.5
 cost_gain = 0
 icon = ExtResource("icon")

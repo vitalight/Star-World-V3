@@ -4,7 +4,13 @@ const Navigation = preload("res://features/battle/navigation.gd")
 
 static func range_cells(unit: Dictionary) -> Array:
 	var cells: Array = []
-	for offset in unit.range:
+	var offsets: Array = unit.range.duplicate()
+	if unit.get("skill_left", 0.0) > 0 and unit.skill.forward_range > 0 and not offsets.is_empty():
+		var front: int = offsets.map(func(offset): return Vector2i(offset).x).max()
+		for offset in unit.range:
+			if Vector2i(offset).x == front:
+				for extra in range(1, unit.skill.forward_range + 1): offsets.append(Vector2i(offset) + Vector2i(extra, 0))
+	for offset in offsets:
 		var p = Vector2i(offset)
 		for i in range(unit.facing): p = Vector2i(-p.y, p.x)
 		cells.append(unit.cell + p)
@@ -31,10 +37,13 @@ static func recover(unit: Dictionary, kind: String, amount: float) -> void:
 static func update_timers(b) -> void:
 	for actor in b._state.units + b._state.enemies: actor.cooldown = maxf(0.0, actor.cooldown - b.STEP)
 	for unit in b._state.units:
+		unit["damage_reduction_left"] = maxf(0.0, unit.get("damage_reduction_left", 0.0) - b.STEP)
 		if unit.skill_left > 0:
 			unit.skill_left = maxf(0.0, unit.skill_left - b.STEP)
 			if unit.skill_left <= 0: b.emit("skill_end", {"source": unit.id})
-		else: recover(unit, "auto", b.STEP)
+		else:
+			recover(unit, "auto", b.STEP)
+			if unit.skill.enabled and unit.skill.trigger == "automatic" and unit.sp + 0.000001 >= unit.skill.required: b._start_skill(unit)
 
 static func unit_target(b, unit: Dictionary) -> Dictionary:
 	var best: Dictionary = {}
@@ -99,6 +108,7 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	actor.action.left -= b.STEP
 	if actor.action.left > 0.000001: return
 	var healing: bool = friendly and actor.role == "healer"
+	var action: Dictionary = actor.action
 	var target: Dictionary
 	if not friendly or healing: target = b._unit(actor.action.target)
 	else: target = b._enemy(actor.action.target)
@@ -107,9 +117,10 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	if target.is_empty() or target.hp <= 0:
 		b.emit("miss", {"source": actor.id})
 		return
-	var power: float = actor.attack
-	var enhanced = false
-	if friendly:
+	var power: float = action.get("power", actor.attack)
+	var enhanced: bool = action.get("enhanced", false)
+	var repeat_hit: bool = action.get("repeat_hit", false)
+	if friendly and not repeat_hit:
 		if actor.skill_left > 0: power *= actor.skill.multiplier
 		if not healing:
 			actor.attack_count += 1
@@ -120,11 +131,24 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	if healing:
 		amount = minf(power, target.max_hp - target.hp)
 		target.hp += amount
+		if actor.skill_left > 0 and actor.skill.heal_damage_reduction > 0:
+			target["damage_reduction"] = actor.skill.heal_damage_reduction
+			target["damage_reduction_left"] = actor.skill.heal_buff_duration
 	else:
 		amount = damage(power, target, actor.damage_type)
+		if not friendly and target.get("damage_reduction_left", 0.0) > 0: amount *= 1.0 - target.damage_reduction
 		target.hp = maxf(0.0, target.hp - amount)
 		if not friendly: recover(target, "hit", 1.0)
 	b.emit("heal" if healing else "damage", {"source": actor.id, "target": target.id,
 		"amount": amount, "damage_type": actor.damage_type, "enhanced": enhanced,
 		"friendly": friendly, "from": actor.position, "to": target.position,
 		"attack_count": actor.get("attack_count", 0)})
+	var remaining: int = action.get("remaining_hits", 0) if repeat_hit else (actor.skill.hit_count - 1 if friendly and not healing and actor.skill_left > 0 else 0)
+	if remaining > 0 and target.hp > 0:
+		# A follow-up launches at the first impact and lands after its own flight.
+		var flight: float = maxf(0.15, actor.windup)
+		actor.target = target.id
+		actor.action = {"target": target.id, "left": flight, "repeat_hit": true,
+			"remaining_hits": remaining - 1, "power": power, "enhanced": enhanced}
+		b.emit("attack_start", {"source": actor.id, "target": target.id, "from": actor.position,
+			"to": target.position, "friendly": true, "windup": flight})

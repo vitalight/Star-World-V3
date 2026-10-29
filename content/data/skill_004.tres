@@ -8,11 +8,11 @@
 script = ExtResource("script")
 content_id = "skill_004"
 display_name = "紧急调度"
-description = "立即获得12点部署费用，持续1秒。"
+description = "立即获得12点部署费用。"
 recovery = "auto"
 required = 18
 initial_sp = 12
-duration = 1
+duration = 0
 multiplier = 1
 interval_multiplier = 1
 cost_gain = 12

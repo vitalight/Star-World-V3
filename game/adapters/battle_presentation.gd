@@ -89,7 +89,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 			if ranged:
 				finish_projectile(event.source)
 				effect.set_meta("target", event.target)
-				effect.play_projectile(from, to, source.get("windup", 0.2))
+				effect.play_projectile(from, to, event.get("windup", source.get("windup", 0.2)))
 				projectiles[event.source] = effect
 			else: effect.play_slash(from, to)
 		elif event.type in ["damage", "heal"]:
