@@ -51,6 +51,7 @@ func run() -> void:
 	await settle()
 	verify_list(1, true)
 	check(player.find_child("LevelType", true, false).text == "剧情", "Story detail shows story badge")
+	check(player.find_child("StartAction", true, false).text == "进入故事" and player.find_child("DetailDescription", true, false) == null, "Story detail shows the story action without descriptive text")
 	var first_card: Control = player.find_child("Level_scene_0101A", true, false)
 	check(first_card.find_child("RouteType", true, false).text == "剧情" and first_card.find_child("RouteTypeBadge", true, false).mouse_filter == Control.MOUSE_FILTER_IGNORE, "Story row shows a non-interactive story badge")
 	var ids: Array = player.catalog.levels.keys()
@@ -63,6 +64,7 @@ func run() -> void:
 	await settle()
 	verify_list(6, true)
 	check(player.find_child("LevelType", true, false).text == "战斗", "Battle detail shows battle badge")
+	check(player.find_child("StartAction", true, false).text == "开始战斗" and player.find_child("DetailDescription", true, false) == null, "Battle detail shows the battle action without descriptive text")
 	var battle_card: Control = player.find_child("Level_scene_0101B", true, false)
 	check(battle_card.find_child("RouteType", true, false).text == "战斗", "Battle row shows battle badge")
 	var scroll: ScrollContainer = player.find_child("LevelScroll", true, false)
@@ -76,7 +78,6 @@ func run() -> void:
 	var panel: Control = player.find_child("LevelDetail", true, false)
 	var detail_scroll: ScrollContainer = player.find_child("DetailScroll", true, false)
 	check(absf(panel.get_global_rect().get_center().y - detail_scroll.get_global_rect().get_center().y) < 2, "Short detail panel is vertically centered")
-	var short_height := panel.size.y
 	var entry: Dictionary = player.catalog.levels[ids.back()]
 	var old_name: String = entry.name
 	entry.name = "很长的关卡标题需要在标签左侧换行".repeat(5)
@@ -86,14 +87,6 @@ func run() -> void:
 	var badge: Control = player.find_child("LevelTypeBadge", true, false)
 	check(title.get_global_rect().end.x <= badge.get_global_rect().position.x, "Long title does not overlap type badge")
 	entry.name = old_name
-	var old_description: String = entry.description
-	entry.description = "很长的关卡说明用于验证自动换行和面板高度。".repeat(100)
-	player.show_levels()
-	await settle()
-	panel = player.find_child("LevelDetail", true, false)
-	detail_scroll = player.find_child("DetailScroll", true, false)
-	check(panel.size.y > short_height and detail_scroll.get_v_scroll_bar().max_value > detail_scroll.get_v_scroll_bar().page, "Long detail expands and can scroll")
-	entry.description = old_description
 	player.developer_mode = true
 	player.show_levels()
 	await settle()

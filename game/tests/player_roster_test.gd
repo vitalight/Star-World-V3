@@ -61,7 +61,27 @@ func run() -> void:
  player.progress.selected = "scene_0103B"
  player.start_battle()
  await process_frame
- check(player.battle_scene.configuration.roster.keys() == expected, "Other stages retain current player roster")
+ var mid_cast = ["character_011", "character_013", "character_014"]
+ check(player.battle_scene.configuration.roster.keys() == mid_cast, "Replaying 1-3 uses the fixed team without the later doctor")
+ for id in ["scene_0102B", "scene_0103B", "scene_0104B", "scene_0104C"]:
+  var fixed_cast = mid_cast if id in ["scene_0102B", "scene_0103B"] else expected
+  check(catalog.battle_operator_ids(id, ["character_012"]) == fixed_cast, id + " ignores current player roster")
+ player.catalog.levels.scene_0103B.roster_mode = "player"
+ player.show_levels()
+ await process_frame
+ var checkbox: CheckBox = player.find_child("Squad_character_015", true, false)
+ check(checkbox != null, "Player roster mode offers available operators")
+ if checkbox: checkbox.button_pressed = false
+ check(player.catalog.battle_operator_ids("scene_0103B", player.selected_squad) == mid_cast, "Player mode resolves the selected squad")
+ var selected_map = load(player.catalog.levels.scene_0103B.map).instantiate()
+ check(player.catalog.configuration("scene_0103B", selected_map, player.selected_squad).roster.keys() == mid_cast, "Selected squad reaches battle configuration")
+ selected_map.free()
+ for id in mid_cast:
+  var selected: CheckBox = player.find_child("Squad_" + id, true, false)
+  if selected: selected.button_pressed = false
+ var action: Button = player.find_child("StartAction", true, false)
+ check(action != null and action.disabled, "Player squad cannot be empty")
+ check(player.progress.available_operators() == expected, "Selecting a squad does not change ownership")
  player.queue_free()
  await process_frame
  # Future return events restore availability without granting a duplicate operator.
@@ -100,7 +120,7 @@ func run() -> void:
  file.close()
  legacy.load_progress(SAVE, catalog.levels.keys())
  check(legacy.completed == ["scene_0101A", "scene_0101B", "scene_0102A", "scene_0102B", "scene_0103A"] and legacy.pending_after == "scene_0103B", "Pending rescue victory migrates with inserted battle")
- for level in catalog.levels.values(): check(not level.has("roster"), "Level metadata has no player roster")
+ for level in catalog.levels.values(): check(not level.has("roster"), "Level metadata does not replace the saved player roster")
  var map = load("res://content/scenes/scene_001/map.tscn").instantiate()
  check(map.level.get("actors") == null and map.level.get("roster") == null, "Development level contains no actor references")
  map.free()

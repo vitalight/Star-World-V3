@@ -13,15 +13,9 @@ point_count = 2
 
 [sub_resource type="Curve2D" id="Curve2D_lower"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 416, 288, 0, 0, 0, 0, 96, 288, 0, 0, 0, 0, 96, 32, 0, 0, 0, 0, 480, 32)
+"points": PackedVector2Array(0, 0, 0, 0, 224, 160, 0, 0, 0, 0, 352, 160, 0, 0, 0, 0, 352, 288, 0, 0, 0, 0, 96, 288, 0, 0, 0, 0, 96, 32, 0, 0, 0, 0, 480, 32)
 }
-point_count = 4
-
-[sub_resource type="Curve2D" id="Curve2D_air"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 96, 96, 0, 0, 0, 0, 96, 32, 0, 0, 0, 0, 480, 32)
-}
-point_count = 4
+point_count = 6
 
 [node name="EditableMap" type="Node2D" unique_id=1200087109]
 script = ExtResource("1_map")
@@ -42,7 +36,3 @@ curve = SubResource("Curve2D_upper")
 
 [node name="lower" type="Path2D" parent="Routes" unique_id=1500086978]
 curve = SubResource("Curve2D_lower")
-
-[node name="air" type="Path2D" parent="Routes" unique_id=1500086979]
-curve = SubResource("Curve2D_air")
-metadata/flying = true

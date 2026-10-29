@@ -7,9 +7,9 @@
 
 [sub_resource type="Curve2D" id="Curve2D_main"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 32, 160, 0, 0, 0, 0, 160, 160, 0, 0, 0, 0, 160, 96, 0, 0, 0, 0, 224, 96, 0, 0, 0, 0, 224, 160, 0, 0, 0, 0, 352, 160, 0, 0, 0, 0, 352, 96, 0, 0, 0, 0, 544, 96, 0, 0, 0, 0, 544, 288)
+"points": PackedVector2Array(0, 0, 0, 0, 32, 160, 0, 0, 0, 0, 352, 160, 0, 0, 0, 0, 352, 96, 0, 0, 0, 0, 544, 96, 0, 0, 0, 0, 544, 288)
 }
-point_count = 9
+point_count = 5
 
 [sub_resource type="Curve2D" id="Curve2D_breach"]
 _data = {

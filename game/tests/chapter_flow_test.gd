@@ -67,12 +67,12 @@ func run() -> void:
 	for dimensions in [Vector2i(1280, 800), Vector2i(960, 600), Vector2i(1600, 900)]:
 		root.size = dimensions; await settle()
 		await capture("levels_%dx%d" % [dimensions.x, dimensions.y])
-		await click("开始行动   ›")
+		await click("进入故事")
 		check(player.page == "story", "Start enters battle introduction")
 		await capture("story_%dx%d" % [dimensions.x, dimensions.y])
 		await click("返回关卡")
 	root.size = Vector2i(1280, 800); await settle()
-	await click("开始行动   ›")
+	await click("进入故事")
 	await click("继续 →")
 	check(player.session.snapshot().history.size() == 2, "Story continue advances shared session")
 	await capture("story_cat")
@@ -105,7 +105,7 @@ func run() -> void:
 		var id := "scene_01%02dB" % index
 		if index == 1:
 			check(player.progress.selected == id, "Completed opening resumes at battle")
-			await click("开始行动   ›")
+			await click("开始战斗")
 		else:
 			check(player.page == "story" and player.story_level == story_id, "Victory opens next story")
 			await click("跳过剧情")
@@ -120,7 +120,7 @@ func run() -> void:
 		else: await click("继续")
 		check(player.progress.completed.has(id) and player.progress.pending_after.is_empty(), "Victory transition commits progress")
 	check(player.page == "levels" and player.progress.selected == "scene_0104C", "Root node victory unlocks final boss")
-	await click("开始行动   ›")
+	await click("开始战斗")
 	game = player.battle_scene; game.set_process(false)
 	check(game.campaign_level == "scene_0104C", "Final boss starts directly from selection")
 	check(game.debug_victory(), "Final boss victory advances the player flow")

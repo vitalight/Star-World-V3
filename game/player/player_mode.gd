@@ -40,6 +40,8 @@ var result_recorded := false
 var return_button: Button
 var tutorial: PanelContainer
 var tutorial_seen := false
+var selected_squad: Array[String] = []
+var squad_level := ""
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -87,6 +89,7 @@ func resume_game() -> void:
 
 func new_game() -> void:
 	progress = Progress.new()
+	selected_squad.clear(); squad_level = ""
 	if not catalog.levels.is_empty(): progress.selected = str(catalog.levels.keys()[0])
 	progress.configure_operators(catalog.starting_operators, catalog.recruits, catalog.characters.keys(), catalog.departures, catalog.returns)
 	completed = false
@@ -361,11 +364,26 @@ func _level_detail(level: Dictionary) -> void:
 	var separator := ColorRect.new()
 	separator.color = Color("67758a"); separator.custom_minimum_size.y = 1
 	column.add_child(separator)
-	var description_text: String = level.description if level.type == "battle" or level.description != "剧情" else "阅读剧情，推进章节故事。"
-	var description := _detail_label(description_text, 21, Color("d1dbe8"))
-	description.name = "DetailDescription"
-	column.add_child(description)
-	var action := _level_button(column, "开始行动   ›", Rect2(0, 0, 0, 66), begin_action, true)
+	if not is_story and level.roster_mode == "player":
+		if squad_level != level.id:
+			squad_level = level.id
+			selected_squad.assign(progress.available_operators())
+		else:
+			selected_squad.assign(selected_squad.filter(func(id): return progress.available_operators().has(id)))
+		var squad_title := _detail_label("选择出战干员", 20, Color("d1dbe8"))
+		column.add_child(squad_title)
+		for id in progress.available_operators():
+			var choice := CheckBox.new()
+			choice.name = "Squad_" + id
+			choice.text = str(catalog.characters[id].stats.name)
+			choice.button_pressed = selected_squad.has(id)
+			choice.toggled.connect(func(enabled: bool):
+				if enabled and not selected_squad.has(id): selected_squad.append(id)
+				elif not enabled: selected_squad.erase(id)
+				var start := column.get_node_or_null("StartAction") as Button
+				if start: start.disabled = selected_squad.is_empty())
+			column.add_child(choice)
+	var action := _level_button(column, "进入故事" if is_story else "开始战斗", Rect2(0, 0, 0, 66), begin_action, true)
 	action.name = "StartAction"
 	action.custom_minimum_size.y = 66
 	action.add_theme_color_override("font_color", Color("14243a"))
@@ -374,6 +392,7 @@ func _level_detail(level: Dictionary) -> void:
 	action.add_theme_stylebox_override("hover", _level_style(Color("fff3d4"), Color("fff7e4")))
 	action.add_theme_stylebox_override("pressed", _level_style(Color("e9c986"), Color("ffeac3")))
 	action.disabled = not catalog.diagnostics(progress.selected).is_empty()
+	if not is_story and level.roster_mode == "player" and selected_squad.is_empty(): action.disabled = true
 
 func _route_card(parent: Control, id: String) -> Button:
 	var level: Dictionary = catalog.levels[id]
@@ -457,6 +476,7 @@ func begin_action() -> void:
 		_continue_campaign(); return
 	if not _level_unlocked(progress.selected): return
 	if not catalog.diagnostics(progress.selected).is_empty(): return
+	if catalog.levels[progress.selected].get("roster_mode", "") == "player" and (squad_level != progress.selected or selected_squad.is_empty()): return
 	progress.started = true
 	_save_progress()
 	if catalog.levels[progress.selected].type == "story": show_story(progress.selected, "story")
@@ -508,7 +528,7 @@ func finish_story() -> void:
 	progress.pending_after = story_level
 	progress.finish_story(catalog.levels.keys(), catalog.recruits, catalog.departures, catalog.returns)
 	_save_progress()
-	if progress.selected != story_level and catalog.levels[progress.selected].type == "battle": start_battle()
+	if progress.selected != story_level and catalog.levels[progress.selected].type == "battle" and catalog.levels[progress.selected].roster_mode == "fixed": start_battle()
 	else: show_levels()
 
 func _focus_action() -> void:
@@ -517,6 +537,9 @@ func _focus_action() -> void:
 func start_battle() -> void:
 	if not _level_unlocked(progress.selected): return
 	if not catalog.diagnostics(progress.selected).is_empty(): return
+	if catalog.levels[progress.selected].roster_mode == "player":
+		selected_squad.assign(selected_squad.filter(func(id): return progress.available_operators().has(id)))
+		if squad_level != progress.selected or selected_squad.is_empty(): show_levels(); return
 	progress.started = true
 	_save_progress()
 	_clear_page()
@@ -527,7 +550,9 @@ func start_battle() -> void:
 	battle_scene.developer_tools_enabled = developer_mode
 	battle_scene.audio = audio
 	battle_scene.campaign_level = progress.selected
-	battle_scene.operator_ids.assign(progress.available_operators())
+	if catalog.levels[progress.selected].roster_mode == "player" and squad_level == progress.selected:
+		battle_scene.operator_ids.assign(selected_squad)
+	else: battle_scene.operator_ids.assign(progress.available_operators())
 	battle_scene.exit_requested.connect(func(): show_levels.call_deferred())
 	battle_scene.continue_requested.connect(func(): _leave_result.call_deferred())
 	battle_scene.observed.connect(_observe_battle)

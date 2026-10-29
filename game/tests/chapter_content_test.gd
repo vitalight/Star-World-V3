@@ -65,6 +65,10 @@ func type_validation(catalog: RefCounted) -> void:
 	write_text(path, original.replace("battle,,res://game/tests/fixtures/chapter/scene_0101B", "battle,res://content/scenes/scene_0101A/story_scene_0101A.md,res://game/tests/fixtures/chapter/scene_0101B"))
 	catalog.reload(base)
 	check("\n".join(catalog.errors).contains("[story]"), "Battle rejects story content")
+	for invalid in ["fixed,", "fixed,character_011|character_011", "fixed,character_999", "player,character_011", "invalid,"]:
+		write_text(path, original.replace("fixed,character_011|character_012", invalid))
+		catalog.reload(base)
+		check("\n".join(catalog.errors).contains("[fixed_roster]") or "\n".join(catalog.errors).contains("[roster_mode]"), "Invalid roster configuration is rejected: " + invalid)
 	write_text(path, original)
 	var waves_path := base + "/waves.csv"
 	write_text(waves_path, FileAccess.get_file_as_string(waves_path).replace("wave_001,scene_0101B", "wave_001,scene_0101A"))

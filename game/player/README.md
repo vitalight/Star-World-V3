@@ -6,6 +6,8 @@
 
 角色／技能／敌人／波次和剧情编辑方式见 `content/campaign/README.md`。Player、Game Test 复用 `game/battle`；剧情复用 features/story 的 Session 和 View。Player 不依赖 devtools；开发者模式下战斗左下角直接展开轻量开发者面板，普通模式不显示。
 
+战斗关卡可配置固定编队或玩家编队。固定编队按关卡名单出战；玩家编队在选关页从当前可出战干员中选择，至少选择一人。第一章五场战斗均使用固定编队，重打时也使用对应关卡名单。
+
 音频：`_ready()` 创建一个常驻的 `AudioDirector`（`features/audio`），加载 `content/audio/cues.tres` 后注入给战斗场景。主菜单、选关、剧情和设置页共用 `music_main`，战斗使用 `music_battle`，切换时交叉淡入淡出；相同曲目重复请求不会重启。主菜单右上角「设置」页提供 BGM／音效两条滑块，改动立即作用到 `Music`／`SFX` 总线并写入 `user://audio_settings.cfg`（测试可用 `audio_settings_path` 重定向）。音量 0 即静音该总线。战斗音效由 `game/adapters/battle_audio.gd` 从战斗事件映射，未配置素材的 cue 静默。
 
 存档仍是 `user://player_progress.cfg`。campaign version=3 保存 selected、completed、pending_after、started，player 区段保存持有与暂离干员。战斗胜利时先持久化 pending_after；继续或读档时结算角色事件、保存完成状态并进入下一剧情。剧情完成后保存再进入战斗。版本 1／2 旧存档映射为独立剧情和战斗关，保留队伍、已完成进度及待续接的胜利，不重复触发角色事件。已完成旧章节的存档会把新增的 1-4C 一并计入完成，保持章节完成状态；未完成的存档按新顺序推进到 1-4C。战斗中间状态不保存；重新出击从头开始。

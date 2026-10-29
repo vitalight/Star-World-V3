@@ -15,14 +15,15 @@
 
 | 文件 | 内容 |
 | --- | --- |
-| levels.csv | 关卡显示、类型及对应的剧情文件或战斗地图和数值；不配置出战干员 |
+| levels.csv | 关卡显示、剧情或战斗地图、数值及编队模式 |
 | waves.csv | 关卡 ID、出怪时刻、数量、间隔、敌人 ID、路线、显示波次 |
 | player_roster.csv | 初始干员与剧情完成后的加入／暂离／回归时点 |
 | backgrounds.csv | 剧情背景 ID 与正式贴图路径 |
 
 CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` 保持 `importer="keep"`。
 
-- 正式关卡 ID 使用 `scene_0101A` 格式；levels.csv 行序即解锁顺序，关卡不保存出战队伍。
+- 正式关卡 ID 使用 `scene_0101A` 格式；levels.csv 行序即解锁顺序。
+- 战斗关的 `roster_mode` 为 `fixed` 或 `player`。固定编队在 `fixed_roster` 中以 `|` 分隔角色 ID；玩家编队留空该字段，由玩家在选关页从当前可出战角色中选择。剧情关两列留空。
 - `type=story` 只填写 story；`type=battle` 填写 map 与战斗数值，story 留空。
 - `waves.csv` 的 `time` 为绝对战斗时刻（秒），`number` 只用于显示，`interval` 为同组出怪间隔；每关至少一组波次。
 - `defend_duration=0` 表示普通清怪关；大于 0 时需计时结束、清空敌人并守住基地才能获胜。
@@ -31,7 +32,7 @@ CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` �
 
 ## 玩家队伍
 
-`player_roster.csv` 每行一个干员：`join_after` 留空表示初始可用，否则填写首次完成该关后续接时加入；`leave_after`／`return_after` 表示暂离与回归。1-1B（scene_0101B）固定由大星、小黄出战；其余关卡沿用存档中当前可用队伍。
+`player_roster.csv` 每行一个干员：`join_after` 留空表示初始可用，否则填写首次完成该关后续接时加入；`leave_after`／`return_after` 表示暂离与回归。固定编队独立于玩家的持有和暂离状态，不修改存档。
 
 角色 `stats.range_cells` 以朝右为基准，运行时按朝向旋转；`role` 为 melee／ranged／healer。
 
@@ -70,7 +71,7 @@ CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` �
 
 ## 预览与验证
 
-- Game Test：F3 切换开发样例与正式关卡；章节关卡使用完整干员列表。“重新加载关卡”读取保存的 `.tres`、CSV 和地图。
+- Game Test：F3 切换开发样例与正式关卡；固定编队关卡使用关卡名单，玩家编队关卡使用完整测试干员列表。“重新加载关卡”读取保存的 `.tres`、CSV 和地图。
 - Story Test：选择剧情关后“重新加载”。
 - Player Mode：重新启动读取最新内容；战斗中不热更新。
 - 编辑正式关卡后必须在 Game Test 实际检查。内容错误会显示文件、字段与行号；地图诊断会指明格子或路线。

@@ -30,13 +30,13 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 	for row in _table(base + "/backgrounds.csv", "id,texture"):
 		_resource(row, "texture")
 		backgrounds[row.id] = row.texture
-	for row in _table(base + "/levels.csv", "id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration"):
+	for row in _table(base + "/levels.csv", "id,name,description,type,story,map,life,initial_cost,cost_cap,cost_regen,deploy_limit,defend_duration,roster_mode,fixed_roster"):
 		var level := {"id": row.id, "name": row.name, "description": row.description, "type": row.type, "story": row.story, "map": row.map,
 			"enemies": {}, "waves": [], "route_warning_duration": 2.0}
 		levels[row.id] = level
 		_level_errors[row.id] = PackedStringArray()
 		if row.type == "story":
-			for field in ["map", "life", "initial_cost", "cost_cap", "cost_regen", "deploy_limit", "defend_duration"]:
+			for field in ["map", "life", "initial_cost", "cost_cap", "cost_regen", "deploy_limit", "defend_duration", "roster_mode", "fixed_roster"]:
 				if not row[field].is_empty(): _error(row, field, "剧情关不能配置战斗内容")
 			if not row.story.begins_with("res://content/"): _error(row, "story", "剧情必须位于正式内容目录")
 			var start := errors.size()
@@ -45,6 +45,15 @@ func reload(base := ROOT, data_base := DATA) -> PackedStringArray:
 			errors.resize(start)
 		elif row.type == "battle":
 			if not row.story.is_empty(): _error(row, "story", "战斗关不能配置剧情")
+			level.roster_mode = row.roster_mode
+			level.fixed_roster = Array(row.fixed_roster.split("|", false))
+			if row.roster_mode not in ["fixed", "player"]: _error(row, "roster_mode", "必须为 fixed 或 player")
+			if row.roster_mode == "fixed":
+				if level.fixed_roster.is_empty(): _error(row, "fixed_roster", "固定编队不能为空")
+				if level.fixed_roster.size() != _unique_count(PackedStringArray(level.fixed_roster)): _error(row, "fixed_roster", "干员不能重复")
+				for key in level.fixed_roster:
+					if not characters.has(key): _error(row, "fixed_roster", "未知干员 " + key)
+			elif not row.fixed_roster.is_empty(): _error(row, "fixed_roster", "玩家编队不能配置固定干员")
 			for field in ["life", "deploy_limit"]: level[field] = int(_number(row, field, 1, true))
 			for field in ["initial_cost", "cost_cap", "cost_regen", "defend_duration"]: level[field] = _number(row, field, 0)
 			if level.initial_cost > level.cost_cap: _error(row, "initial_cost", "不能大于 cost_cap")
@@ -142,7 +151,8 @@ func diagnostics(id: String) -> PackedStringArray:
 	return result
 
 func battle_operator_ids(id: String, operator_ids: Array = []) -> Array:
-	if id == "scene_0101B": return ["character_011", "character_012"]
+	var level: Dictionary = levels.get(id, {})
+	if level.get("roster_mode", "player") == "fixed": return level.fixed_roster.duplicate()
 	return starting_operators.duplicate() if operator_ids.is_empty() else operator_ids.duplicate()
 
 func configuration(id: String, map: Node, operator_ids: Array = []) -> Dictionary:

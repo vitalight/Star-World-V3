@@ -10,7 +10,7 @@ func run() -> void:
 	await click("开始游戏")
 	for id in ["scene_0101B", "scene_0102B", "scene_0103B", "scene_0104B", "scene_0104C"]:
 		player.developer_mode = true
-		if player.page == "levels": await click("开始行动   ›")
+		if player.page == "levels": await click("进入故事" if player.catalog.levels[player.progress.selected].type == "story" else "开始战斗")
 		if player.page == "story": await click("跳过剧情")
 		player.developer_mode = false
 		var game = player.battle_scene
@@ -27,10 +27,10 @@ func run() -> void:
 				await process_frame
 			check(game.last_state.paused, "Final stage skip starts from a paused running battle")
 		var air_markers: Array = game.markers.get_children().filter(func(marker): return marker.get_meta("is_air", false))
-		check(air_markers.size() == (1 if id in ["scene_0102B", "scene_0103B", "scene_0104B"] else 0), "Flying routes use a distinct aerial entry marker")
+		check(air_markers.size() == (1 if id in ["scene_0102B", "scene_0103B", "scene_0104C"] else 0), "Flying routes use a distinct aerial entry marker")
 		if not air_markers.is_empty():
 			var air = air_markers[0]
-			var expected_entry := Vector2i(0, 1) if id == "scene_0104B" else Vector2i(0, 0)
+			var expected_entry := Vector2i(0, 2) if id == "scene_0104C" else Vector2i(0, 0)
 			check(air.get_children().any(func(child): return child is Sprite3D) and air.get_meta("endpoint_cell") == expected_entry, "Aerial marker uses its texture at the flying route start")
 		var before: Dictionary = game.battle.snapshot()
 		check(game.hud.developer_panel.visible and not game.hud.game_menu.visible, "Developer panel is expanded without opening menu")
