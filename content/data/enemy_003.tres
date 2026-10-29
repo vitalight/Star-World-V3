@@ -1,29 +1,29 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://blq428x4lvsy3"]
 
-[ext_resource type="Texture2D" uid="uid://b8y7vrd4moj3j" path="res://content/enemies/enemy_001/atlas.png" id="1_3eng4"]
-[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="2_mn6jm"]
-[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="3_2bllg"]
-[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="4_v70da"]
+[ext_resource type="Texture2D" uid="uid://b8y7vrd4moj3j" path="res://content/enemies/enemy_001/atlas.png" id="1_1iexs"]
+[ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="2_wcgue"]
+[ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="3_a3a1g"]
+[ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="4_a3eik"]
 
 [sub_resource type="Resource" id="Appearance"]
-script = ExtResource("2_mn6jm")
-atlas = ExtResource("1_3eng4")
+script = ExtResource("2_wcgue")
+atlas = ExtResource("1_1iexs")
 atlas_row = 3
 height = 1.02
 
 [sub_resource type="Resource" id="Stats"]
-script = ExtResource("4_v70da")
+script = ExtResource("4_a3eik")
 content_id = "enemy_003"
 display_name = "浮空裂隙"
 max_hp = 300.0
 attack = 0.0
 resistance = 10.0
 interval = 1.5
-speed = 0.6
+speed = 0.5
 attack_range = 0.0
 flying = true
 
 [resource]
-script = ExtResource("3_2bllg")
+script = ExtResource("3_a3a1g")
 stats = SubResource("Stats")
 appearance = SubResource("Appearance")

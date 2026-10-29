@@ -153,7 +153,7 @@ func reload_level() -> void:
 	hud.roster_selected.connect(select_roster)
 	hud.roster_drag_started.connect(select_roster)
 	hud.roster_drag_ended.connect(func():
-		hud.set_playback(last_state.get("paused", false), speed)
+		hud.set_playback(last_state.get("paused", false), _effective_speed())
 		update_overlays())
 	hud.roster_drag_hovered.connect(preview_drag)
 	hud.roster_dropped.connect(drop_roster)
@@ -346,7 +346,8 @@ func set_speed(value: float) -> void:
 	refresh()
 
 func _effective_speed() -> float:
-	return 0.25 if not replay_mode and hud and not hud.dragged_roster.is_empty() else speed
+	if replay_mode or not hud: return speed
+	return 0.25 if deployment_pending or not hud.dragged_roster.is_empty() else speed
 
 func step() -> void:
 	if battle and not replay_mode:

@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="3_6hrt8"]
 [ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="4_8l8v4"]
 [ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="5_r1tsn"]
-[ext_resource type="Resource" path="res://content/data/skill_005.tres" id="6_6dyjs"]
+[ext_resource type="Resource" uid="uid://ctn02p0lofn0o" path="res://content/data/skill_005.tres" id="6_6dyjs"]
 
 [sub_resource type="AtlasTexture" id="ClassIcon"]
 atlas = ExtResource("2_xb6so")
@@ -22,7 +22,7 @@ script = ExtResource("5_r1tsn")
 content_id = "character_015"
 display_name = "月月"
 max_hp = 850.0
-attack = 100.0
+attack = 120.0
 defense = 20.0
 resistance = 10.0
 interval = 1.5

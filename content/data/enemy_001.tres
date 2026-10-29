@@ -19,7 +19,7 @@ attack = 55.0
 defense = 5.0
 interval = 1.4
 windup = 0.25
-speed = 0.6
+speed = 0.55
 attack_range = 0.0
 
 [resource]

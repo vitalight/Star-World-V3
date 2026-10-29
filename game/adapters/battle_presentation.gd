@@ -13,7 +13,10 @@ var configuration: Dictionary
 var effect_texture: Texture2D
 var combatants := {}
 var projectiles := {}
+var skill_effects := {}
 var route_guides := {}
+const SKILL_LOOP_CYCLE := 0.9
+const ROUTE_WARNING_SWEEPS := 2.0
 const PROJECTILE = preload("res://content/effects/effect_001/projectile.tres")
 const IMPACT = preload("res://content/effects/effect_001/impact.tres")
 const HEALING = preload("res://content/effects/effect_001/healing.tres")
@@ -27,7 +30,7 @@ func clear() -> void:
 	for actor in actors.values() + departing + effects + route_guides.values():
 		if is_instance_valid(actor): actor.free()
 	actors.clear(); departing.clear(); effects.clear()
-	combatants.clear(); projectiles.clear(); route_guides.clear()
+	combatants.clear(); projectiles.clear(); skill_effects.clear(); route_guides.clear()
 
 func position(at: Vector2, flying := false) -> Vector3:
 	return Vector3(at.x, field.surface_height(Vector2i(at.round())) + (0.8 if flying else 0.045), at.y)
@@ -40,6 +43,8 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 		if is_instance_valid(effect) and not effect.is_queued_for_deletion():
 			if effect.kind == "projectile" and actors.has(effect.get_meta("target", -1)):
 				effect.destination = world.to_local(actors[effect.get_meta("target")].visual_position()) + body_offset()
+			elif effect.has_meta("skill_of") and actors.has(effect.get_meta("skill_of")):
+				effect.position = world.to_local(actors[effect.get_meta("skill_of")].visual_position()) + body_offset()
 			effect.advance_visual(delta)
 	departing = departing.filter(func(a): return is_instance_valid(a) and not a.is_queued_for_deletion())
 	effects = effects.filter(func(a): return is_instance_valid(a) and not a.is_queued_for_deletion())
@@ -98,17 +103,18 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 			var color := Color.WHITE if not event.get("enhanced", false) else Color("cbbaff")
 			pulse(event_position(event.target, event.to), color, HEALING if event.type == "heal" else IMPACT, "heal" if event.type == "heal" else "impact")
 		elif event.type == "miss": finish_projectile(event.source)
-		elif event.type == "skill_start" and actors.has(event.source):
+		elif event.type == "skill_start" and actors.has(event.source) and event.get("duration", 0.0) <= 0.0:
 			pulse(world.to_local(actors[event.source].visual_position()) + body_offset(), Color.WHITE, BOOST, "skill")
 	for id in actors.keys():
 		if not present.has(id):
 			actors[id].depart()
 			departing.append(actors[id])
 			actors.erase(id)
+	_sync_skill_effects(state)
 	if state.phase in ["victory", "defeat"]:
 		for view in departing + effects:
 			if is_instance_valid(view): view.queue_free()
-		departing.clear(); effects.clear(); projectiles.clear()
+		departing.clear(); effects.clear(); projectiles.clear(); skill_effects.clear()
 
 func facing_for(direction: Vector2) -> int:
 	return (0 if direction.x >= 0 else 2) if absf(direction.x) > absf(direction.y) else (1 if direction.y >= 0 else 3)
@@ -123,6 +129,22 @@ func initial_enemy_facing(unit: Dictionary) -> int:
 		remaining -= direction.length()
 	return unit.get("facing", 0)
 
+func _sync_skill_effects(state: Dictionary) -> void:
+	var active := {}
+	for unit in state.units:
+		if unit.get("skill_left", 0.0) <= 0.0 or not actors.has(unit.id): continue
+		active[unit.id] = true
+		if skill_effects.has(unit.id): continue
+		var effect = spawn_effect(BOOST, "skill", 1.15)
+		effect.set_meta("skill_of", unit.id)
+		effect.position = world.to_local(actors[unit.id].visual_position()) + body_offset()
+		effect.play_loop(Color.WHITE, SKILL_LOOP_CYCLE)
+		skill_effects[unit.id] = effect
+	for id in skill_effects.keys():
+		if active.has(id) and is_instance_valid(skill_effects[id]): continue
+		if is_instance_valid(skill_effects[id]): skill_effects[id].free()
+		skill_effects.erase(id)
+
 func _sync_route_guides(state: Dictionary) -> void:
 	var active := {}
 	if state.phase not in ["victory", "defeat"]:
@@ -133,7 +155,8 @@ func _sync_route_guides(state: Dictionary) -> void:
 				world.add_child(guide)
 				guide.configure(configuration.routes[warning.route], Callable(field, "surface_height"))
 				route_guides[warning.id] = guide
-			route_guides[warning.id].set_progress((state.time - warning.start) / warning.duration)
+			var elapsed := clampf((state.time - warning.start) / warning.duration, 0.0, 1.0)
+			route_guides[warning.id].set_progress(fposmod(elapsed * ROUTE_WARNING_SWEEPS, 1.0))
 	for id in route_guides.keys():
 		if not active.has(id):
 			route_guides[id].free()

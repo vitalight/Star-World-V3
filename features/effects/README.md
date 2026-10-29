@@ -5,10 +5,11 @@
 - `play_once(color, seconds)`：单次缩放淡出，用于受击、治疗、技能启动。
 - `play_projectile(from, to, seconds, color)`：沿世界坐标飞行的子弹，贴图默认朝左，按照镜头平面朝向目标；`destination` 可由适配器更新以跟随移动目标。
 - `play_slash(from, to, color)`：在攻击者前方播放朝向目标的刀光，素材默认朝左，按镜头平面中的攻击方向旋转。
-- `advance_visual(delta)`：只由外部模拟时钟推进；不自行使用真实时间。到期释放节点，`kind` 区分 projectile、slash、impact、heal、skill。
+- `play_loop(color, cycle)`：按外部时钟循环脉冲，不自行到期；用于技能持续期间循环播放的强化效果。
+- `advance_visual(delta)`：只由外部模拟时钟推进；不自行使用真实时间。单次特效到期释放节点，循环特效持续到调用方释放；`kind` 区分 projectile、slash、impact、heal、skill。
 
 战斗单次特效作为小幅叠加提示，使用 render_priority 10 与 no_depth_test，保证在角色立片上可读；不会影响地块、角色或战斗拾取。循环预览保持原深度行为。
 
-`game/adapters/battle_presentation.gd` 将真实／模拟 attack_start 映射为子弹或刀光；damage 映射为命中闪光与角色闪烁，heal 使用绿色治疗图，skill_start 使用强化图。命中或 miss 关闭对应飞行子弹，伤害时机始终由 battle 决定。重开、退出和终局清理效果。
+`game/adapters/battle_presentation.gd` 将真实／模拟 attack_start 映射为子弹或刀光；damage 映射为命中闪光与角色闪烁，heal 使用绿色治疗图；瞬时技能在 skill_start 使用一次强化图，持续技能则从快照的 `skill_left` 驱动，在持续期间循环强化图并跟随施放者。命中或 miss 关闭对应飞行子弹，伤害时机始终由 battle 决定。重开、退出和终局清理效果。
 
 具体素材来自 content/effects/effect_001 中的 AtlasTexture 配置：texture.tres（刀光）、projectile.tres（子弹）、impact.tres（受击）、healing.tres（治疗）、boost.tres（强化）。全部复用原有 atlas.png，未生成新图片。

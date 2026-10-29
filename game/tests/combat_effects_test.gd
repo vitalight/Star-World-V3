@@ -43,6 +43,15 @@ func run() -> void:
 		effect.play_slash(origin, origin + game.camera.global_basis * direction)
 		check((-effect.sprite.global_basis.x.normalized()).dot(game.camera.global_basis * direction) > 0.99, "Slash texture faces its target on either side")
 		effect.queue_free()
+	var loop_effect = game.presentation.spawn_effect(preload("res://content/effects/effect_001/boost.tres"), "skill", 1.15)
+	loop_effect.play_loop(Color.WHITE, 0.9)
+	loop_effect.advance_visual(0.45)
+	var loop_peak: float = loop_effect.sprite.modulate.a
+	loop_effect.advance_visual(0.45)
+	var loop_trough: float = loop_effect.sprite.modulate.a
+	loop_effect.advance_visual(0.45)
+	check(is_instance_valid(loop_effect) and is_equal_approx(loop_peak, 0.8) and loop_trough < 0.3 and is_equal_approx(loop_effect.sprite.modulate.a, loop_peak), "Looping aura repeats its pulse instead of expiring")
+	loop_effect.queue_free()
 	for args in Fixture.deployments(): game.command("deploy", args)
 	game.start()
 	var seen := {}

@@ -8,6 +8,8 @@ var origin := Vector3.ZERO
 var destination := Vector3.ZERO
 var oriented := false
 var single_shot := false
+var looping := false
+var loop_cycle := 1.0
 var age := 0.0
 var duration := 0.45
 
@@ -27,6 +29,11 @@ func show_phase(time: float) -> void:
 	sprite.scale = Vector3.ONE * lerpf(0.5, 1.2, progress)
 	sprite.modulate.a = sin(progress * PI) * 0.85 if cycle < 0.65 else 0.0
 
+func _update_loop() -> void:
+	var pulse := sin(fposmod(age, loop_cycle) / loop_cycle * PI)
+	sprite.scale = Vector3.ONE * lerpf(0.75, 1.2, pulse)
+	sprite.modulate.a = 0.25 + 0.55 * pulse
+
 func play_once(color := Color.WHITE, seconds := 0.45) -> void:
 	single_shot = true
 	sprite.no_depth_test = true # Small combat accents stay readable over the cutout.
@@ -36,6 +43,16 @@ func play_once(color := Color.WHITE, seconds := 0.45) -> void:
 	sprite.scale = Vector3.ONE * 0.8
 	sprite.modulate = color
 	sprite.modulate.a = 0.0
+
+## Repeats a pulse for as long as the caller keeps the effect alive.
+func play_loop(color := Color.WHITE, cycle := 1.0) -> void:
+	looping = true
+	sprite.no_depth_test = true
+	sprite.render_priority = 10
+	age = 0.0
+	loop_cycle = maxf(cycle, 0.016)
+	sprite.modulate = color
+	_update_loop()
 
 func play_projectile(from: Vector3, to: Vector3, seconds: float, color := Color.WHITE) -> void:
 	kind = "projectile"
@@ -64,6 +81,10 @@ func _orient() -> void:
 	sprite.global_basis = camera.global_basis.rotated(camera.global_basis.z, angle).scaled(sprite.scale)
 
 func advance_visual(delta: float) -> void:
+	if looping:
+		age += delta
+		_update_loop()
+		return
 	if not single_shot: return
 	age += delta
 	var progress := clampf(age / duration, 0, 1)

@@ -1,22 +1,15 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" script_class="SkillDefinition" format=3 uid="uid://ctn02p0lofn0o"]
 
-[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
-
-[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_05.tres" id="icon"]
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_05.tres" id="1_04ok3"]
+[ext_resource type="Script" uid="uid://cxmdep82en3r0" path="res://features/content_definitions/skill_definition.gd" id="2_qi5rq"]
 
 [resource]
-script = ExtResource("script")
+script = ExtResource("2_qi5rq")
+icon = ExtResource("1_04ok3")
 content_id = "skill_005"
 display_name = "安心处方"
-description = "充能完成后自动强化，10秒内治疗的友军获得30%减伤，持续3秒。"
-trigger = "automatic"
+description = "释放技能后，10秒内治疗的友军获得30%减伤，持续2秒。"
+required = 20.0
+duration = 10.0
 heal_damage_reduction = 0.3
-heal_buff_duration = 3.0
-recovery = "auto"
-required = 20
-initial_sp = 12
-duration = 10
-multiplier = 1
-interval_multiplier = 1
-cost_gain = 0
-icon = ExtResource("icon")
+heal_buff_duration = 2.0

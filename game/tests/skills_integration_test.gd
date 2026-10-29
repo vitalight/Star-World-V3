@@ -47,6 +47,8 @@ func run() -> void:
 					await capture("skill_game_" + unit.roster_id)
 				activated[unit.roster_id] = true
 				check(pure.activate_skill(unit.id).ok and game.command("activate_skill",[unit.id]).ok,"Real skill activation succeeds")
+				if unit.skill.duration > 0:
+					check(game.presentation.skill_effects.has(unit.id),"Persistent skill loops its aura: " + unit.roster_id)
 		pure.advance(0.05); game.battle.advance(0.05); game.refresh(0.05)
 		if pure.snapshot().phase in ["victory","defeat"]: break
 	check(activated.size() == 5,"All five skills charge and activate in a real battle")
