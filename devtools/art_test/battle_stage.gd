@@ -55,7 +55,7 @@ func _ready() -> void:
 	configuration.roster = operator_roster.configuration()
 	catalog = operator_roster.appearances()
 	skill_icons = operator_roster.skill_icons()
-	StageView.fit_camera(camera, source.bounds, Vector2(viewport.size))
+	StageView.fit_camera(camera, StageView.terrain_bounds(source.cells(), source.bounds), Vector2(viewport.size))
 	markers = Node3D.new(); world.add_child(markers)
 	StageView.route_markers(markers, configuration.routes, field, source.flying_routes(), preload("res://content/ui/battle/air_spawn_marker_v1.png"))
 	for key in source.level.enemies:

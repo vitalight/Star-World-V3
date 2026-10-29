@@ -15,7 +15,8 @@ func _ready() -> void:
 	field.configure(map.cells(), map.bounds)
 	add_child(field)
 	var camera := Stage.create_camera(self)
-	var center := Vector3(map.bounds.size.x * 0.5 - 0.5, 0, map.bounds.size.y * 0.5 - 0.5)
+	var visible_bounds: Rect2i = Stage.terrain_bounds(map.cells(), map.bounds)
+	var center := Vector3(visible_bounds.get_center().x - 0.5, 0, visible_bounds.get_center().y - 0.5)
 	camera.position = center + Vector3(0, 18, 11)
 	camera.look_at(center)
 	camera.fov = 32

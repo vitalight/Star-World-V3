@@ -176,7 +176,7 @@ func _show_error(message: String) -> void:
 
 func fit_camera() -> void:
 	if camera and map_data:
-		StageView.fit_camera(camera, map_data.bounds, get_viewport().get_visible_rect().size)
+		StageView.fit_camera(camera, StageView.terrain_bounds(map_data.cells(), map_data.bounds), get_viewport().get_visible_rect().size)
 		update_operator_anchor()
 
 func reset_auto_start() -> void:

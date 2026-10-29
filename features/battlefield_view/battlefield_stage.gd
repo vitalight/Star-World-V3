@@ -3,6 +3,14 @@ extends RefCounted
 const ENEMY_COLOR := Color("ec5743")
 const BASE_COLOR := Color("63c6f5")
 
+static func terrain_bounds(cells: Dictionary, fallback: Rect2i) -> Rect2i:
+	if cells.is_empty(): return fallback
+	var result := Rect2i(cells.keys()[0], Vector2i.ONE)
+	for cell in cells:
+		result = result.expand(cell)
+		result = result.expand(cell + Vector2i.ONE)
+	return result
+
 static func setup_environment(parent: Node3D) -> void:
 	var environment := WorldEnvironment.new()
 	environment.name = "BattleEnvironment"
@@ -52,7 +60,8 @@ static func fit_camera(camera: Camera3D, bounds: Rect2i, viewport_size: Vector2)
 	if not camera: return
 	var center := Vector3(bounds.get_center().x - 0.5, 0, bounds.get_center().y - 0.5)
 	var bottom_clearance := 138.0 if viewport_size.x < 1100 else 162.0
-	var safe := Rect2(Vector2(24, 68), viewport_size - Vector2(48, 68 + bottom_clearance))
+	var right_clearance := 170.0 if viewport_size.x >= 1100 else 140.0
+	var safe := Rect2(Vector2(24, 68), viewport_size - Vector2(24 + right_clearance, 68 + bottom_clearance))
 	var direction := Vector3(0, 18.0, 11.0).normalized()
 	for distance_step in range(120, 700):
 		var distance := distance_step / 10.0
