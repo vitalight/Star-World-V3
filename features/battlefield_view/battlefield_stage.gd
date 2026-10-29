@@ -66,15 +66,19 @@ static func fit_camera(camera: Camera3D, bounds: Rect2i, viewport_size: Vector2)
 					if not safe.has_point(camera.unproject_position(Vector3(x, y, z))): fits = false
 		if fits: break
 
-static func route_markers(parent: Node3D, routes: Dictionary, terrain: Node3D) -> void:
+static func route_markers(parent: Node3D, routes: Dictionary, terrain: Node3D, flying_routes := PackedStringArray(), air_texture: Texture2D = null) -> void:
 	var endpoints := {}
-	for route in routes.values():
+	for route_id in routes:
+		var route: Array = routes[route_id]
 		for index in [0, -1]:
 			var cell := Vector2i(route[index])
-			var key := str([cell, index])
+			var is_air: bool = index == 0 and flying_routes.has(str(route_id)) and air_texture != null
+			var key := str([cell, index, is_air])
 			if endpoints.has(key): continue
 			endpoints[key] = true
-			var marker := portal(parent, Vector3(cell.x, terrain.surface_height(cell) + 0.06, cell.y), ENEMY_COLOR if index == 0 else BASE_COLOR)
+			var at := Vector3(cell.x, terrain.surface_height(cell) + 0.06, cell.y)
+			var marker := air_portal(parent, at, air_texture) if is_air else portal(parent, at, ENEMY_COLOR if index == 0 else BASE_COLOR)
+			marker.set_meta("is_air", is_air)
 			marker.set_meta("endpoint_cell", cell)
 			marker.set_meta("is_base", index == -1)
 
@@ -100,3 +104,34 @@ static func portal(parent: Node3D, at: Vector3, color: Color) -> Node3D:
 		instance.position = Vector3(0, 0.43, 0) + offset
 		marker.add_child(instance)
 	return marker
+
+static func air_portal(parent: Node3D, at: Vector3, texture: Texture2D) -> Node3D:
+	var marker := Node3D.new()
+	marker.position = at
+	parent.add_child(marker)
+	air_frame(marker, 0.36)
+	air_frame(marker, 1.08)
+	var icon := Sprite3D.new()
+	icon.texture = texture
+	icon.pixel_size = 0.0008
+	icon.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	icon.shaded = false
+	icon.position.y = 0.72
+	marker.add_child(icon)
+	return marker
+
+static func air_frame(parent: Node3D, height: float) -> void:
+	var frame := Node3D.new()
+	frame.position.y = height
+	parent.add_child(frame)
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = ENEMY_COLOR
+	for side in 4:
+		var edge := MeshInstance3D.new()
+		var mesh := PlaneMesh.new()
+		mesh.size = Vector2(0.65, 0.045) if side < 2 else Vector2(0.045, 0.65)
+		edge.mesh = mesh
+		edge.material_override = material
+		edge.position = Vector3(0, 0, -0.325 if side == 0 else 0.325) if side < 2 else Vector3(-0.325 if side == 2 else 0.325, 0, 0)
+		frame.add_child(edge)

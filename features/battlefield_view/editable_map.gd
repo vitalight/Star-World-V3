@@ -93,7 +93,13 @@ func errors(check_level := true) -> PackedStringArray:
 			for step in range(steps + 1):
 				_check_route_cell(result, data, key, Vector2i((previous + delta * float(step) / steps).round()), flying)
 	if check_level and not external_level:
-		if level: result.append_array(level.errors(paths))
+		if level:
+			result.append_array(level.errors(paths))
+			var air_routes := flying_routes()
+			for wave in level.waves:
+				if wave and air_routes.has(wave.route) and level.enemies.has(wave.enemy):
+					var enemy = level.enemies[wave.enemy]
+					if enemy and not enemy.flying: result.append("Wave: 地面敌人 %s 不能使用飞行路线 %s" % [wave.enemy, wave.route])
 		else: result.append("Level: 未指定关卡资源")
 	return result
 

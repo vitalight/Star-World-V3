@@ -37,7 +37,7 @@ func run() -> void:
 	change_scene_to_file("res://devtools/art_test/battle_preview.tscn")
 	await settle()
 	var stage = current_scene.battle_stage
-	check(stage.actors.size() == 5 and stage.presentation.route_guides.size() == 2, "Route guide precedes preview enemies")
+	check(stage.actors.size() == 5 and stage.presentation.route_guides.size() == 3, "Route guide precedes preview enemies")
 	check(stage.field.layout.size() == 6, "Six map rows")
 	check(stage.hud.cards.size() == 5, "Five shared roster cards")
 	for child in stage.hud.get_children():

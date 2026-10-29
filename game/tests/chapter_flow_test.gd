@@ -35,9 +35,7 @@ func click(text: String) -> void:
 	if not target or target.disabled: return
 	var point := target.get_global_rect().get_center()
 	check(root.get_visible_rect().encloses(target.get_global_rect()), "Button fits viewport: " + text)
-	# Synchronize the native cursor before sending the complete GUI click.
-	root.warp_mouse(point)
-	await process_frame
+	# Send GUI input to the viewport without moving the user's native cursor.
 	var motion := InputEventMouseMotion.new(); motion.position = point; motion.global_position = point
 	root.push_input(motion, true)
 	await process_frame

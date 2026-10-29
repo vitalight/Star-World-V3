@@ -36,3 +36,5 @@ $env:APPDATA = (Resolve-Path temp/game_test).Path
 ```
 
 `battle_integration_test` 比较纯逻辑与组装场景；`battle_visual_test` 使用真实渲染和原生输入，验证部署、选择、技能、暂停、调试窗与窗口尺寸。图形验收不能使用 headless。角色遮挡、部署、特效、路线预告等专项测试位于 `game/tests/`。
+
+开发样例的无人机使用独立飞行路线，其入口与正式关卡共用飞行标识；地面敌人不能使用飞行路线。

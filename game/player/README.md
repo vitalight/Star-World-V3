@@ -16,7 +16,7 @@
 
 快速测试：开发者模式下点击战斗左下角的“跳过战斗并胜利”。此操作进入正常胜利结算，再点击“继续”；记录完成状态并直接进入下一关剧情，最后一战后播放独立尾声。面板不自动暂停，暂停中的战斗也可以跳过；已结束的战斗不能再次跳过或覆盖失败结果。面板没有单独的存档或解锁实现。
 
-验证入口 `game/tests/player_flow_test.gd`（兼容入口，继承 chapter_flow_test），通过 GODOT_PATH 运行。加 `-- --capture` 并移除 headless 使用真实鼠标输入，截图及隔离存档输出到 `temp/chapter_one/`，不覆盖玩家存档。
+验证入口 `game/tests/player_flow_test.gd`（兼容入口，继承 chapter_flow_test），通过 GODOT_PATH 运行。测试向窗口发送模拟输入，不移动系统鼠标；加 `-- --capture` 并移除 headless 可生成截图。截图及隔离存档输出到 `temp/chapter_one/`，不覆盖玩家存档。
 
 选关列表和详情布局的针对性验证：`GODOT_PATH --headless --path . --script res://game/tests/level_selection_test.gd`。
 

@@ -121,7 +121,7 @@ func reload_level() -> void:
 		return
 	presentation = Presentation.new(world, field, appearances, configuration)
 	markers = Node3D.new(); world.add_child(markers)
-	StageView.route_markers(markers, configuration.routes, field)
+	StageView.route_markers(markers, configuration.routes, field, map_data.flying_routes(), preload("res://content/ui/battle/air_spawn_marker_v1.png"))
 	overlays = Node3D.new(); world.add_child(overlays)
 	var layer := CanvasLayer.new(); add_child(layer)
 	hud = Hud.new()

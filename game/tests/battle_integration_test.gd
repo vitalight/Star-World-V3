@@ -20,7 +20,7 @@ func run() -> void:
 	var map = Map.instantiate()
 	root.add_child(map)
 	check(map.errors().is_empty(), "Default map validates: " + str(map.errors()))
-	check(map.cells().size() == 60 and map.routes().size() == 2, "60 cells and two paths")
+	check(map.cells().size() == 60 and map.routes().size() == 3, "60 cells and three paths")
 	var tiles: TileMapLayer = map.get_node("Terrain")
 	var chapter_map = load("res://content/scenes/scene_0101B/map.tscn").instantiate()
 	check(tiles.tile_set.resource_path == "res://content/terrains/terrain_003/tileset.tres", "Test map uses marker TileSet")
@@ -51,12 +51,26 @@ func run() -> void:
 	check(not map.errors().is_empty(), "Out of bounds route rejected")
 	path.curve.set_point_position(1, Vector2(608, 96))
 	map.level = map.level.duplicate(true)
+	map.level.waves[0].route = "air"
+	check(not map.errors().is_empty(), "Ground enemy on flying route is rejected in Game Test")
 	map.level.waves[0].route = "missing"
 	check(not map.errors().is_empty(), "Invalid wave route rejected before constructing battle")
 	map.free()
 	var game = Scene.instantiate()
 	root.add_child(game)
 	game.set_process(false)
+	var air_markers: Array = game.markers.get_children().filter(func(marker): return marker.get_meta("is_air", false))
+	check(air_markers.size() == 1 and air_markers[0].get_meta("endpoint_cell") == Vector2i(0, 0), "Game Test shows the flying marker at the sample air route")
+	check(air_markers.size() == 1 and air_markers[0].get_child_count() == 3, "Flying marker includes two planar frames and the air icon")
+	if air_markers.size() == 1:
+		for frame in air_markers[0].get_children().filter(func(child): return not child is Sprite3D):
+			check(frame.get_child_count() == 4 and frame.get_children().all(func(edge): return edge.mesh is PlaneMesh), "Air frame has only planar edges")
+	check(game.configuration.waves.any(func(wave): return wave.enemy == "drone" and wave.route == "air"), "Sample drone uses the marked air route")
+	check(game.last_state.life == 50 and game.last_state.remaining == 50 and game.hud.life_status.text == "50" and game.hud.status.text == "0 / 50", "Game Test simulation and HUD show authored 50 life and 50 enemies")
+	check(game.configuration.waves.size() == 10, "Game Test has ten waves")
+	for i in game.configuration.waves.size():
+		var wave: Dictionary = game.configuration.waves[i]
+		check(wave.number == i + 1 and wave.count == 5 and wave.time == (1.0 if i == 0 else 3.0 + i * 12.0), "Wave order, size and spacing are authored correctly")
 	verify_auto_start(game)
 	for key in game.configuration.roster:
 		var spec: Dictionary = game.configuration.roster[key]
@@ -91,7 +105,8 @@ func run() -> void:
 	var pure_events: Array = pure.take_events()
 	var scheduled: Array = Fixture.scheduled()
 	var command_index := 0
-	for tick in 600:
+	var observed_waves: Array[int] = []
+	for tick in 1800:
 		var time: float = game.last_state.time
 		while command_index < scheduled.size() and time + 0.00001 >= scheduled[command_index].at:
 			var action: Dictionary = scheduled[command_index]
@@ -102,6 +117,7 @@ func run() -> void:
 			command_index += 1
 		game.battle.advance(0.1); pure.advance(0.1)
 		game.refresh(0.1)
+		if game.last_state.wave > 0 and not observed_waves.has(game.last_state.wave): observed_waves.append(game.last_state.wave)
 		pure_events.append_array(pure.take_events())
 		if tick % 30 == 0: check(game.last_state == pure.snapshot(), "Pure and assembled simulation agree")
 		if game.last_state.phase != "running": break
@@ -109,7 +125,8 @@ func run() -> void:
 	check(history == pure_events, "Presentation and observers receive exactly the pure battle event stream")
 	for type in ["damage", "heal", "block", "skill_start", "retreat", "spawn", "finished"]:
 		check(history.any(func(event): return event.type == type), "Integrated event observed: " + type)
-	check(game.last_state.wave == 3 and game.last_state.spawned == 13, "Three numbered waves spawn all enemies")
+	check(observed_waves == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "Wave progression follows authored order")
+	check(game.last_state.spawned == 50 and game.last_state.wave == 10, "All 50 enemies spawn through wave 10")
 	var terminal: Dictionary = game.last_state.duplicate(true)
 	game.battle.advance(5); game.refresh()
 	check(terminal == game.last_state, "Terminal simulation freezes")
@@ -122,7 +139,7 @@ func run() -> void:
 	game.step()
 	check(is_equal_approx(game.last_state.time, Battle.STEP), "Single step advances one fixed tick")
 	game.reset(); game.start()
-	game.battle.advance(80); game.refresh()
+	game.battle.advance(180); game.refresh()
 	check(game.last_state.phase == "defeat" and game.last_state.life == 0, "Empty defense loses")
 	game.reload_level(); game.set_process(false)
 	check(game.last_state.phase == "ready" and game.presentation.actors.is_empty(), "Reload restores authored content and resets battle")
@@ -155,7 +172,7 @@ func run() -> void:
 	check(game.battle == null, "Start cannot bypass invalid configuration")
 	game.map_source = Map
 	game.reload_level(); game.set_process(false)
-	check(game.last_state.life == 3 and game.last_state.remaining == 13, "Reload original recovers without retaining edited resources")
+	check(game.last_state.life == 50 and game.last_state.remaining == 50, "Reload original recovers without retaining edited resources")
 	game.start(); game.set_speed(2.0); game._process(0.5)
 	check(is_equal_approx(game.last_state.time, 1.0), "2x advances shared simulation clock")
 	game.set_speed(4.0); game._process(0.25)
