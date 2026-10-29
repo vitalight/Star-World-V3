@@ -1,0 +1,25 @@
+extends SceneTree
+const Document = preload("res://devtools/balance_editor/csv_document.gd")
+
+func _init() -> void:
+	var path := "res://temp/balance_editor_test.csv"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string("id,name,description\nitem_001,\"中文,名字\",\"first\nsecond\"\nitem_002,other,untouched\n")
+	f.close()
+	var doc = Document.new()
+	assert(doc.load_table(path))
+	assert(doc.rows.size() == 2)
+	assert(doc.rows[0].values.name == "中文,名字")
+	doc.set_value(doc.rows[0], "description", "updated, \"quoted\"")
+	assert(doc.save().is_empty())
+	assert(doc.rows[0].values.description == "updated, \"quoted\"")
+	assert(FileAccess.get_file_as_string(path).contains("item_002,other,untouched"))
+	f = FileAccess.open(path, FileAccess.WRITE)
+	f.store_string("external change")
+	f.close()
+	assert(doc.conflicts())
+	assert(not doc.save().is_empty())
+	assert(FileAccess.get_file_as_string(path) == "external change")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	print("balance CSV test passed")
+	quit()

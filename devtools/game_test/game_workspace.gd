@@ -8,6 +8,13 @@ var debug_window: PanelContainer
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	game = Game.instantiate()
+	# This one-shot request is produced only by the editor's Play button.
+	var request_path := "res://temp/balance_editor/play_request.json"
+	if FileAccess.file_exists(request_path):
+		var request = JSON.parse_string(FileAccess.get_file_as_string(request_path))
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(request_path))
+		if request is Dictionary and absf(Time.get_unix_time_from_system() - float(request.get("time", 0))) < 60.0:
+			game.campaign_level = str(request.get("level", ""))
 	game.operator_roster = operator_roster
 	# Chapter previews use the full Game Test squad, including anti-air operators.
 	game.operator_ids.assign(operator_roster.actors.keys())
@@ -23,6 +30,11 @@ func _ready() -> void:
 	debug_window = DebugWindow.new()
 	debug_window.game = game
 	overlay.add_child(debug_window)
+	if not game.campaign_level.is_empty():
+		for index in debug_window.level_picker.item_count:
+			if debug_window.level_picker.get_item_metadata(index) == game.campaign_level:
+				debug_window.level_picker.select(index)
+				break
 	debug_window.hide()
 	var toggle := Button.new()
 	toggle.text = "F3"
