@@ -26,4 +26,6 @@
 
 选关列表和详情布局的针对性验证：`GODOT_PATH --headless --path . --script res://game/tests/level_selection_test.gd`。
 
+选关详情显示剧情首段的背景，战斗关显示对应地图的截图。截图使用默认 1440×900 战斗视口的镜头与出生／终点标记，保留完整画面。修改地图或新增战斗关后，在项目根目录运行 `& $env:GODOT_PATH --path . --script res://scripts/update_level_previews.gd`，在图形环境中更新所有战斗关截图；等待 Godot 编辑器导入 PNG 后再运行或导出游戏。截图按关卡 ID 保存到 `content/scenes/<关卡 ID>/level_preview.png`，以 levels.csv 中配置的地图为准。
+
 模式和存档隔离验证：运行 `game/tests/developer_mode_test.gd`，分别不带参数及带 `-- --developer-mode` 执行。

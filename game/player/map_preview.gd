@@ -2,6 +2,8 @@ extends Node3D
 const Field = preload("res://features/battlefield_view/editable_field.gd")
 const Stage = preload("res://features/battlefield_view/battlefield_stage.gd")
 var map_source: PackedScene
+var camera: Camera3D
+var terrain_bounds: Rect2i
 
 func _ready() -> void:
 	Stage.setup_environment(self)
@@ -14,10 +16,8 @@ func _ready() -> void:
 	field.has_backdrop = map.background_texture != null
 	field.configure(map.cells(), map.bounds)
 	add_child(field)
-	var camera := Stage.create_camera(self)
-	var visible_bounds: Rect2i = Stage.terrain_bounds(map.cells(), map.bounds)
-	var center := Vector3(visible_bounds.get_center().x - 0.5, 0, visible_bounds.get_center().y - 0.5)
-	camera.position = center + Vector3(0, 18, 11)
-	camera.look_at(center)
-	camera.fov = 32
+	Stage.route_markers(self, map.routes(), field, map.flying_routes(), preload("res://content/ui/battle/air_spawn_marker_v1.png"))
+	camera = Stage.create_camera(self)
+	terrain_bounds = Stage.terrain_bounds(map.cells(), map.bounds)
+	Stage.fit_camera(camera, terrain_bounds, get_viewport().get_visible_rect().size)
 	map.free()

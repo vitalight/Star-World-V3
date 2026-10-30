@@ -487,6 +487,21 @@ func _level_detail(level: Dictionary) -> void:
 	var separator := ColorRect.new()
 	separator.color = Color("67758a"); separator.custom_minimum_size.y = 1
 	column.add_child(separator)
+	var preview_path := ""
+	if is_story:
+		var story_script = catalog.story(level.story)
+		var first: Dictionary = story_script.nodes.get(story_script.start, {})
+		preview_path = str(catalog.backgrounds.get(first.get("background", ""), ""))
+	else:
+		preview_path = "res://content/scenes/%s/level_preview.png" % level.id
+	var preview := TextureRect.new()
+	preview.name = "LevelPreview"
+	preview.custom_minimum_size = Vector2(0, 260)
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED if is_story else TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if ResourceLoader.exists(preview_path): preview.texture = load(preview_path)
+	column.add_child(preview)
 	if not is_story and level.roster_mode == "player":
 		if squad_level != level.id:
 			squad_level = level.id

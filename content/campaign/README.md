@@ -74,6 +74,7 @@ CSV 保存为 UTF-8（Excel 选择 CSV UTF-8），保留列名；`.csv.import` �
 - Game Test：F3 切换开发样例与正式关卡；固定编队关卡使用关卡名单，玩家编队关卡使用完整测试干员列表。“重新加载关卡”读取保存的 `.tres`、CSV 和地图。
 - Story Test：选择剧情关后“重新加载”。
 - Player Mode：重新启动读取最新内容；战斗中不热更新。
+- 修改地图或添加战斗关后，运行 `& $env:GODOT_PATH --path . --script res://scripts/update_level_previews.gd` 更新选关截图；此命令需要图形环境，生成后等待编辑器导入 PNG。
 - 编辑正式关卡后必须在 Game Test 实际检查。内容错误会显示文件、字段与行号；地图诊断会指明格子或路线。
 
 在项目根目录使用 `GODOT_PATH` 运行（首次先创建 `temp/chapter_one` 和 `temp/.gdignore`）：

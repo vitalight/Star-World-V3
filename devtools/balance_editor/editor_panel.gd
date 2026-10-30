@@ -14,7 +14,7 @@ const OPERATOR_FIELDS := ["role", "cost", "redeploy_time", "block", "anti_air", 
 const ENEMY_FIELDS := ["speed", "ranged", "attack_range", "flying", "leak_damage"]
 const SKILL_FIELDS := ["recovery", "required", "initial_sp", "duration", "multiplier", "defense_multiplier", "interval_multiplier", "cost_gain", "trigger", "forward_range", "hit_count", "heal_damage_reduction", "heal_buff_duration"]
 const LEVEL_FIELDS := ["life", "initial_cost", "cost_cap", "cost_regen", "deploy_limit", "defend_duration", "roster_mode", "fixed_roster"]
-const WAVE_FIELDS := ["time", "count", "interval", "enemy", "route", "number"]
+const WAVE_FIELDS := ["time", "count", "interval", "enemy", "route"]
 const CHOICES := {"damage_type":["physical","arts","true"], "role":["melee","ranged","healer"], "recovery":["auto","attack","hit"], "trigger":["manual","automatic"], "roster_mode":["fixed","player"]}
 
 var model = Model.new()
@@ -285,6 +285,22 @@ func _level_form() -> void:
 		if candidate.values.id == selected: row = candidate; break
 	if row.is_empty(): return
 	_heading(str(row.values.name), "调整关卡容错、部署节奏和出怪安排。修改会保留在草稿中，保存后可试玩。")
+	var preview_path := "res://content/scenes/%s/level_preview.png" % selected
+	if ResourceLoader.exists(preview_path):
+		var preview := TextureRect.new()
+		preview.name = "LevelPreview"
+		preview.texture = ResourceLoader.load(preview_path, "", ResourceLoader.CACHE_MODE_IGNORE)
+		preview.custom_minimum_size = Vector2(480, 270)
+		preview.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		body.add_child(preview)
+	else:
+		var missing := Label.new()
+		missing.name = "MissingLevelPreview"
+		missing.text = "暂无地图预览，请运行地图截图更新脚本并等待导入。"
+		missing.add_theme_color_override("font_color", Color("9bafba"))
+		body.add_child(missing)
 	var groups := [
 		{"title":"基地与防守", "description":"决定漏怪容错和胜利条件。", "fields":["life", "defend_duration"]},
 		{"title":"部署资源", "description":"控制开局费用、费用回复和同时上场人数。", "fields":["initial_cost", "cost_cap", "cost_regen", "deploy_limit"]},
@@ -301,6 +317,7 @@ func _level_form() -> void:
 				_choice_field(fields, field, str(row.values[field]), CHOICES[field], callback)
 			else:
 				_text_field(fields, field, str(row.values[field]), callback)
+
 	_heading("出怪波次", "按出场时间安排敌人；每张卡片代表一组敌人。")
 	var scene = load(str(row.values.map))
 	var route_names: Array = []
@@ -314,7 +331,7 @@ func _level_form() -> void:
 	enemy_ids.sort()
 	for wave in model.waves.rows:
 		if wave.values.level != selected: continue
-		var box := _card("第 %s 波  ·  %s" % [wave.values.number, wave.values.id])
+		var box := _card("出怪组  ·  %s" % wave.values.id)
 		var fields := _grid(box)
 		for field in WAVE_FIELDS:
 			var callback := func(value):
@@ -367,6 +384,15 @@ func _resource_form() -> void:
 	var object: Resource = owner if category == 2 else owner.stats
 	var display: String = owner.display_name if category == 2 else object.display_name
 	_heading(display + "  ·  " + selected, "此资源会影响所有引用它的内容。 " + _references(selected))
+	if category == 2 or owner.appearance != null:
+		var portrait := TextureRect.new()
+		portrait.name = "SkillIcon" if category == 2 else "Portrait"
+		portrait.texture = owner.icon if category == 2 else owner.appearance.portrait
+		portrait.custom_minimum_size = Vector2(144, 144)
+		portrait.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		body.add_child(portrait)
 	var groups: Array
 	if category == 2:
 		groups = [
@@ -390,7 +416,7 @@ func _resource_form() -> void:
 		var fields := _grid(_card(group.title, group.description))
 		for field in group.fields: _resource_field(fields, owner, object, field)
 	if category == 1:
-		var range_card := _card("攻击范围", "以角色朝右为基准，每个坐标用分号分隔，例如 0,0;1,0。")
+		var range_card := _card("攻击范围", "角色朝右，点击格子切换范围；箭头移动视野。范围不能为空。")
 		_range_field(range_card, owner, object)
 		var skill_note := Label.new()
 		skill_note.text = "关联技能：" + (str(object.skill_spec.display_name) if object.skill_spec else "无") + "；可在技能强度页调整。"
@@ -448,6 +474,15 @@ func _range_field(parent: Control, owner: Resource, stats: Resource) -> void:
 	var parts := PackedStringArray()
 	for cell in stats.range_cells:
 		parts.append("%d,%d" % [cell.x, cell.y])
+	var state := {"cells": stats.range_cells.duplicate(), "origin": Vector2i(-3, -3)}
+	var navigation := HBoxContainer.new()
+	parent.add_child(navigation)
+	var grid := GridContainer.new()
+	grid.name = "RangeGrid"
+	grid.columns = 9
+	grid.add_theme_constant_override("h_separation", 3)
+	grid.add_theme_constant_override("v_separation", 3)
+	parent.add_child(grid)
 	_text_field(parent, "range_cells", ";".join(parts), func(value):
 		var points: Array[Vector2i] = []
 		var valid := true
@@ -457,13 +492,62 @@ func _range_field(parent: Control, owner: Resource, stats: Resource) -> void:
 				valid = false
 				break
 			points.append(Vector2i(int(coordinates[0]), int(coordinates[1])))
-		if not valid or points.is_empty():
+		if not valid:
 			invalid[key] = true
 		else:
-			invalid.erase(key)
-			stats.range_cells = points
-			model.mark_resource(owner.resource_path)
+			state.cells = points
+			if points.is_empty():
+				invalid[key] = true
+			else:
+				invalid.erase(key)
+				stats.range_cells = points
+				model.mark_resource(owner.resource_path)
+			_render_range_grid(grid, state)
 		_update_status())
+	var input: LineEdit = parent.get_child(parent.get_child_count() - 1).get_child(1)
+	state.input = input
+	for entry in [["←", Vector2i.LEFT], ["→", Vector2i.RIGHT], ["↑", Vector2i.UP], ["↓", Vector2i.DOWN]]:
+		var button := Button.new()
+		button.text = entry[0]
+		button.name = "RangePan_%d_%d" % [entry[1].x, entry[1].y]
+		button.tooltip_text = "移动范围视野"
+		button.pressed.connect(func():
+			state.origin += entry[1]
+			_render_range_grid(grid, state))
+		navigation.add_child(button)
+	var legend := Label.new()
+	legend.text = "  高亮：攻击范围    ▶：角色位置及朝向"
+	legend.add_theme_color_override("font_color", Color("c2d0d5"))
+	navigation.add_child(legend)
+	_render_range_grid(grid, state)
+
+func _render_range_grid(grid: GridContainer, state: Dictionary) -> void:
+	for child in grid.get_children():
+		grid.remove_child(child)
+		child.queue_free()
+	for y in range(7):
+		for x in range(9):
+			var cell: Vector2i = state.origin + Vector2i(x, y)
+			var button := Button.new()
+			button.name = "Cell_%d_%d" % [cell.x, cell.y]
+			button.custom_minimum_size = Vector2(38, 38)
+			button.text = "▶" if cell == Vector2i.ZERO else ""
+			button.tooltip_text = "(%d, %d)" % [cell.x, cell.y]
+			button.toggle_mode = true
+			button.add_theme_stylebox_override("normal", _box(Color("1a2834"), Color("455968"), 0))
+			button.add_theme_stylebox_override("hover", _box(Color("354f5e"), Color("91c5be"), 0))
+			button.add_theme_stylebox_override("pressed", _box(Color("398e82"), Color("a5e8d9"), 0))
+			button.add_theme_stylebox_override("hover_pressed", _box(Color("50a899"), Color("d3fff2"), 0))
+			button.button_pressed = state.cells.has(cell)
+			button.pressed.connect(func():
+				var cells: Array = state.cells.duplicate()
+				if cells.has(cell): cells.erase(cell)
+				else: cells.append(cell)
+				var parts := PackedStringArray()
+				for point in cells: parts.append("%d,%d" % [point.x, point.y])
+				state.input.text = ";".join(parts)
+				state.input.text_changed.emit(state.input.text))
+			grid.add_child(button)
 func _references(id: String) -> String:
 	var used := PackedStringArray()
 	if category == 2:

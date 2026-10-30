@@ -51,6 +51,11 @@ func run() -> void:
 	await settle()
 	verify_list(1, true)
 	check(player.find_child("LevelType", true, false).text == "剧情", "Story detail shows story badge")
+	var preview: TextureRect = player.find_child("LevelPreview", true, false)
+	check(preview.texture != null and preview.texture.resource_path == player.catalog.backgrounds.background_001, "Story detail uses opening background")
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("res://temp/chapter_one/selection_story_preview.png")
 	check(player.find_child("StartAction", true, false).text == "进入故事" and player.find_child("DetailDescription", true, false) == null, "Story detail shows the story action without descriptive text")
 	var first_card: Control = player.find_child("Level_scene_0101A", true, false)
 	check(first_card.find_child("RouteType", true, false).text == "剧情" and first_card.find_child("RouteTypeBadge", true, false).mouse_filter == Control.MOUSE_FILTER_IGNORE, "Story row shows a non-interactive story badge")
@@ -64,6 +69,11 @@ func run() -> void:
 	await settle()
 	verify_list(6, true)
 	check(player.find_child("LevelType", true, false).text == "战斗", "Battle detail shows battle badge")
+	preview = player.find_child("LevelPreview", true, false)
+	check(preview.texture != null and preview.texture.resource_path == "res://content/scenes/%s/level_preview.png" % ids[5], "Battle detail uses selected level screenshot")
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png("res://temp/chapter_one/selection_battle_preview.png")
 	check(player.find_child("StartAction", true, false).text == "开始战斗" and player.find_child("DetailDescription", true, false) == null, "Battle detail shows the battle action without descriptive text")
 	var battle_card: Control = player.find_child("Level_scene_0101B", true, false)
 	check(battle_card.find_child("RouteType", true, false).text == "战斗", "Battle row shows battle badge")
@@ -71,6 +81,12 @@ func run() -> void:
 	var selected: Control = player.find_child("Level_" + ids[5], true, false)
 	check(selected.get_global_rect().intersection(scroll.get_global_rect()).size.y >= selected.get_global_rect().size.y - 1, "Selected level is scrolled into view")
 	player.progress.completed.assign(ids)
+	for id in ids:
+		player.progress.selected = id
+		player.show_levels()
+		await settle()
+		preview = player.find_child("LevelPreview", true, false)
+		check(preview.texture != null, "Selected level has a preview: " + id)
 	player.progress.selected = ids.back()
 	player.show_levels()
 	await settle()
