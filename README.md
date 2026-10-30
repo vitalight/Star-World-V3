@@ -8,6 +8,7 @@
 
 - [`scripts/run_game.bat`](scripts/run_game.bat)：启动 Player Mode；加 `-d` 进入开发者模式。
 - [`scripts/run_devtools.bat`](scripts/run_devtools.bat)：启动 Developer Hub。
+- [`scripts/build_game.bat`](scripts/build_game.bat)：打包 Windows 可执行文件到 `builds/`；需先安装与该 Godot 版本一致的导出模板。
 
 项目默认入口是 `game/player/player_mode.tscn`。玩家流程与存档见 [Player Mode](game/player/README.md)；音频见 [音频内容](content/audio/README.md)。
 

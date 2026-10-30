@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="3_h806n"]
 [ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="4_6b8je"]
 [ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="5_g37dm"]
-[ext_resource type="Resource" path="res://content/data/skill_003.tres" id="6_ioel2"]
+[ext_resource type="Resource" uid="uid://625x25le78yi" path="res://content/data/skill_003.tres" id="6_ioel2"]
 
 [sub_resource type="AtlasTexture" id="ClassIcon"]
 atlas = ExtResource("2_mythv")
@@ -23,7 +23,7 @@ script = ExtResource("5_g37dm")
 content_id = "character_013"
 display_name = "阿五"
 max_hp = 750.0
-attack = 80.0
+attack = 90.0
 defense = 20.0
 resistance = 5.0
 interval = 1.2
@@ -32,7 +32,7 @@ cost = 15.0
 redeploy_time = 45.0
 block = 0
 anti_air = true
-range_cells = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, -1), Vector2i(2, 0), Vector2i(2, 1), Vector2i(3, -1), Vector2i(3, 0), Vector2i(3, 1)])
+range_cells = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, -1), Vector2i(2, 0), Vector2i(2, 1), Vector2i(3, 0)])
 skill_spec = ExtResource("6_ioel2")
 
 [resource]
