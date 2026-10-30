@@ -130,6 +130,9 @@ func run() -> void:
 			await click("跳过剧情")
 		game = player.battle_scene; game.set_process(false)
 		check(game.campaign_level == id, "Story enters corresponding battle")
+		check(is_instance_valid(player.tutorial) and game.last_state.paused, "Battle hint appears and pauses " + id)
+		await click("确认")
+		check(not game.last_state.paused, "Battle hint resumes " + id)
 		check(game.debug_victory(), "Battle victory advances the player flow")
 		check(game.last_state.phase == "victory" and player.progress.pending_after == id, "Victory persists pending continuation")
 		if index == 1:
@@ -143,6 +146,8 @@ func run() -> void:
 	await click("开始战斗")
 	game = player.battle_scene; game.set_process(false)
 	check(game.campaign_level == "scene_0104C", "Final boss starts directly from selection")
+	check(is_instance_valid(player.tutorial) and game.last_state.paused, "Final battle hint pauses battle")
+	await click("确认")
 	check(game.debug_victory(), "Final boss victory advances the player flow")
 	check(game.last_state.phase == "victory" and player.progress.pending_after == "scene_0104C", "Final boss persists pending continuation")
 	await click("继续")

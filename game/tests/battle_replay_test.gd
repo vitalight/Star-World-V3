@@ -97,7 +97,6 @@ func run() -> void:
 	var player = Player.instantiate()
 	player.developer_mode = true
 	player.replay_directory = "res://temp/replay_test"
-	player.tutorial_seen = true
 	root.add_child(player)
 	await settle()
 	player.progress.selected = "scene_0101B"
@@ -109,6 +108,9 @@ func run() -> void:
 	if dialog: dialog.canceled.emit()
 	await settle()
 	check(player.page == "battle" and not player.battle_scene.replay_mode, "Choice can start a normal battle")
+	if player.tutorial:
+		for node in player.tutorial.get_child(0).get_children():
+			if node is Button and node.text == "确认": node.pressed.emit()
 	player.battle_scene.set_process(false)
 	player.battle_scene.start()
 	player.battle_scene._process(0.2)

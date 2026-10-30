@@ -10,6 +10,13 @@ const MainButtonLight = preload("res://content/ui/player/main_button_light_v2.pn
 const MainButtonDark = preload("res://content/ui/player/main_button_dark_v2.png")
 const MainSettings = preload("res://content/ui/player/main_settings_v2.png")
 const FirstBattleHintImage = preload("res://content/ui/tutorial/scene_0101B_battle.png")
+const BATTLE_HINTS := {
+	"scene_0101B": [FirstBattleHintImage, "欢迎来到星世界。\n- 你的目标，是部署干员，击退来袭的敌人。\n- 敌人突破防线，会消耗基地生命值。\n- 当基地生命值降至 0 时，游戏失败。"],
+	"scene_0102B": [preload("res://content/scenes/scene_0102B/level_preview.png"), "警戒！出现了飞行敌人。\n- 飞行会从高台出发，不受干员阻挡，是极大的威胁。\n- 阿五拥有远程攻击能力，是制裁他们的办法。"],
+	"scene_0103B": [preload("res://content/scenes/scene_0103B/level_preview.png"), "部署干员需要消耗 DP。\n- DP 会随时间自动恢复。\n- 先锋干员【胡胡】的技能，可以帮助你更快获得 DP。\n- 合理安排部署顺序，尽快建立防线。"],
+	"scene_0104B": [preload("res://content/scenes/scene_0104B/level_preview.png"), "怪物的攻势愈发猛烈，需要紧急救援。\n- 干员生命值为0时，就会退场。\n- 月月拥有治疗能力，会自动治疗范围内生命值最低的盟友。"],
+	"scene_0104C": [preload("res://content/scenes/scene_0104C/level_preview.png"), "大量敌人来袭！\n- 受节点紊乱影响，本关DP恢复变慢。\n- 请合理安排干员位置，确保最大化输出。"],
+}
 const Catalog = preload("res://game/content/content_catalog.gd")
 const Progress = preload("res://game/player/campaign_progress.gd")
 const Session = preload("res://features/story/story_session.gd")
@@ -41,7 +48,6 @@ var story_level := ""
 var result_recorded := false
 var return_button: Button
 var tutorial: PanelContainer
-var tutorial_seen := false
 var selected_squad: Array[String] = []
 var squad_level := ""
 var selected_slot := 1
@@ -741,10 +747,9 @@ func _start_battle(play_replay: bool) -> void:
 	return_button.add_theme_font_size_override("font_size", 22)
 	return_button.pressed.connect(_leave_result)
 	battle_scene.hud.end_panel.get_child(0).add_child(return_button)
-	if progress.selected == "scene_0101B" and not tutorial_seen: _show_tutorial()
+	if BATTLE_HINTS.has(progress.selected): _show_tutorial(BATTLE_HINTS[progress.selected])
 
-func _show_tutorial() -> void:
-	tutorial_seen = true
+func _show_tutorial(hint: Array) -> void:
 	battle_scene.battle.set_paused(true)
 	battle_scene.refresh()
 	var shade := ColorRect.new()
@@ -772,14 +777,14 @@ func _show_tutorial() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
 	var screenshot := TextureRect.new()
-	screenshot.texture = FirstBattleHintImage
+	screenshot.texture = hint[0]
 	screenshot.custom_minimum_size = Vector2(564, 250)
 	screenshot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	screenshot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	screenshot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(screenshot)
 	var label := Label.new()
-	label.text = "按住角色卡拖到战场，松开后选择朝向进行部署。\n角色会阻挡并攻击敌人；阻止敌人进入蓝色基地。\n部署消耗费用，费用会随时间恢复。"
+	label.text = hint[1]
 	label.add_theme_font_size_override("font_size", 18)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	column.add_child(label)
