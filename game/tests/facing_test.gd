@@ -22,6 +22,8 @@ func run() -> void:
 			check(pointer.dot(expected) > 0.999, "Compass points along actual facing: " + str(facing))
 			var state: Dictionary = game.battle.find_unit(result.id)
 			state.action = {"target": 999}
+			actor.start_attack()
+			actor.advance_visual(0.2)
 			game.presentation.actors[result.id].apply_state(state, false)
 			check(game.presentation.actors[result.id].sprite.flip_h == (facing == 0) and game.presentation.actors[result.id].sprite.texture == game.appearances[key].poses[3 if facing == 3 else 2], key + " attack pose preserves facing")
 			if key == "guard":

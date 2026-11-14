@@ -1,8 +1,7 @@
 [gd_resource type="Resource" format=3]
 [ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="script"]
-[ext_resource type="Texture2D" path="res://content/enemies/enemy_001/atlas.png" id="atlas"]
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_004/attack_v1.png" id="atlas"]
 [resource]
 script = ExtResource("script")
-atlas = ExtResource("atlas")
-atlas_row = 3
+attack_sheet = ExtResource("atlas")
 height = 1.02

@@ -1,6 +1,43 @@
 @tool
 extends Resource
 
+@export var attack_sheet: Texture2D:
+	set(value):
+		attack_sheet = value
+		_attack_frames.clear()
+
+@export var move_sheet: Texture2D:
+	set(value):
+		move_sheet = value
+		_move_frames.clear()
+
+var _attack_frames: Array[Texture2D] = []
+var _move_frames: Array[Texture2D] = []
+
+func attack_frames() -> Array[Texture2D]:
+	if attack_sheet == null:
+		return []
+	if _attack_frames.is_empty():
+		for column in 4:
+			var frame := AtlasTexture.new()
+			frame.atlas = attack_sheet
+			frame.region = Rect2(column * attack_sheet.get_width() / 4.0, 0, attack_sheet.get_width() / 4.0, attack_sheet.get_height())
+			frame.filter_clip = true
+			_attack_frames.append(frame)
+	return _attack_frames
+
+func move_frames() -> Array[Texture2D]:
+	if move_sheet == null:
+		return []
+	if _move_frames.is_empty():
+		for column in 4:
+			var frame := AtlasTexture.new()
+			frame.atlas = move_sheet
+			frame.region = Rect2(column * move_sheet.get_width() / 4.0, 0, move_sheet.get_width() / 4.0, move_sheet.get_height())
+			frame.filter_clip = true
+			_move_frames.append(frame)
+	return _move_frames
+
 ## Columns: idle_front_left, idle_back_left, attack_front_left, attack_back_left.
 @export var atlas: Texture2D:
 	set(value):
@@ -14,6 +51,9 @@ extends Resource
 ## Legacy individual textures are used when no atlas is assigned.
 @export var poses: Array[Texture2D] = []:
 	get:
+		if attack_sheet != null:
+			var frames := attack_frames()
+			return [frames[0], frames[0], frames[2], frames[2]] as Array[Texture2D]
 		if atlas == null:
 			return poses
 		if _atlas_poses.is_empty() or _atlas_size != atlas.get_size():

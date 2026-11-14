@@ -1,0 +1,913 @@
+{
+  "reference": "../enemy_animation_reference_v1.png",
+  "generator": "built-in image_gen",
+  "source_order": "2x2 reading order",
+  "processing": "Quadrant slices resized to 512x512 for GIF; six pairs assembled into horizontal strips for in-game use. GIF transparency is binary.",
+  "checks": "Alpha bounds use threshold 64; montage visually inspected. Frame-by-frame artifact and in-game clipping checks are not comprehensive.",
+  "entries": [
+    {
+      "sheet": "beast-attack-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            107,
+            63,
+            576,
+            549
+          ],
+          "edge_gap_px": 51
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            81,
+            67,
+            563,
+            546
+          ],
+          "edge_gap_px": 64
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            15,
+            51,
+            610,
+            547
+          ],
+          "edge_gap_px": 15
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            55,
+            66,
+            600,
+            549
+          ],
+          "edge_gap_px": 27
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "beast-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            81,
+            59,
+            582,
+            567
+          ],
+          "edge_gap_px": 45
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            62,
+            66,
+            589,
+            570
+          ],
+          "edge_gap_px": 38
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            30,
+            63,
+            611,
+            563
+          ],
+          "edge_gap_px": 16
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            37,
+            63,
+            564,
+            560
+          ],
+          "edge_gap_px": 37
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "boss-attack-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            148,
+            36,
+            569,
+            534
+          ],
+          "edge_gap_px": 36
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            64,
+            57,
+            597,
+            533
+          ],
+          "edge_gap_px": 30
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            21,
+            51,
+            599,
+            527
+          ],
+          "edge_gap_px": 21
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            70,
+            33,
+            584,
+            528
+          ],
+          "edge_gap_px": 33
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "boss-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            110,
+            16,
+            544,
+            543
+          ],
+          "edge_gap_px": 16
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            81,
+            25,
+            519,
+            543
+          ],
+          "edge_gap_px": 25
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            81,
+            29,
+            561,
+            549
+          ],
+          "edge_gap_px": 29
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            83,
+            21,
+            496,
+            549
+          ],
+          "edge_gap_px": 21
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "brute-attack-sheet.png",
+      "size": [
+        1262,
+        1246
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            88,
+            53,
+            595,
+            515
+          ],
+          "edge_gap_px": 36
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            44,
+            85,
+            589,
+            504
+          ],
+          "edge_gap_px": 42
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            20,
+            138,
+            627,
+            522
+          ],
+          "edge_gap_px": 4
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            73,
+            69,
+            597,
+            518
+          ],
+          "edge_gap_px": 34
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "brute-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            46,
+            63,
+            600,
+            552
+          ],
+          "edge_gap_px": 27
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            30,
+            61,
+            606,
+            556
+          ],
+          "edge_gap_px": 21
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            38,
+            62,
+            596,
+            521
+          ],
+          "edge_gap_px": 31
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            37,
+            61,
+            586,
+            527
+          ],
+          "edge_gap_px": 37
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "fly-attack-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            107,
+            47,
+            573,
+            506
+          ],
+          "edge_gap_px": 47
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            52,
+            33,
+            567,
+            515
+          ],
+          "edge_gap_px": 33
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            35,
+            78,
+            577,
+            591
+          ],
+          "edge_gap_px": 35
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            91,
+            42,
+            567,
+            476
+          ],
+          "edge_gap_px": 42
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "fly-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            107,
+            102,
+            582,
+            519
+          ],
+          "edge_gap_px": 45
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            110,
+            21,
+            519,
+            513
+          ],
+          "edge_gap_px": 21
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            126,
+            5,
+            483,
+            512
+          ],
+          "edge_gap_px": 5
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            68,
+            107,
+            579,
+            513
+          ],
+          "edge_gap_px": 48
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "raptor-attack-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            183,
+            48,
+            568,
+            561
+          ],
+          "edge_gap_px": 48
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            80,
+            112,
+            545,
+            561
+          ],
+          "edge_gap_px": 66
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            20,
+            106,
+            625,
+            553
+          ],
+          "edge_gap_px": 2
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            106,
+            69,
+            564,
+            554
+          ],
+          "edge_gap_px": 63
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "raptor-move-sheet.png",
+      "size": [
+        1246,
+        1263
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            126,
+            38,
+            532,
+            555
+          ],
+          "edge_gap_px": 38
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            106,
+            40,
+            464,
+            560
+          ],
+          "edge_gap_px": 40
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            138,
+            34,
+            515,
+            544
+          ],
+          "edge_gap_px": 34
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            104,
+            34,
+            488,
+            549
+          ],
+          "edge_gap_px": 34
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "shield-attack-sheet.png",
+      "size": [
+        1262,
+        1246
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            151,
+            82,
+            544,
+            505
+          ],
+          "edge_gap_px": 82
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            60,
+            96,
+            598,
+            505
+          ],
+          "edge_gap_px": 33
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            34,
+            84,
+            614,
+            513
+          ],
+          "edge_gap_px": 17
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            96,
+            101,
+            554,
+            514
+          ],
+          "edge_gap_px": 77
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "shield-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            115,
+            75,
+            555,
+            546
+          ],
+          "edge_gap_px": 72
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            86,
+            72,
+            543,
+            543
+          ],
+          "edge_gap_px": 72
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            116,
+            69,
+            553,
+            548
+          ],
+          "edge_gap_px": 69
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            126,
+            79,
+            537,
+            545
+          ],
+          "edge_gap_px": 79
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "slime-attack-sheet.png",
+      "size": [
+        1261,
+        1247
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            108,
+            195,
+            556,
+            465
+          ],
+          "edge_gap_px": 74
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            102,
+            160,
+            520,
+            464
+          ],
+          "edge_gap_px": 102
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            67,
+            185,
+            584,
+            470
+          ],
+          "edge_gap_px": 46
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            81,
+            197,
+            528,
+            472
+          ],
+          "edge_gap_px": 81
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "slime-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            103,
+            269,
+            566,
+            469
+          ],
+          "edge_gap_px": 61
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            79,
+            201,
+            546,
+            466
+          ],
+          "edge_gap_px": 79
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            56,
+            218,
+            590,
+            443
+          ],
+          "edge_gap_px": 37
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            88,
+            206,
+            556,
+            448
+          ],
+          "edge_gap_px": 71
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "wolf-attack-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            64,
+            113,
+            588,
+            474
+          ],
+          "edge_gap_px": 39
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            41,
+            161,
+            588,
+            476
+          ],
+          "edge_gap_px": 39
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            38,
+            134,
+            622,
+            470
+          ],
+          "edge_gap_px": 5
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            64,
+            127,
+            604,
+            481
+          ],
+          "edge_gap_px": 23
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "wolf-move-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            32,
+            184,
+            589,
+            511
+          ],
+          "edge_gap_px": 32
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            42,
+            161,
+            604,
+            493
+          ],
+          "edge_gap_px": 23
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            17,
+            145,
+            610,
+            431
+          ],
+          "edge_gap_px": 17
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            26,
+            170,
+            612,
+            482
+          ],
+          "edge_gap_px": 15
+        }
+      ],
+      "gif_frames": 4
+    },
+    {
+      "sheet": "shield-attack-v2-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            142,
+            72,
+            502,
+            548
+          ],
+          "edge_gap_px": 72
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            89,
+            108,
+            522,
+            547
+          ],
+          "edge_gap_px": 80
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            39,
+            106,
+            595,
+            530
+          ],
+          "edge_gap_px": 32
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            86,
+            72,
+            496,
+            532
+          ],
+          "edge_gap_px": 72
+        }
+      ],
+      "gif_frames": 4,
+      "reference": "../enemy_animation_reference_v1.png",
+      "review": "Face, eye and held shield visually checked to face left in all cells."
+    },
+    {
+      "sheet": "shield-move-v2-sheet.png",
+      "size": [
+        1254,
+        1254
+      ],
+      "cells": [
+        {
+          "cell": 1,
+          "bbox": [
+            123,
+            56,
+            550,
+            555
+          ],
+          "edge_gap_px": 56
+        },
+        {
+          "cell": 2,
+          "bbox": [
+            101,
+            54,
+            481,
+            555
+          ],
+          "edge_gap_px": 54
+        },
+        {
+          "cell": 3,
+          "bbox": [
+            120,
+            36,
+            543,
+            549
+          ],
+          "edge_gap_px": 36
+        },
+        {
+          "cell": 4,
+          "bbox": [
+            109,
+            38,
+            516,
+            548
+          ],
+          "edge_gap_px": 38
+        }
+      ],
+      "gif_frames": 4,
+      "reference": "shield-attack-v2-sheet.png",
+      "review": "Face, eye and held shield visually checked to face left in all cells."
+    }
+  ]
+}

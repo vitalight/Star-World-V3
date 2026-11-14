@@ -67,11 +67,11 @@ func run() -> void:
 	await capture("skill_formal_roster")
 	game.free(); await process_frame
 	var art = load("res://devtools/art_test/art_workspace.tscn").instantiate()
-	art.page = 4; root.add_child(art)
+	art.page = 5; root.add_child(art)
 	await settle()
-	check(art.tabs.get_tab_title(4) == "Skill" and art.tabs.current_tab == 4,"Art Test exposes Skill tab")
-	check(art.skill_grid.get_child_count() == 16,"Skill page displays the full atlas")
-	var labels: Array[Node] = art.tabs.get_child(4).find_children("*","Label",true,false)
+	check(art.tabs.get_tab_title(5) == "Skill" and art.tabs.current_tab == 5,"Art Test exposes Skill tab")
+	check(art.skill_grid.get_child_count() == preload("res://devtools/art_test/asset_catalog.gd").skills().size(),"Skill page displays the registered skill icons")
+	var labels: Array[Node] = art.tabs.get_child(5).find_children("*","Label",true,false)
 	check(labels.all(func(label): return not ["技力","回复","释放","Game Test","攻击力","防御力","治疗量"].any(func(word): return label.text.contains(word))),"Art Skill page contains no gameplay descriptions")
 	for dimensions in [Vector2i(1280,800),Vector2i(960,600),Vector2i(1600,900)]:
 		root.size = dimensions; await settle()

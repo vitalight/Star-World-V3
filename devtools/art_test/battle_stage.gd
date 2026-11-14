@@ -4,7 +4,7 @@ const Presentation = preload("res://game/adapters/battle_presentation.gd")
 const StageView = preload("res://features/battlefield_view/battlefield_stage.gd")
 const HUD = preload("res://features/battle_hud/playable_hud.gd")
 const MAP = preload("res://content/scenes/scene_001/field.tscn")
-@export var operator_roster: Resource = preload("res://content/data/test_roster.tres")
+@export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
 var viewport: SubViewport
 var world: Node3D
 var field: Node3D
@@ -16,6 +16,7 @@ var mock_state: Dictionary
 var configuration: Dictionary
 var catalog := {}
 var skill_icons := {}
+var game_catalog
 var actors: Array[Node3D] = []
 var preview_enemies: Array = []
 var next_attack := 2.4
@@ -58,8 +59,21 @@ func _ready() -> void:
 	StageView.fit_camera(camera, StageView.terrain_bounds(source.cells(), source.bounds), Vector2(viewport.size))
 	markers = Node3D.new(); world.add_child(markers)
 	StageView.route_markers(markers, configuration.routes, field, source.flying_routes(), preload("res://content/ui/battle/air_spawn_marker_v1.png"))
-	for key in source.level.enemies:
-		catalog[key] = load("res://content/enemies/%s/appearance.tres" % source.level.enemies[key].content_id)
+	if game_catalog == null:
+		game_catalog = preload("res://game/content/content_catalog.gd").new()
+		game_catalog.reload()
+	var all_appearances: Dictionary = game_catalog.all_appearances()
+	for key in configuration.enemies:
+		var id := ""
+		for candidate in game_catalog.enemies:
+			var stats: Dictionary = game_catalog.enemies[candidate].stats
+			if (key == "drone" and stats.flying) or (key == "rifle" and stats.ranged and not stats.flying) or (key == "soldier" and not stats.ranged and not stats.flying):
+				id = candidate
+				break
+		if id.is_empty(): continue
+		configuration.enemies[key] = game_catalog.enemies[id].stats.duplicate(true)
+		configuration.enemies[key].content_id = id
+		catalog[id] = all_appearances[id]
 	source.free()
 	_build_mock()
 	presentation = Presentation.new(world, field, catalog, configuration)
@@ -84,12 +98,12 @@ func _ready() -> void:
 func _build_mock() -> void:
 	mock_state = {"phase": "running", "paused": false, "time": 0.0, "cost": 55.0,
 		"life": 5, "killed": 34, "escaped": 0, "remaining": 9, "units": [], "enemies": [], "redeploy": {}}
-	var cells := {"guard": Vector2i(3,1), "tank": Vector2i(3,4), "sniper": Vector2i(5,2), "caster": Vector2i(4,3), "medic": Vector2i(4,2)}
+	var cells := [Vector2i(3,1), Vector2i(3,4), Vector2i(5,2), Vector2i(4,3), Vector2i(4,2)]
 	var index := 0
 	for key in configuration.roster:
 		var spec: Dictionary = configuration.roster[key]
 		var unit := spec.duplicate(true)
-		unit.merge({"id": index + 1, "roster_id": key, "cell": cells[key], "position": Vector2(cells[key]),
+		unit.merge({"id": index + 1, "roster_id": key, "cell": cells[index], "position": Vector2(cells[index]),
 			"hp": spec.max_hp * (0.92 - index * 0.06), "sp": float(spec.skill.get("initial_sp", index)), "skill_left": 2.5 if index == 0 and spec.skill.enabled else 0.0,
 			"blocked": [], "facing": 2, "action": {}}, true)
 		mock_state.units.append(unit)
@@ -158,8 +172,8 @@ func _preview_events() -> Array:
 		for source in mock_state.units + mock_state.enemies:
 			var friendly: bool = source.has("roster_id")
 			var key: String = source.roster_id if friendly else source.template
-			if key not in ["guard", "sniper", "medic", "soldier", "rifle"]: continue
-			var healing: bool = key == "medic"
+			if key not in ["character_011", "character_013", "character_015", "soldier", "rifle"]: continue
+			var healing: bool = friendly and source.get("role", "") == "healer"
 			var target: Dictionary = mock_state.units[0] if not friendly or healing else mock_state.enemies[-1]
 			var attack := {"type": "attack_start", "source": source.id, "target": target.id,
 				"from": source.position, "to": target.position, "friendly": friendly}

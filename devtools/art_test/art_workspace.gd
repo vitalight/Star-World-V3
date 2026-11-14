@@ -4,19 +4,24 @@ const ACTOR = preload("res://features/actor_view/actor_view.gd")
 const EFFECT = preload("res://features/effects/effect_view.gd")
 const UI = preload("res://devtools/ui/workspace_style.gd")
 const CATALOG = preload("res://devtools/art_test/asset_catalog.gd")
-const TAB_NAMES = ["Character", "Effect", "Animation", "Battle", "Skill"]
-const PREVIEW_SCALE = 0.44
+const TAB_NAMES = ["Character", "Enemy", "Effect", "Animation", "Battle", "Skill"]
+enum Page { CHARACTER, ENEMY, EFFECT, ANIMATION, BATTLE, SKILL }
 const PREVIEW_CENTER = Vector2(104, 74)
-@export_enum("Character", "Effect", "Animation", "Battle", "Skill") var page: int = 0
+@export_enum("Character", "Enemy", "Effect", "Animation", "Battle", "Skill") var page: int = 0
 var tabs: TabContainer
 var character_scroll: ScrollContainer
 var character_columns: HBoxContainer
+var enemy_scroll: ScrollContainer
+var enemy_columns: HBoxContainer
 var effect_grid: HFlowContainer
 var skill_grid: HFlowContainer
 var animation_actors: Array[Node2D] = []
 var animation_effects: Array[Node2D] = []
 var battle_stage: Control
 var animation_playing := true
+var game_catalog
+var actor_entries := {}
+var built_pages := {}
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -30,11 +35,6 @@ func _ready() -> void:
 		panel.name = title
 		panel.add_theme_constant_override("separation", 10)
 		tabs.add_child(panel)
-	build_characters(tabs.get_child(0))
-	build_effects(tabs.get_child(1))
-	build_animations(tabs.get_child(2))
-	build_battle(tabs.get_child(3))
-	build_skills(tabs.get_child(4))
 	tabs.current_tab = page
 	tabs.tab_changed.connect(_tab_changed)
 	_tab_changed(page)
@@ -43,15 +43,39 @@ func _tab_changed(index: int) -> void:
 	page = index
 	for i in tabs.get_child_count():
 		tabs.get_child(i).process_mode = Node.PROCESS_MODE_INHERIT if i == index else Node.PROCESS_MODE_DISABLED
+	_build_page(index)
 	_sync_playback()
+
+func _build_page(index: int) -> void:
+	if built_pages.has(index): return
+	built_pages[index] = true
+	var box: VBoxContainer = tabs.get_child(index)
+	match index:
+		Page.CHARACTER: build_characters(box, "character")
+		Page.ENEMY: build_characters(box, "enemy")
+		Page.EFFECT: build_effects(box)
+		Page.ANIMATION: build_animations(box)
+		Page.BATTLE: build_battle(box)
+		Page.SKILL: build_skills(box)
+
+func _game_catalog():
+	if game_catalog == null:
+		game_catalog = CATALOG.GameCatalog.new()
+		game_catalog.reload()
+	return game_catalog
+
+func _actor_entries(kind: String) -> Array:
+	if not actor_entries.has(kind):
+		actor_entries[kind] = CATALOG.characters(_game_catalog(), kind)
+	return actor_entries[kind]
 
 func _sync_playback() -> void:
 	for actor in animation_actors:
-		actor.set_playing(page == 2 and animation_playing)
+		actor.set_playing(page == Page.ANIMATION and animation_playing)
 	for effect in animation_effects:
-		effect.set_process(page == 2 and animation_playing)
+		effect.set_process(page == Page.ANIMATION and animation_playing)
 	if battle_stage:
-		battle_stage.set_active(page == 3)
+		battle_stage.set_active(page == Page.BATTLE)
 
 func set_animation_playing(enabled: bool) -> void:
 	animation_playing = enabled
@@ -119,37 +143,43 @@ func image_border(parent: Control, texture: Texture2D, animated: bool = false) -
 	parent.add_child(border)
 	border.draw.connect(func():
 		var source_size := texture.get_size()
-		var factor := PREVIEW_SCALE if animated else minf(border.size.x / source_size.x, border.size.y / source_size.y)
+		var factor := minf(190.0 / source_size.x, 134.0 / source_size.y) if animated else minf(border.size.x / source_size.x, border.size.y / source_size.y)
 		var extent := source_size * factor
 		var center := PREVIEW_CENTER if animated else border.size / 2.0
 		border.draw_rect(Rect2(center - extent / 2.0, extent).grow(-1.0), Color("8aacc5"), false, 2.0))
 	border.resized.connect(border.queue_redraw)
 
-func build_characters(box: VBoxContainer) -> void:
-	label(box, "16 个角色 · 每列四姿态 · 水平滚动浏览")
-	character_scroll = ScrollContainer.new()
-	character_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(character_scroll)
-	character_columns = HBoxContainer.new()
-	character_columns.add_theme_constant_override("separation", 12)
-	character_scroll.add_child(character_columns)
-	for entry in CATALOG.characters():
-		var column := card(character_columns)
-		label(column, entry.source, 16)
-		label(column, "角色行 %d" % (entry.row + 1), 16)
-		for i in 4:
-			label(column, CATALOG.POSES[i], 16)
-			image_cell(column, entry.poses[i])
+func build_characters(box: VBoxContainer, kind: String) -> void:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(scroll)
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 12)
+	scroll.add_child(columns)
+	if kind == "character":
+		character_scroll = scroll
+		character_columns = columns
+	else:
+		enemy_scroll = scroll
+		enemy_columns = columns
+	for entry in _actor_entries(kind):
+		var column := card(columns)
+		label(column, entry.name, 18)
+		label(column, entry.id if not entry.id.is_empty() else "未注册", 16)
+		for action in ["attack", "move"]:
+			if entry[action].is_empty(): continue
+			for i in entry[action].size():
+				label(column, "%s %d" % ["攻击" if action == "attack" else "移动", i + 1], 16)
+				image_cell(column, entry[action][i])
 
 func build_effects(box: VBoxContainer) -> void:
-	label(box, "32 张静态素材 · 包括大小变体")
+	label(box, "战斗特效")
 	var body := scroll_body(box)
 	effect_grid = HFlowContainer.new()
 	body.add_child(effect_grid)
 	for entry in CATALOG.effects():
 		var column := card(effect_grid)
-		label(column, entry.source, 16)
-		label(column, "行 %d / 列 %d" % [entry.row + 1, entry.column + 1], 16)
+		label(column, entry.name, 16)
 		image_cell(column, entry.texture)
 
 func build_animations(box: VBoxContainer) -> void:
@@ -159,20 +189,21 @@ func build_animations(box: VBoxContainer) -> void:
 	button(controls, "暂停", set_animation_playing.bind(false))
 	button(controls, "重播", replay_animations)
 	var body := scroll_body(box)
-	label(body, "角色 · 姿态循环（2 FPS，待机 / 攻击交替）")
+	label(body, "角色与敌人 · 动作循环")
 	var actors_grid := HFlowContainer.new()
 	body.add_child(actors_grid)
-	for entry in CATALOG.characters():
-		for back in [false, true]:
+	for entry in _actor_entries("character") + _actor_entries("enemy"):
+		for action in ["attack", "move"]:
+			if entry[action].is_empty(): continue
 			var column := card(actors_grid)
-			label(column, entry.source, 16)
-			label(column, "行 %d · %s" % [entry.row + 1, "背面" if back else "正面"], 16)
-			var canvas := preview_cell(column, entry.poses[0])
+			label(column, "%s · %s" % [entry.name, "攻击" if action == "attack" else "移动"], 16)
+			var texture: Texture2D = entry[action][0]
+			var canvas := preview_cell(column, texture)
 			var actor := Node2D.new()
 			actor.set_script(ACTOR)
-			actor.frames = CATALOG.frames(entry.poses, back)
+			actor.frames = CATALOG.frames(entry[action], action)
 			actor.animation = &"default"
-			actor.display_scale = PREVIEW_SCALE
+			actor.display_scale = minf(190.0 / texture.get_width(), 134.0 / texture.get_height())
 			actor.position = PREVIEW_CENTER
 			canvas.add_child(actor)
 			animation_actors.append(actor)
@@ -181,13 +212,12 @@ func build_animations(box: VBoxContainer) -> void:
 	body.add_child(effects_grid)
 	for entry in CATALOG.effects():
 		var column := card(effects_grid)
-		label(column, entry.source, 16)
-		label(column, "行 %d / 列 %d" % [entry.row + 1, entry.column + 1], 16)
+		label(column, entry.name, 16)
 		var canvas := preview_cell(column, entry.texture)
 		var effect := Node2D.new()
 		effect.set_script(EFFECT)
 		effect.texture = entry.texture
-		effect.display_scale = PREVIEW_SCALE
+		effect.display_scale = minf(190.0 / entry.texture.get_width(), 134.0 / entry.texture.get_height())
 		effect.position = PREVIEW_CENTER
 		canvas.add_child(effect)
 		animation_effects.append(effect)
@@ -203,19 +233,18 @@ func preview_cell(parent: Node, texture: Texture2D) -> Control:
 func build_battle(box: VBoxContainer) -> void:
 	battle_stage = AspectRatioContainer.new()
 	battle_stage.set_script(preload("res://devtools/art_test/battle_stage.gd"))
+	battle_stage.game_catalog = _game_catalog()
 	battle_stage.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(battle_stage)
 
 func build_skills(box: VBoxContainer) -> void:
-	label(box, "技能图标 · 16 张静态素材")
+	label(box, "技能图标")
 	var body := scroll_body(box)
-	label(body, "skill-atlas-01.png · 4 × 4", 18)
 	skill_grid = HFlowContainer.new()
 	skill_grid.add_theme_constant_override("h_separation", 12)
 	skill_grid.add_theme_constant_override("v_separation", 12)
 	body.add_child(skill_grid)
-	for entry in CATALOG.skills():
+	for entry in CATALOG.skills(_game_catalog()):
 		var column := card(skill_grid)
 		label(column, entry.name, 18)
 		image_cell(column, entry.texture)
-		label(column, "行 %d / 列 %d" % [entry.row + 1, entry.column + 1], 15)

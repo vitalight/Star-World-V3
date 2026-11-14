@@ -24,8 +24,12 @@ var skill_ready := false
 var readiness_phase := 0.0
 var motion_phase := 0.0
 var motion_mode := ""
+var attack_elapsed := -1.0
+var visual_facing := 2
+var visual_attacking := false
 const IDLE_PERIOD := 2.4
 const WALK_PERIOD := 0.55
+const ATTACK_FRAME_ENDS := [0.06, 0.18, 0.30, 0.45]
 const IDLE_TRANSLATION := 0.025
 const WALK_TRANSLATION := 0.012
 const WALK_ROLL := 0.035
@@ -161,15 +165,9 @@ func apply_state(state: Dictionary, is_enemy: bool) -> void:
 	compass.visible = not is_enemy and fade_left < 0
 	compass.rotation.y = -int(state.get("facing", 2)) * PI / 2.0
 	if appearance and appearance.poses.size() >= 4:
-		var facing := int(state.get("facing", 2))
-		var attacking: bool = not state.get("action", {}).is_empty()
-		var pose := (1 if facing == 3 else 0) + (2 if attacking else 0)
-		if sprite.texture != appearance.poses[pose]:
-			sprite.texture = appearance.poses[pose]
-			billboard_material.set_shader_parameter("sprite_texture", sprite.texture)
-			sprite.pixel_size = height / sprite.texture.get_height()
-			sprite.offset = Vector2(-foot_offset.x, sprite.texture.get_height() / 2.0 - foot_offset.y)
-		sprite.flip_h = facing == 0 # Source poses face left; mirror only for right.
+		visual_facing = int(state.get("facing", 2))
+		visual_attacking = not state.get("action", {}).is_empty()
+		_update_pose()
 	health.hide()
 	health.modulate = Color("ef9681") if is_enemy else Color("a6e8c1")
 	var ratio: float = clampf(state.hp / state.max_hp, 0.0, 1.0)
@@ -198,6 +196,32 @@ func _bar(row: int, ratio: float, color: Color) -> void:
 	health_image.fill_rect(Rect2i(0, row, 64, 5), Color("24302b"))
 	health_image.fill_rect(Rect2i(1, row + 1, maxi(0, roundi(62 * ratio)), 3), color)
 
+func start_attack() -> void:
+	if appearance and not appearance.attack_frames().is_empty():
+		attack_elapsed = 0.0
+		_update_pose()
+
+func _update_pose() -> void:
+	var frames: Array[Texture2D] = appearance.attack_frames()
+	var selected: Texture2D
+	if not frames.is_empty() and attack_elapsed >= 0.0:
+		var frame := 0
+		while frame < ATTACK_FRAME_ENDS.size() - 1 and attack_elapsed >= ATTACK_FRAME_ENDS[frame]:
+			frame += 1
+		selected = frames[frame]
+	elif motion_mode == "walk" and not appearance.move_frames().is_empty():
+		var movement: Array[Texture2D] = appearance.move_frames()
+		selected = movement[int(motion_phase / WALK_PERIOD * movement.size()) % movement.size()]
+	else:
+		var pose := (1 if visual_facing == 3 else 0) + (2 if visual_attacking and frames.is_empty() else 0)
+		selected = appearance.poses[pose]
+	if sprite.texture != selected:
+		sprite.texture = selected
+		billboard_material.set_shader_parameter("sprite_texture", selected)
+		sprite.pixel_size = height / selected.get_height()
+		sprite.offset = Vector2(-foot_offset.x, selected.get_height() / 2.0 - foot_offset.y)
+	sprite.flip_h = visual_facing == 0
+
 func _update_skill_glow() -> void:
 	skill_hint.visible = skill_ready
 	var strength := 0.72 + 0.28 * sin(readiness_phase * 4.0) if skill_ready else 0.0
@@ -219,7 +243,12 @@ func depart() -> void:
 	health_bar.hide()
 
 func advance_visual(delta: float) -> void:
+	if attack_elapsed >= 0.0:
+		attack_elapsed += delta
+		if attack_elapsed >= ATTACK_FRAME_ENDS[-1]: attack_elapsed = -1.0
+		_update_pose()
 	if fade_left < 0 and not motion_mode.is_empty(): motion_phase += delta
+	if motion_mode == "walk" and appearance and not appearance.move_frames().is_empty(): _update_pose()
 	if skill_ready:
 		readiness_phase += delta
 		_update_skill_glow()

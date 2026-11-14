@@ -7,6 +7,8 @@
 - `content/data/character_NNN.tres`、`enemy_NNN.tres`：stats 保存姓名与战斗数值，appearance 保存贴图、头像、显示高度与职业图标；两者均为文件内子资源。
 - `content/data/skill_NNN.tres`：技能规则与图标；角色通过 `stats.skill_spec` 引用，可复用。
 - `content/data/actors.tres`：显式注册正式角色、敌人与技能；内容加载、关联与导出都以此为准。
+- 第一章五名角色的 appearance 使用 `attack_sheet`：横向四帧依次为待机、蓄力、命中、收势，首帧也用于头像和剧情；战斗表现按攻击事件播放。当前图仅含正面方向，朝上时沿用正面。
+- 第一章敌人可同时配置横向四帧的 `attack_sheet` 和 `move_sheet`；移动帧随战斗时钟循环，攻击事件播放攻击帧。未配置时继续使用原有四姿态图集。
 - `content_id` 使用 `type_NNN`，分配后保持稳定；不要只改文件名而保留旧 ID。
 - 新增角色／敌人时复制同类 `.tres`，修改文件名与 `content_id`，替换 appearance，再加入 `actors.tres` 对应列表。新增技能同样命名 `skill_NNN.tres`，注册后再赋给角色。
 - 保存资源后在 Game Test／Story Test 中重新加载。运行中的生命、SP、冷却由 battle 持有，不写回资源。

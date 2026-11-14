@@ -14,27 +14,24 @@ func run() -> void:
  var art = load("res://devtools/art_test/battle_stage.gd").new()
  root.add_child(art)
  art.set_process(false)
- var keys = ["guard", "tank", "sniper", "caster", "medic"]
  for index in range(5):
   var formal_id := "character_%03d" % (11 + index)
   var formal = load("res://content/data/%s.tres" % formal_id).appearance
   var actual = game.appearances[formal_id]
-  check(actual.atlas.resource_path == formal.atlas.resource_path and actual.atlas_row == formal.atlas_row, "Game Test uses official actor atlas row: " + formal_id)
-  var sample = load("res://content/data/character_%03d.tres" % [1, 3, 4, 5, 6][index]).appearance
-  var art_actual = art.catalog[keys[index]]
-  check(art_actual.atlas.resource_path == sample.atlas.resource_path and art_actual.atlas_row == sample.atlas_row, "Art Battle uses configured sample atlas row: " + keys[index])
+  check(actual.attack_sheet.resource_path == formal.attack_sheet.resource_path, "Game Test uses official actor animation: " + formal_id)
+  var art_actual = art.catalog[formal_id]
+  check(art_actual.attack_sheet.resource_path == formal.attack_sheet.resource_path, "Art Battle uses official animation: " + formal_id)
  var entries = load("res://devtools/art_test/asset_catalog.gd").characters()
- check(entries.size() == 28, "Art previews all 12 heroes and 16 monsters")
- for filename in ["hero-atlas-101-v2.png", "hero-atlas-102-v2.png", "hero-atlas-103-v2.png", "enemy-atlas-101.png", "enemy-atlas-102.png", "enemy-atlas-103.png", "enemy-atlas-104.png"]:
-  for row in 4:
-   check(entries.any(func(entry): return entry.source == filename and entry.row == row), "Art includes %s row %d" % [filename, row + 1])
+ check(entries.size() == 17, "Art previews all 9 heroes and 8 monsters")
+ for entry in entries:
+  check(entry.attack.size() == 4 and (entry.move.is_empty() or entry.move.size() == 4), "Art has action frames: " + entry.name)
  for index in 5:
   var appearance = load("res://content/data/character_%03d.tres" % (11 + index)).appearance
-  var source = "hero-atlas-101-v2.png" if index < 4 else "hero-atlas-102-v2.png"
-  check(appearance.atlas.get_image().get_data() == load("res://Human/StarterContent/character/" + source).get_image().get_data() and appearance.atlas_row == [1, 2, 3, 4, 1][index], "Formal actor identity matches supplied atlas: " + str(11 + index))
+  check(appearance.attack_sheet.resource_path == "res://content/characters/character_%03d/attack_v1.png" % (11 + index) and appearance.attack_frames().size() == 4 and appearance.portrait == appearance.attack_frames()[0], "Formal actor uses its updated attack frames: " + str(11 + index))
  for index in 5:
   var appearance = load("res://content/data/enemy_%03d.tres" % (1 + index)).appearance
-  check(appearance.atlas.get_image().get_data() == load("res://Human/StarterContent/character/enemy-atlas-101.png").get_image().get_data() and appearance.atlas_row == [1, 2, 3, 3, 4][index], "Formal enemy matches supplied role: " + str(1 + index))
+  var version := 2 if index == 4 else 1
+  check(appearance.attack_frames().size() == 4 and appearance.move_frames().size() == 4 and appearance.attack_sheet.resource_path == "res://content/enemies/enemy_%03d/attack_v%d.png" % [1 + index, version], "Formal enemy has updated action frames: " + str(1 + index))
  var catalog = preload("res://game/content/content_catalog.gd").new()
  catalog.reload()
  var filenames = ["chapter01_01_home_anomaly_v1.png", "chapter01_02_roadside_rescue_v2.png", "chapter01_03_oriental_pearl_node_v2.png"]

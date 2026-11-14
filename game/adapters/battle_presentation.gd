@@ -17,6 +17,7 @@ var skill_effects := {}
 var route_guides := {}
 const SKILL_LOOP_CYCLE := 0.9
 const ROUTE_WARNING_SWEEPS := 2.0
+const SLASH = preload("res://content/effects/effect_001/texture.tres")
 const PROJECTILE = preload("res://content/effects/effect_001/projectile.tres")
 const IMPACT = preload("res://content/effects/effect_001/impact.tres")
 const HEALING = preload("res://content/effects/effect_001/healing.tres")
@@ -24,7 +25,7 @@ const BOOST = preload("res://content/effects/effect_001/boost.tres")
 
 func _init(parent: Node3D, terrain: Node3D, catalog: Dictionary, config: Dictionary) -> void:
 	world = parent; field = terrain; appearances = catalog; configuration = config
-	effect_texture = preload("res://content/effects/effect_001/texture.tres")
+	effect_texture = SLASH
 
 func clear() -> void:
 	for actor in actors.values() + departing + effects + route_guides.values():
@@ -84,6 +85,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 		present[unit.id] = true
 	for event in events:
 		if event.type == "attack_start":
+			if actors.has(event.source): actors[event.source].start_attack()
 			var source: Dictionary = combatants.get(event.source, {})
 			var healing: bool = event.friendly and source.get("role", "") == "healer"
 			if healing: continue

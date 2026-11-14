@@ -73,7 +73,7 @@ func run() -> void:
 	current_scene.tabs.current_tab = 0
 	await settle()
 	check(stage.viewport.render_target_update_mode == SubViewport.UPDATE_DISABLED, "Hidden viewport stops rendering")
-	current_scene.tabs.current_tab = 3
+	current_scene.tabs.current_tab = 4
 	await settle()
 	check(stage.paused and stage.phase == phase, "Pause preference survives tab switch")
 	stage.hud.replay_requested.emit()
@@ -87,7 +87,7 @@ func run() -> void:
 	phase = stage.phase
 	await create_timer(0.2).timeout
 	check(stage.phase == phase, "Hidden running presentation freezes")
-	current_scene.tabs.current_tab = 3
+	current_scene.tabs.current_tab = 4
 	await settle()
 	check(stage.phase > phase, "Returning resumes running presentation")
 	for dimensions in [Vector2i(1280, 800), Vector2i(960, 600)]:

@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://dw7kuswps7skd"]
 
-[ext_resource type="Texture2D" uid="uid://b0gl61e1xb20w" path="res://content/characters/character_011/atlas.png" id="1_nkbco"]
+[ext_resource type="Texture2D" path="res://content/characters/character_014/attack_v1.png" id="attack_sheet"]
 [ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="2_ang13"]
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="3_uaayt"]
 [ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="4_0jmql"]
@@ -14,8 +14,7 @@ filter_clip = true
 
 [sub_resource type="Resource" id="Appearance"]
 script = ExtResource("3_uaayt")
-atlas = ExtResource("1_nkbco")
-atlas_row = 4
+attack_sheet = ExtResource("attack_sheet")
 class_icon = SubResource("ClassIcon")
 
 [sub_resource type="Resource" id="Stats"]

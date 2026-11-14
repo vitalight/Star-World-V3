@@ -1,0 +1,3 @@
+Tool: built-in image_gen
+Reference: shield-attack-v2-sheet.png
+Prompt: Use the attached four-pose sheet as identity and costume reference. Produce a new 2x2 four-frame walking cycle for this exact purple crystal shield guard, full body, walking left. Match the reference's left-facing bone helmet, visible purple eye, proportions and the shield held IN FRONT on the LEFT of the character in every frame, as in all four reference poses. Alternate leg strides; maintain consistent face pointing left and consistent shield side, scale and foot baseline. Four equal cells, one full creature per cell, no overlap or clipping. Transparent background, no text, no background or grid.

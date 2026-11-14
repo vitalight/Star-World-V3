@@ -1,11 +1,12 @@
 [gd_resource type="Resource" format=3]
 
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_004/attack_v1.png" id="attack_sheet"]
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_004/move_v1.png" id="move_sheet"]
 [ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="script"]
 
 [ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="stats_type"]
 [ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance_2_q3ovm"]
 
-[ext_resource type="Texture2D" path="res://content/enemies/enemy_001/atlas.png" id="formal_atlas"]
 
 [sub_resource type="Resource" id="Stats"]
 script = ExtResource("stats_type")
@@ -24,8 +25,8 @@ attack_range = 3.5
 
 [sub_resource type="Resource" id="Appearance"]
 script = ExtResource("appearance_2_q3ovm")
-atlas = ExtResource("formal_atlas")
-atlas_row = 3
+attack_sheet = ExtResource("attack_sheet")
+move_sheet = ExtResource("move_sheet")
 height = 1.02
 
 [resource]

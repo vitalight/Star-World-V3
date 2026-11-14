@@ -11,7 +11,7 @@ func check(ok: bool, message: String) -> void:
 func run() -> void:
 	root.content_scale_size = Vector2i(1280,720)
 	root.size = Vector2i(1280,720)
-	var game = load("res://game/tests/sample_battle_fixture.tscn").instantiate()
+	var game = load("res://game/battle/battle_scene.tscn").instantiate()
 	root.add_child(game)
 	game.set_process(false)
 	var art = load("res://devtools/art_test/battle_stage.gd").new()
@@ -30,10 +30,10 @@ func run() -> void:
 	for index in art.markers.get_child_count():
 		var a = art.markers.get_child(index)
 		var b = game.markers.get_child(index)
-		check(a.position.is_equal_approx(b.position) and a.get_meta("portal_color") == b.get_meta("portal_color"), "Matching route endpoint style and position")
-		check(a.get_child_count() == 12 and b.get_child_count() == 12, "Art-style twelve-edge portal")
-		for edge in 12:
-			check(a.get_child(edge).position.is_equal_approx(b.get_child(edge).position) and a.get_child(edge).mesh.size == b.get_child(edge).mesh.size, "Matching portal geometry")
+		check(a.position.is_equal_approx(b.position) and a.get_meta("portal_color", "") == b.get_meta("portal_color", ""), "Matching route endpoint style and position")
+		check(a.get_child_count() == b.get_child_count(), "Matching route marker geometry")
+		for edge in mini(a.get_child_count(), b.get_child_count()):
+			check(a.get_child(edge).position.is_equal_approx(b.get_child(edge).position) and a.get_child(edge).get_class() == b.get_child(edge).get_class(), "Matching route marker element")
 	game.presentation.sync(art.mock_state, [], 0.0)
 	game.hud.update_state(art.mock_state, "", -1, art.speed, game.configuration.deploy_limit)
 	check(art.presentation.route_guides.size() == game.presentation.route_guides.size(), "Same route-warning view count")

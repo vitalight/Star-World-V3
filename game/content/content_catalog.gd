@@ -201,6 +201,12 @@ func appearances(id: String, operator_ids: Array = []) -> Dictionary:
 	for key in levels[id].enemies: result[key] = _appearances[key]
 	return result
 
+func all_appearances() -> Dictionary:
+	return _appearances.duplicate()
+
+func all_skill_icons() -> Dictionary:
+	return _skill_icons.duplicate()
+
 func story_textures() -> Dictionary:
 	var result := {"backgrounds": {}, "actors": {}}
 	for id in backgrounds: result.backgrounds[id] = load(backgrounds[id])

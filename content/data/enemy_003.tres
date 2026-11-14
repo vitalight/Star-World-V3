@@ -1,14 +1,15 @@
 [gd_resource type="Resource" script_class="ActorDefinition" format=3 uid="uid://blq428x4lvsy3"]
 
-[ext_resource type="Texture2D" uid="uid://b8y7vrd4moj3j" path="res://content/enemies/enemy_001/atlas.png" id="1_1iexs"]
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_003/attack_v1.png" id="attack_sheet"]
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_003/move_v1.png" id="move_sheet"]
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="2_wcgue"]
 [ext_resource type="Script" uid="uid://d3hql373aqeu6" path="res://features/content_definitions/actor_definition.gd" id="3_a3a1g"]
 [ext_resource type="Script" uid="uid://mm78tpidgl0k" path="res://features/battle/unit_spec.gd" id="4_a3eik"]
 
 [sub_resource type="Resource" id="Appearance"]
 script = ExtResource("2_wcgue")
-atlas = ExtResource("1_1iexs")
-atlas_row = 3
+attack_sheet = ExtResource("attack_sheet")
+move_sheet = ExtResource("move_sheet")
 height = 1.02
 
 [sub_resource type="Resource" id="Stats"]

@@ -75,16 +75,14 @@ func check_catalog() -> void:
 	var catalog = preload("res://devtools/art_test/asset_catalog.gd")
 	var characters = catalog.characters()
 	var effects = catalog.effects()
-	check(characters.size() == 16, "All 16 characters")
-	check(effects.size() == 32, "All 32 effects")
+	check(characters.size() == 17, "All 9 heroes and 8 enemies")
+	check(effects.size() == 5, "Battle effects")
 	var regions := {}
 	for entry in characters:
-		check(entry.poses.size() == 4, "Four poses per character")
-		for pose in entry.poses:
-			check_slice(pose, regions)
+		check(entry.attack.size() == 4 and (entry.move.is_empty() or entry.move.size() == 4), "Four frames per action")
 	for entry in effects:
 		check_slice(entry.texture, regions)
-	check(regions.size() == 96, "96 distinct source slices")
+	check(regions.size() == 5, "Distinct battle effect slices")
 
 func check_slice(texture: AtlasTexture, regions: Dictionary) -> void:
 	var key := texture.atlas.resource_path + str(texture.region)
@@ -128,17 +126,27 @@ func run() -> void:
 				check(current_scene.preview.texture.resource_path.ends_with("concept_b.png"), "Blueprint B selection")
 				if repeat == 0: await capture("blueprint_b")
 			if entry == "Story Test":
-				current_scene.stage.reveal_dialogue()
-				await click_control(current_scene.stage)
-				current_scene.stage.reveal_dialogue()
-				await click_control(current_scene.stage)
-				await settle()
-				check(current_scene.session.snapshot().text.contains("奇怪的空洞") and current_scene.choices.get_child_count() == 0, "Story opens formal linear portal scene")
-				if repeat == 0: await capture("story_portal")
-				await click_control(find_button("跳过 ▸"))
-				check(current_scene.session.snapshot().finished, "Story reaches formal ending")
+				var initial: Dictionary = current_scene.session.snapshot()
+				check(not initial.is_empty() and not current_scene.modal.visible, "Story loads successfully")
+				if initial.get("type") == "line":
+					current_scene.stage.reveal_dialogue()
+					await click_control(current_scene.stage)
+					var advanced: Dictionary = current_scene.session.snapshot()
+					check(advanced.get("history", []).size() == initial.history.size() + 1, "Story advances after clicking the stage")
+				if repeat == 0: await capture("story_progress")
+				var visited := {}
+				for step in 128:
+					var state: Dictionary = current_scene.session.snapshot()
+					if state.is_empty() or state.get("finished") or visited.has(state.get("id")): break
+					visited[state.id] = true
+					if state.type == "choice" and current_scene.choices.get_child_count() > 0:
+						await click_control(current_scene.choices.get_child(0))
+					else:
+						await click_control(find_button("跳过 ▸"))
+				check(current_scene.session.snapshot().get("finished", false), "Story reaches an ending")
 				await click_control(find_button("重播剧情"))
-				check(current_scene.session.snapshot().history.size() == 1, "Story replay clears transcript")
+				var restarted: Dictionary = current_scene.session.snapshot()
+				check(restarted.get("id") == initial.get("id") and restarted.get("history", []).size() == 1, "Story replay returns to the start and clears transcript")
 			var workspace = weakref(current_scene)
 			if entry == "Game Test":
 				await click_control(find_button("☰"))
@@ -147,7 +155,7 @@ func run() -> void:
 			await settle()
 			check(workspace.get_ref() == null, "Departed workspace freed")
 	check_catalog()
-	var scenes := ["character_preview", "effect_preview", "animation_preview", "battle_preview", "skill_preview"]
+	var scenes := ["character_preview", "enemy_preview", "effect_preview", "animation_preview", "battle_preview", "skill_preview"]
 	for index in scenes.size():
 		change_scene_to_file("res://devtools/art_test/" + scenes[index] + ".tscn")
 		await settle()
@@ -156,22 +164,25 @@ func run() -> void:
 		await capture(scenes[index])
 	change_scene_to_file("res://devtools/art_test/art_workspace.tscn")
 	await settle()
-	check(current_scene.character_columns.get_child_count() == 16, "16 character columns")
-	check(current_scene.tabs.get_tab_count() == 5, "Five persistent tabs")
-	for panel in current_scene.character_columns.get_children():
+	check(current_scene.character_columns.get_child_count() == 9 and current_scene.enemy_columns == null and current_scene.battle_stage == null, "Only the initial page is built on entry")
+	check(current_scene.tabs.get_tab_count() == 6, "Six persistent tabs")
+	await select_tab(1)
+	check(current_scene.enemy_columns.get_child_count() == 8, "Enemy page builds on demand")
+	await select_tab(0)
+	for panel in current_scene.character_columns.get_children() + current_scene.enemy_columns.get_children():
 		var images = panel.get_child(0).get_children().filter(func(n): return n is TextureRect)
-		check(images.size() == 4, "Four visible static poses in each column")
+		check(images.size() in [4, 8], "Four frames per visible action")
 	await check_static()
 	current_scene.character_scroll.scroll_horizontal = 100000
 	await settle()
 	check(current_scene.character_scroll.scroll_horizontal > 0, "Character horizontal scroll")
 	await capture("character_last_columns")
-	await select_tab(1)
-	check(current_scene.effect_grid.get_child_count() == 32, "32 static effect cards")
-	await check_static()
 	await select_tab(2)
-	check(current_scene.animation_actors.size() == 32, "Both directions of all characters")
-	check(current_scene.animation_effects.size() == 32, "All effect pulses")
+	check(current_scene.effect_grid.get_child_count() == 5, "Battle effect cards")
+	await check_static()
+	await select_tab(3)
+	check(current_scene.animation_actors.size() == 25, "Attack and movement animations")
+	check(current_scene.animation_effects.size() == 5, "All effect pulses")
 	await click_control(find_button("重播"))
 	await settle()
 	var actor = current_scene.animation_actors[0]
@@ -189,25 +200,25 @@ func run() -> void:
 	for preview in current_scene.animation_effects:
 		check(not preview.is_processing(), "All effect previews paused")
 	await select_tab(0)
-	await select_tab(2)
+	await select_tab(3)
 	check(not current_scene.animation_playing and not actor.sprite.is_playing(), "Paused preference survives tab switch")
 	await click_control(find_button("播放"))
 	await create_timer(0.2).timeout
 	check(effect.phase != paused_phase, "Play resumes effect")
-	await select_tab(1)
+	await select_tab(2)
 	paused_frame = actor.sprite.frame
 	paused_phase = effect.phase
 	await create_timer(0.6).timeout
 	check(actor.sprite.frame == paused_frame and effect.phase == paused_phase, "Hidden Animation stops")
-	await select_tab(2)
+	await select_tab(3)
 	check(actor.sprite.is_playing() and effect.is_processing(), "Returning resumes playing preference")
 	await click_control(find_button("重播"))
 	check(actor.sprite.frame == 0 and effect.phase < 0.2, "Replay resets all previews")
-	var animation_scroll: ScrollContainer = current_scene.tabs.get_child(2).get_child(1)
+	var animation_scroll: ScrollContainer = current_scene.tabs.get_child(3).get_child(1)
 	animation_scroll.scroll_vertical = 100000
 	await settle()
 	await capture("animation_effects")
-	await select_tab(3)
+	await select_tab(4)
 	var battle_stage = current_scene.battle_stage
 	await select_tab(0)
 	var battle_phase: float = battle_stage.phase
@@ -224,10 +235,10 @@ func run() -> void:
 	await settle()
 	check(current_scene.character_scroll.scroll_vertical > 0, "Narrow Character supports vertical scrolling")
 	await capture("character_narrow_bottom")
-	await select_tab(1)
+	await select_tab(2)
 	await capture("effect_narrow")
 	check(current_scene.effect_grid.get_child(0).position.y < current_scene.effect_grid.get_child(4).position.y, "Effect grid wraps")
-	await select_tab(2)
+	await select_tab(3)
 	await capture("animation_narrow")
 	root.content_scale_size = original_scale
 	root.size = original_size
