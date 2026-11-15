@@ -19,7 +19,7 @@ func configure(data: Dictionary, bounds: Rect2i) -> void:
 		layout.append(row)
 
 func build_perimeter() -> void:
-	if perimeter_style == 1:
+	if perimeter_style != RUINS:
 		build_city_perimeter()
 		return
 	# Broken outpost ruins frame the terrain without enclosing it like a board.
@@ -51,6 +51,8 @@ func build_city_perimeter() -> void:
 		concrete.albedo_texture = tops[perimeter_texture_index()].albedo_texture
 		concrete.uv1_triplanar = true
 		concrete.uv1_world_triplanar = true
+	if perimeter_style == COAST:
+		concrete = coastal_stone()
 	var width := terrain_rect.size.x
 	var depth := terrain_rect.size.y
 	var origin := Vector3(terrain_rect.position.x, 0, terrain_rect.position.y)

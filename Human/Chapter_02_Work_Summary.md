@@ -34,6 +34,8 @@
 
 第二章三场战斗共用[战场背景](../content/terrains/terrain_004/backdrop.png)和[地面图集](../content/terrains/terrain_004/atlas.png)，各关单独配置布局、路线和波次。素材原图与提示词保存在 `Human/StarterContent/`；每章共用一张背景和一套图集的要求已写入美术规范。
 
+2026-11-15：按[济州海岸概念图](../devtools/blueprint/images/chapter02_battle_concept.png)更新共用背景、灰石地面、钢架高台和玄武岩围边。三张选关图已重渲染；在实际 Game Test 窗口检查了三关的构图和出入口可读性，三场固定回放均通过。
+
 ### 共用战场背景
 
 ![第二章共用战场背景](../content/terrains/terrain_004/backdrop.png)

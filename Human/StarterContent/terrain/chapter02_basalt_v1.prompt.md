@@ -1,0 +1,4 @@
+Tool: built-in imagegen
+Reference: devtools/blueprint/images/chapter02_battle_concept.png.
+
+Use case: stylized-concept. Square seamless material texture for a hand-painted isometric tactical RPG environment. Reference chapter2-battle: match only the rough charcoal-gray Jeju basalt wall stones from the central obstacle. Fill the entire square edge to edge with a tightly fitted, irregular but broad and readable dry stack of chunky volcanic basalt blocks, around 3 to 4 blocks across and three courses vertically. Cool slate gray, subtle violet cast, pitted surfaces, angular chipped edges, dark narrow mortar-free seams. Flat evenly lit diffuse albedo suitable for triplanar projection onto low 3D wall blocks; orthographic straight-on texture, no perspective or visible wall silhouette, no plants, background, border, text, or other material. Keep contrast moderate and avoid uniform tiny pebbles.

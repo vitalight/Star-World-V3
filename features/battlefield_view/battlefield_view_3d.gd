@@ -1,6 +1,7 @@
 @tool
 extends Node3D
 ## Externally supplied layout and materials; coordinates are cell centers on X/Z.
+enum { RUINS, CITY, COAST }
 @export var atlas: Texture2D
 @export var layout: PackedStringArray = []
 @export var decorations: Array[Vector3] = []
@@ -37,7 +38,7 @@ func block(at: Vector3, dimensions: Vector3, mat: Material) -> MeshInstance3D:
 	add_child(instance)
 	return instance
 
-func beveled_tile(at: Vector3, height: float) -> void:
+func beveled_tile(at: Vector3, height: float, edge: Material) -> void:
 	var builder := SurfaceTool.new()
 	builder.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var rings: Array[PackedVector3Array] = []
@@ -53,12 +54,13 @@ func beveled_tile(at: Vector3, height: float) -> void:
 	builder.generate_normals()
 	var instance := MeshInstance3D.new()
 	instance.mesh = builder.commit()
-	instance.material_override = side
+	instance.material_override = edge
 	instance.position = at
 	add_child(instance)
 
 func _ready() -> void:
-	side = material(Color("7b8282") if perimeter_style == 1 else Color("847660"))
+	var coast := perimeter_style == COAST and not graybox
+	side = material(Color("7b8282") if perimeter_style != RUINS else Color("847660"))
 	# Extract each region once; filtering never samples its neighbouring atlas cell.
 	for index in 16:
 		var mat := material(Color.WHITE)
@@ -70,12 +72,25 @@ func _ready() -> void:
 		else:
 			mat.albedo_color = Color("c6b590")
 		tops.append(mat)
+	var steel: StandardMaterial3D
+	var brace: StandardMaterial3D
+	var basalt: StandardMaterial3D
+	if coast:
+		steel = material(Color("30373e"))
+		brace = material(Color("515a62"))
+		basalt = coastal_stone()
 	for z in layout.size():
 		for x in layout[z].length():
 			if not cells.is_empty() and not cells.has(Vector2i(x, z)): continue
 			var symbol := layout[z][x]
 			var elevation := surface_height(Vector2i(x, z))
-			beveled_tile(Vector3(x, 0, z), elevation)
+			var at := Vector3(x, 0, z)
+			var edge := side
+			if coast and elevation > 0.0:
+				edge = basalt if symbol == "B" else steel
+			beveled_tile(at, elevation, edge)
+			if edge == steel and steel != null:
+				platform_braces(Vector2i(x, z), elevation, brace)
 			var tile := (x * 3 + z) % 4
 			if symbol == "R": tile = 4 + (x + z) % 4
 			if symbol == "G": tile = 10
@@ -117,6 +132,32 @@ func _ready() -> void:
 	var depth := layout.size()
 	if not has_backdrop:
 		block(Vector3((width - 1) / 2.0, -0.3, (depth - 1) / 2.0), Vector3(width + 40.0, 0.2, depth + 40.0), material(Color("656e70") if perimeter_style == 1 else Color("767667")))
+
+func coastal_stone() -> StandardMaterial3D:
+	var stone := material(Color("c1c3c7"))
+	if not graybox:
+		stone.albedo_texture = tops[3].albedo_texture
+		stone.uv1_triplanar = true
+		stone.uv1_world_triplanar = true
+	return stone
+
+func platform_braces(cell: Vector2i, height: float, brace: Material) -> void:
+	for direction in [Vector2i.DOWN, Vector2i.RIGHT, Vector2i.UP, Vector2i.LEFT]:
+		var foot := maxf(0.0, surface_height(cell + direction))
+		var rise := height - foot - 0.07
+		if rise <= 0.1: continue
+		var face := Node3D.new()
+		face.position = Vector3(cell.x + direction.x * 0.496, foot + rise / 2.0, cell.y + direction.y * 0.496)
+		face.rotation.y = atan2(direction.x, direction.y)
+		add_child(face)
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(Vector2(0.7, rise).length(), 0.036, 0.016)
+		for slope in [-1.0, 1.0]:
+			var bar := MeshInstance3D.new()
+			bar.mesh = mesh
+			bar.material_override = brace
+			bar.rotation.z = slope * atan2(rise, 0.7)
+			face.add_child(bar)
 
 func grass(at: Vector3) -> void:
 	# Low, separated tufts keep tactical silhouettes clear.

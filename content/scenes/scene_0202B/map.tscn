@@ -25,10 +25,9 @@ point_count = 4
 
 [node name="EditableMap" type="Node2D" unique_id=1302817971]
 script = ExtResource("1_unxfw")
-tint = Color(0.72, 0.88, 0.94, 1)
 terrain_atlas = ExtResource("2_8jo53")
 background_texture = ExtResource("3_rei40")
-perimeter_style = 1
+perimeter_style = 2
 external_level = true
 
 [node name="Terrain" type="TileMapLayer" parent="." unique_id=1431188149]
