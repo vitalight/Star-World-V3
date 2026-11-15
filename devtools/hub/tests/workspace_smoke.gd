@@ -75,11 +75,11 @@ func check_catalog() -> void:
 	var catalog = preload("res://devtools/art_test/asset_catalog.gd")
 	var characters = catalog.characters()
 	var effects = catalog.effects()
-	check(characters.size() == 17, "All 9 heroes and 8 enemies")
+	check(characters.size() == 25, "All 9 heroes and 16 enemies")
 	check(effects.size() == 5, "Battle effects")
 	var regions := {}
 	for entry in characters:
-		check(entry.attack.size() == 4 and (entry.move.is_empty() or entry.move.size() == 4), "Four frames per action")
+		check(entry.attack.size() == 4 and (entry.move.size() == 1 if entry.kind == "enemy" else entry.move.is_empty()), "Expected frames per action")
 	for entry in effects:
 		check_slice(entry.texture, regions)
 	check(regions.size() == 5, "Distinct battle effect slices")
@@ -167,11 +167,11 @@ func run() -> void:
 	check(current_scene.character_columns.get_child_count() == 9 and current_scene.enemy_columns == null and current_scene.battle_stage == null, "Only the initial page is built on entry")
 	check(current_scene.tabs.get_tab_count() == 6, "Six persistent tabs")
 	await select_tab(1)
-	check(current_scene.enemy_columns.get_child_count() == 8, "Enemy page builds on demand")
+	check(current_scene.enemy_columns.get_child_count() == 16, "Enemy page builds on demand")
 	await select_tab(0)
 	for panel in current_scene.character_columns.get_children() + current_scene.enemy_columns.get_children():
 		var images = panel.get_child(0).get_children().filter(func(n): return n is TextureRect)
-		check(images.size() in [4, 8], "Four frames per visible action")
+		check(images.size() in [4, 5], "Expected frames per visible action")
 	await check_static()
 	current_scene.character_scroll.scroll_horizontal = 100000
 	await settle()
@@ -181,7 +181,7 @@ func run() -> void:
 	check(current_scene.effect_grid.get_child_count() == 5, "Battle effect cards")
 	await check_static()
 	await select_tab(3)
-	check(current_scene.animation_actors.size() == 25, "Attack and movement animations")
+	check(current_scene.animation_actors.size() == 41, "Attack and movement animations")
 	check(current_scene.animation_effects.size() == 5, "All effect pulses")
 	await click_control(find_button("重播"))
 	await settle()

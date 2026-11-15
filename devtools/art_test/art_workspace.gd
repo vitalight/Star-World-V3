@@ -83,8 +83,7 @@ func set_animation_playing(enabled: bool) -> void:
 
 func replay_animations() -> void:
 	for actor in animation_actors:
-		actor.sprite.stop()
-		actor.sprite.play()
+		actor.replay()
 	for effect in animation_effects:
 		effect.replay()
 	set_animation_playing(true)
@@ -203,6 +202,7 @@ func build_animations(box: VBoxContainer) -> void:
 			actor.set_script(ACTOR)
 			actor.frames = CATALOG.frames(entry[action], action)
 			actor.animation = &"default"
+			actor.procedural_walk = action == "move" and entry.get("procedural_walk", false)
 			actor.display_scale = minf(190.0 / texture.get_width(), 134.0 / texture.get_height())
 			actor.position = PREVIEW_CENTER
 			canvas.add_child(actor)

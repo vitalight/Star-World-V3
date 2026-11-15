@@ -127,6 +127,9 @@ static func projected_position(camera: Camera3D, at: Vector3) -> Vector3:
 func visual_position() -> Vector3:
 	return projected_position(get_viewport().get_camera_3d(), global_position)
 
+static func walk_sway(phase: float) -> float:
+	return sin(phase * TAU / WALK_PERIOD)
+
 func update_projection() -> void:
 	var camera := get_viewport().get_camera_3d()
 	if not camera or not sprite: return
@@ -136,7 +139,7 @@ func update_projection() -> void:
 	if motion_mode == "idle":
 		displacement = camera.global_basis.y * sin(motion_phase * TAU / IDLE_PERIOD) * IDLE_TRANSLATION
 	elif motion_mode == "walk":
-		var sway := sin(motion_phase * TAU / WALK_PERIOD)
+		var sway := walk_sway(motion_phase)
 		displacement = camera.global_basis.x * sway * WALK_TRANSLATION
 		roll = sway * WALK_ROLL
 	billboard_material.set_shader_parameter("walk_roll", roll)
@@ -209,9 +212,6 @@ func _update_pose() -> void:
 		while frame < ATTACK_FRAME_ENDS.size() - 1 and attack_elapsed >= ATTACK_FRAME_ENDS[frame]:
 			frame += 1
 		selected = frames[frame]
-	elif motion_mode == "walk" and not appearance.move_frames().is_empty():
-		var movement: Array[Texture2D] = appearance.move_frames()
-		selected = movement[int(motion_phase / WALK_PERIOD * movement.size()) % movement.size()]
 	else:
 		var pose := (1 if visual_facing == 3 else 0) + (2 if visual_attacking and frames.is_empty() else 0)
 		selected = appearance.poses[pose]
@@ -248,7 +248,6 @@ func advance_visual(delta: float) -> void:
 		if attack_elapsed >= ATTACK_FRAME_ENDS[-1]: attack_elapsed = -1.0
 		_update_pose()
 	if fade_left < 0 and not motion_mode.is_empty(): motion_phase += delta
-	if motion_mode == "walk" and appearance and not appearance.move_frames().is_empty(): _update_pose()
 	if skill_ready:
 		readiness_phase += delta
 		_update_skill_glow()

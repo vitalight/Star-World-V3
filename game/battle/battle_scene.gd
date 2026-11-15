@@ -25,6 +25,7 @@ var replay_error_message := ""
 var save_replay_button: Button
 @export var operator_ids: Array[String] = []
 @export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
+@export var enemy_appearance_overrides: Dictionary[String, Resource] = {}
 var battle: RefCounted
 var map_data: Node2D
 var field: Node3D
@@ -123,7 +124,8 @@ func reload_level() -> void:
 		for key in collection:
 			var unit = collection[key]
 			var path := "res://content/enemies/%s/appearance.tres" % unit.content_id
-			var appearance = load(path) if ResourceLoader.exists(path) else null
+			var appearance = enemy_appearance_overrides.get(key)
+			if appearance == null and ResourceLoader.exists(path): appearance = load(path)
 			if appearance == null or appearance.poses.size() < 4:
 				validation_errors.append("Appearance %s: 缺少四种姿态资源 %s" % [key, path])
 			else: appearances[key] = appearance

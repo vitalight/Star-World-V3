@@ -18,6 +18,10 @@ extends Resource
 @export var hit_count := 1
 @export_range(0.0, 1.0) var heal_damage_reduction := 0.0
 @export var heal_buff_duration := 0.0
+@export_range(0.0, 1.0) var reflect_ratio := 0.0
+@export var max_charges := 0
+@export var charge_attack_bonus := 0.0
+@export var charge_cost_gain := 0.0
 
 func configuration() -> Dictionary:
 	return {"enabled": true, "name": display_name, "description": description,
@@ -26,7 +30,9 @@ func configuration() -> Dictionary:
 		"defense_multiplier": defense_multiplier,
 		"interval_multiplier": interval_multiplier, "cost_gain": cost_gain,
 		"trigger": trigger, "forward_range": forward_range, "hit_count": hit_count,
-		"heal_damage_reduction": heal_damage_reduction, "heal_buff_duration": heal_buff_duration}
+		"heal_damage_reduction": heal_damage_reduction, "heal_buff_duration": heal_buff_duration,
+		"reflect_ratio": reflect_ratio, "max_charges": max_charges,
+		"charge_attack_bonus": charge_attack_bonus, "charge_cost_gain": charge_cost_gain}
 
 func errors() -> PackedStringArray:
 	var result := PackedStringArray()
@@ -39,4 +45,5 @@ func errors() -> PackedStringArray:
 	if trigger not in ["manual", "automatic"]: result.append("trigger: 可用值 manual/automatic")
 	if forward_range < 0 or hit_count < 1: result.append("技能范围或攻击次数无效")
 	if not is_finite(heal_damage_reduction) or heal_damage_reduction < 0 or heal_damage_reduction > 1 or not is_finite(heal_buff_duration) or heal_buff_duration < 0: result.append("治疗减伤参数无效")
+	if not is_finite(reflect_ratio) or reflect_ratio < 0 or reflect_ratio > 1 or max_charges < 0 or not is_finite(charge_attack_bonus) or charge_attack_bonus < 0 or not is_finite(charge_cost_gain) or charge_cost_gain < 0: result.append("反伤或叠层参数无效")
 	return result

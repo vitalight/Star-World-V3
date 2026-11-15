@@ -140,6 +140,9 @@ func run() -> void:
 	await shot("game_dragging")
 	await mouse(point,false); await settle()
 	check(game.deployment_pending and game.candidate == Vector2i(3,1),"Release on tile opens facing selection")
+	if not game.deployment_pending or not is_instance_valid(game.deployment_preview):
+		push_error("Cannot continue facing checks: selected=%s candidate=%s notice=%s" % [game.selected_roster, game.candidate, game.hud.notice.text])
+		quit(1); return
 	check(overlay_cells("deployable").is_empty() and not overlay_cells("attack_range").is_empty(), "Facing selection keeps attack range but clears deployment overlay")
 	check(game.last_state.cost == before,"Dropping waits for facing confirmation without charging")
 	check(is_instance_valid(game.deployment_preview) and game.deployment_preview.position.distance_to(game.presentation.position(Vector2(3,1))) < 0.001, "Pending operator stands at the chosen tile")

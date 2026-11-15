@@ -55,6 +55,13 @@ static func update_timers(b) -> void:
 	for actor in b._state.units + b._state.enemies: actor.cooldown = maxf(0.0, actor.cooldown - b.STEP)
 	for unit in b._state.units:
 		unit["damage_reduction_left"] = maxf(0.0, unit.get("damage_reduction_left", 0.0) - b.STEP)
+		if unit.skill.enabled and unit.skill.max_charges > 0:
+			if unit.charges < unit.skill.max_charges:
+				unit.sp += b.STEP
+				if unit.sp + 0.000001 >= unit.skill.required:
+					unit.sp = maxf(0.0, unit.sp - unit.skill.required)
+					unit.charges += 1
+			continue
 		if unit.skill_left > 0:
 			unit.skill_left = maxf(0.0, unit.skill_left - b.STEP)
 			if unit.skill_left <= 0: b.emit("skill_end", {"source": unit.id})
@@ -147,11 +154,18 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	if friendly and not repeat_hit:
 		if actor.skill_left > 0: power *= actor.skill.multiplier
 		if not healing:
+			if actor.skill.max_charges > 0 and actor.charges > 0:
+				actor.charges -= 1
+				power += actor.attack * actor.skill.charge_attack_bonus
+				var gain: float = minf(actor.skill.charge_cost_gain, b._config.cost_cap - b._state.cost)
+				b._state.cost += gain
+				if gain > 0: b.emit("cost_gain", {"source": actor.id, "amount": gain})
 			actor.attack_count += 1
 			enhanced = actor.passive and actor.attack_count % 4 == 0
 			if enhanced: power *= actor.passive_multiplier
 		recover(actor, "attack", 1.0)
 	var amount: float
+	var hp_before := 0.0
 	if healing:
 		amount = minf(power, target.max_hp - target.hp)
 		target.hp += amount
@@ -161,12 +175,20 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	else:
 		amount = damage(power, target, actor.damage_type)
 		if not friendly and target.get("damage_reduction_left", 0.0) > 0: amount *= 1.0 - target.damage_reduction
+		hp_before = target.hp
 		target.hp = maxf(0.0, target.hp - amount)
 		if not friendly: recover(target, "hit", 1.0)
 	b.emit("heal" if healing else "damage", {"source": actor.id, "target": target.id,
 		"amount": amount, "damage_type": actor.damage_type, "enhanced": enhanced,
 		"friendly": friendly, "from": actor.position, "to": target.position,
 		"attack_count": actor.get("attack_count", 0)})
+	if not healing and not friendly and target.skill_left > 0 and target.skill.reflect_ratio > 0:
+		var reflected: float = (hp_before - target.hp) * target.skill.reflect_ratio
+		if reflected > 0:
+			actor.hp = maxf(0.0, actor.hp - reflected)
+			b.emit("damage", {"source": target.id, "target": actor.id, "amount": reflected,
+				"damage_type": "true", "enhanced": false, "friendly": true,
+				"from": target.position, "to": actor.position, "attack_count": 0})
 	var remaining: int = action.get("remaining_hits", 0) if repeat_hit else (actor.skill.hit_count - 1 if friendly and not healing and actor.skill_left > 0 else 0)
 	if remaining > 0 and target.hp > 0:
 		# A follow-up launches at the first impact and lands after its own flight.

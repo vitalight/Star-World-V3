@@ -50,6 +50,8 @@ battle.reset()
 
 `skill` 支持 `recovery`（auto／attack／hit）、`required`、`initial_sp`、`duration`、`multiplier`、`defense_multiplier`、`interval_multiplier`、`cost_gain`；倍率只在技能持续期间生效。`trigger` 为 manual（默认）或 automatic；自动技能充满后自行释放，持续期不充能。`duration=0` 为瞬发。`forward_range` 按朝向延伸最前列，`hit_count` 为每次攻击的独立伤害次数；后续命中在前一次命中后发射，目标死亡或消失时取消，整个连击只计一次攻击和充能，`heal_damage_reduction` 和 `heal_buff_duration` 指定治疗后附加的减伤及持续时间；重复治疗刷新效果。
 
+`reflect_ratio` 在技能生效时将实际失去生命值的指定比例作为真实伤害反弹给攻击者。`max_charges` 大于零时，每 `required` 秒储存一层，满层停止充能；有效攻击消耗一层，将 `attack * charge_attack_bonus` 加入本次攻击威力，并回复 `charge_cost_gain` 费用（不超过费用上限）。叠层和充能属于部署实例，撤退或重置后清空。
+
 ## 状态与事件
 
 快照包含 `phase / paused / time / life / cost / wave / spawned / killed / escaped / remaining / units / enemies / redeploy / route_warnings`；`phase` 为 ready／running／victory／defeat，有防守目标时另含 `objective`。`remaining` 包含未出生敌人，`route_warnings` 无预告时为空数组。

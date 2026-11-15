@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_4euts"]
+
+[resource]
+script = ExtResource("1_4euts")
+content_id = "character_009"
+display_name = "远程兵"
+max_hp = 320.0
+attack = 35.0
+defense = 4.0
+speed = 0.8
+ranged = true

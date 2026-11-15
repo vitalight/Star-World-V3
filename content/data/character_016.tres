@@ -1,0 +1,39 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor"]
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="stats"]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance"]
+[ext_resource type="Texture2D" path="res://content/characters/character_016/attack_v1.png" id="sheet"]
+[ext_resource type="Texture2D" path="res://content/ui/class_icons/atlas.png" id="icon"]
+[ext_resource type="Resource" path="res://content/data/skill_011.tres" id="skill"]
+
+[sub_resource type="AtlasTexture" id="ClassIcon"]
+atlas = ExtResource("icon")
+region = Rect2(0, 313.5, 313.5, 313.5)
+filter_clip = true
+
+[sub_resource type="Resource" id="Stats"]
+script = ExtResource("stats")
+content_id = "character_016"
+display_name = "Tiger"
+max_hp = 1900.0
+attack = 85.0
+defense = 100.0
+resistance = 5.0
+interval = 1.4
+cost = 20.0
+redeploy_time = 45.0
+block = 3
+skill_spec = ExtResource("skill")
+
+[sub_resource type="Resource" id="Appearance"]
+script = ExtResource("appearance")
+attack_sheet = ExtResource("sheet")
+class_icon = SubResource("ClassIcon")
+
+[resource]
+script = ExtResource("actor")
+stats = SubResource("Stats")
+appearance = SubResource("Appearance")
+identity = "船长"
+profession = "重装"

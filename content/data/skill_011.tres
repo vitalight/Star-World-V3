@@ -1,0 +1,15 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_06.tres" id="icon"]
+
+[resource]
+script = ExtResource("script")
+icon = ExtResource("icon")
+content_id = "skill_011"
+display_name = "坚盾回击"
+description = "持续10秒，向攻击者反弹实际受到伤害的30%。"
+required = 20.0
+duration = 10.0
+multiplier = 1.0
+reflect_ratio = 0.3

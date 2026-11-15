@@ -35,14 +35,14 @@ func run() -> void:
 		var enemy: Dictionary = state.enemies[0]
 		var actor = game.presentation.actors[enemy.id]
 		var appearance = game.appearances[key]
-		var walk: Array[Texture2D] = appearance.move_frames()
 		var attack: Array[Texture2D] = appearance.attack_frames()
-		check(walk.size() == 4 and attack.size() == 4, key + " has both animations")
-		check(actor.sprite.texture == walk[0], key + " starts walking")
+		check(attack.size() == 4, key + " has attack animation")
+		check(actor.sprite.texture == appearance.poses[0], key + " walks with its static pose")
 		game.presentation.sync(state, [], 0.15)
-		check(actor.sprite.texture == walk[1], key + " advances walking")
+		check(actor.sprite.texture == appearance.poses[0] and actor.motion_phase > 0.0, key + " advances procedural walking")
+		var paused_phase: float = actor.motion_phase
 		game.presentation.sync(state, [], 0.0)
-		check(actor.sprite.texture == walk[1], key + " freezes without visual time")
+		check(actor.sprite.texture == appearance.poses[0] and actor.motion_phase == paused_phase, key + " freezes without visual time")
 		var event := {"type": "attack_start", "source": enemy.id, "target": -1, "from": enemy.position, "to": enemy.position + Vector2.LEFT, "friendly": false}
 		game.presentation.sync(state, [event], 0.0)
 		check(actor.sprite.texture == attack[0], key + " starts attack")
@@ -53,7 +53,7 @@ func run() -> void:
 			await RenderingServer.frame_post_draw
 			root.get_texture().get_image().save_png("res://temp/verification/chapter_enemy_attack.png")
 		game.presentation.sync(state, [], 0.3)
-		check(actor.sprite.texture in walk, key + " resumes walking")
+		check(actor.sprite.texture == appearance.poses[0], key + " resumes walking")
 		state.enemies[0].blocked_by = 99
 		game.presentation.sync(state, [], 0.0)
 		check(actor.sprite.texture == appearance.poses[0], key + " stops walking when blocked")
@@ -62,7 +62,7 @@ func run() -> void:
 			for direction in [-1, 1]:
 				state.enemies[0].position += Vector2(direction * 0.25, 0)
 				game.presentation.sync(state, [], 0.15)
-				check(actor.sprite.flip_h == (direction > 0) and actor.sprite.texture in walk, "Shield guard faces its movement direction")
+				check(actor.sprite.flip_h == (direction > 0) and actor.sprite.texture == appearance.poses[0], "Shield guard faces its movement direction")
 				for frame in 4: await process_frame
 				await RenderingServer.frame_post_draw
 				root.get_texture().get_image().save_png("res://temp/verification/shield_guard_%s.png" % ("left" if direction < 0 else "right"))

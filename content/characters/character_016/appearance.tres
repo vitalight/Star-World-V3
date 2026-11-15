@@ -1,0 +1,8 @@
+[gd_resource type="Resource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="script"]
+[ext_resource type="Texture2D" path="res://content/characters/character_016/attack_v1.png" id="attack"]
+
+[resource]
+script = ExtResource("script")
+attack_sheet = ExtResource("attack")

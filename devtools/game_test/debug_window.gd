@@ -1,6 +1,7 @@
 extends PanelContainer
 ## An embedded Control, not an OS Window. Consumes only its own input region.
 var game: Node3D
+var sample_map: PackedScene
 var title_bar: HBoxContainer
 var inspect: Label
 var event_log: Label
@@ -58,7 +59,7 @@ func _ready() -> void:
 	level_picker.item_selected.connect(func(index: int):
 		events.clear()
 		game.campaign_level = level_picker.get_item_metadata(index)
-		if game.campaign_level.is_empty(): game.map_source = load("res://content/scenes/scene_001/map.tscn")
+		if game.campaign_level.is_empty(): game.map_source = sample_map
 		game.reload_level())
 	body.add_child(level_picker)
 	var switches := HBoxContainer.new(); body.add_child(switches)

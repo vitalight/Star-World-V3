@@ -101,13 +101,16 @@ func _build_mock() -> void:
 	var cells := [Vector2i(3,1), Vector2i(3,4), Vector2i(5,2), Vector2i(4,3), Vector2i(4,2)]
 	var index := 0
 	for key in configuration.roster:
+		mock_state.redeploy[key] = 0.0
+		if index >= cells.size():
+			index += 1
+			continue
 		var spec: Dictionary = configuration.roster[key]
 		var unit := spec.duplicate(true)
 		unit.merge({"id": index + 1, "roster_id": key, "cell": cells[index], "position": Vector2(cells[index]),
 			"hp": spec.max_hp * (0.92 - index * 0.06), "sp": float(spec.skill.get("initial_sp", index)), "skill_left": 2.5 if index == 0 and spec.skill.enabled else 0.0,
 			"blocked": [], "facing": 2, "action": {}}, true)
 		mock_state.units.append(unit)
-		mock_state.redeploy[key] = 0.0
 		index += 1
 	for key in configuration.enemies:
 		var spec: Dictionary = configuration.enemies[key]

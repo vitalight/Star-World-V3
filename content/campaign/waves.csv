@@ -41,3 +41,17 @@ wave_038,scene_0104B,168,3,9,enemy_001,lower,8
 wave_039,scene_0104B,190,3,8,enemy_001,upper,9
 wave_040,scene_0104B,212,2,12,enemy_005,lower,10
 wave_041,scene_0104B,238,1,1,enemy_006,upper,11
+wave_047,scene_0201B,5,6,5,enemy_011,main,1
+wave_048,scene_0201B,42,8,3,enemy_011,main,2
+wave_049,scene_0201B,78,2,12,enemy_015,main,3
+wave_050,scene_0202B,5,4,6,enemy_011,upper,1
+wave_051,scene_0202B,35,5,5,enemy_012,lower,2
+wave_052,scene_0202B,65,3,8,enemy_014,upper,3
+wave_053,scene_0202B,70,5,5,enemy_016,lower,3
+wave_054,scene_0203B,5,4,6,enemy_011,main,1
+wave_055,scene_0203B,28,4,6,enemy_012,flank,2
+wave_056,scene_0203B,70,1,1,enemy_018,main,3
+wave_057,scene_0203B,85,5,5,enemy_016,flank,4
+wave_058,scene_0202B,48,3,8,enemy_013,air,2
+wave_059,scene_0203B,45,2,12,enemy_017,main,2
+wave_060,scene_0203B,100,2,12,enemy_014,flank,4

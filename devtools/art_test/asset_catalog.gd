@@ -4,10 +4,8 @@ const GameCatalog = preload("res://game/content/content_catalog.gd")
 const Presentation = preload("res://game/adapters/battle_presentation.gd")
 const ActorView = preload("res://features/actor_view/actor_view_3d.gd")
 const PENDING_HEROES = [
-	["Tiger", "res://content/characters/tiger/appearance.tres"],
-	["Sugar", "res://content/characters/sugar/appearance.tres"],
-	["前哥", "res://content/characters/qiange/appearance.tres"],
-	["冰冰", "res://content/characters/bingbing/appearance.tres"],
+	["前哥", "res://content/characters/character_018/appearance.tres"],
+	["冰冰", "res://content/characters/character_019/appearance.tres"],
 ]
 const PENDING_ENEMIES = [
 	["晶甲巨兽", "brute"],
@@ -45,7 +43,8 @@ static func characters(catalog = null, filter_kind := "") -> Array[Dictionary]:
 			names[name] = true
 			var attack: Array = appearance.attack_frames()
 			if attack.is_empty(): attack = appearance.poses
-			result.append({"id": id, "kind": kind, "name": name, "attack": attack, "move": appearance.move_frames()})
+			var movement: Array = [appearance.poses[0]] if kind == "enemy" else appearance.move_frames()
+			result.append({"id": id, "kind": kind, "name": name, "attack": attack, "move": movement, "procedural_walk": kind == "enemy"})
 	if filter_kind in ["", "character"]:
 		for item in PENDING_HEROES:
 			if names.has(item[0]): continue
@@ -54,7 +53,8 @@ static func characters(catalog = null, filter_kind := "") -> Array[Dictionary]:
 	if filter_kind in ["", "enemy"]:
 		for item in PENDING_ENEMIES:
 			if names.has(item[0]): continue
-			result.append({"id": "", "kind": "enemy", "name": item[0], "attack": raw_frames(item[1], "attack"), "move": raw_frames(item[1], "move")})
+			var attack := raw_frames(item[1], "attack")
+			result.append({"id": "", "kind": "enemy", "name": item[0], "attack": attack, "move": [attack[0]], "procedural_walk": true})
 	return result
 
 static func effects() -> Array[Dictionary]:

@@ -1,7 +1,13 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="PackedScene" path="res://game/battle/battle_scene.tscn" id="1"]
-[ext_resource type="Resource" path="res://content/data/test_roster.tres" id="2"]
+[ext_resource type="Resource" path="res://game/tests/fixtures/battle/roster.tres" id="2"]
+[ext_resource type="PackedScene" path="res://game/tests/fixtures/battle/map.tscn" id="3"]
+[ext_resource type="Resource" path="res://game/tests/fixtures/battle/soldier_appearance.tres" id="4"]
+[ext_resource type="Resource" path="res://game/tests/fixtures/battle/rifle_appearance.tres" id="5"]
+[ext_resource type="Resource" path="res://game/tests/fixtures/battle/drone_appearance.tres" id="6"]
 
 [node name="SampleBattleFixture" instance=ExtResource("1")]
 operator_roster = ExtResource("2")
+map_source = ExtResource("3")
+enemy_appearance_overrides = {"soldier": ExtResource("4"), "rifle": ExtResource("5"), "drone": ExtResource("6")}

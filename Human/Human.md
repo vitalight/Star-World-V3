@@ -22,11 +22,7 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
     - Commit（提交）
     - Retro（留下备忘、更新记录）
 
-- [ ] 第一章素材更新
-    - [ ] 怪物素材（战士类型、boss类型）
-
 - [ ] 第二章初版
-    - [ ] 怪物
     - [ ] 剧情
 
 - [ ] 干员养成系统

@@ -1,0 +1,4 @@
+Reference: Human/StarterContent/chapter02_enemy_concept_v2.png
+Tool: built-in imagegen
+Prompt: Using the supplied approved concept sheet as the exact identity and art-style reference, create a transparent-background 2D game attack sprite sheet for ONLY its top-middle sleek four-legged hunter with fin and long tail. Show exactly four separate full-body poses arranged in ONE horizontal row in this order: idle, anticipation, attack impact, recovery. All four poses have the same body, face, colors and equipment and FACE LEFT in the same three-quarter view. Generous transparent space in each equal-width cell, no overlap, no clipping, no extra characters, no letters, no ground, no panels. Keep effects compact and the entire subject, tail, weapon and silhouette within its own cell.
+Processing: trim low-alpha artifacts, divide at transparent gaps, uniformly resize and align into 2048x512 transparent PNG.

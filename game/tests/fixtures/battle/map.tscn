@@ -1,0 +1,49 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://features/battlefield_view/editable_map.gd" id="1_8m3hf"]
+[ext_resource type="Resource" path="res://game/tests/fixtures/battle/level.tres" id="2_n8xx3"]
+[ext_resource type="Texture2D" path="res://game/tests/fixtures/battle/terrain_atlas.png" id="3_hlsk4"]
+[ext_resource type="TileSet" path="res://game/tests/fixtures/battle/tileset.tres" id="5_s5yyo"]
+[ext_resource type="Texture2D" path="res://game/tests/fixtures/battle/backdrop.png" id="city_bg"]
+
+[sub_resource type="Curve2D" id="Curve2D_s5yyo"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 608, 96)
+}
+point_count = 2
+
+[sub_resource type="Curve2D" id="Curve2D_3ybtt"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 288, 0, 0, 0, 0, 608, 288)
+}
+point_count = 2
+
+
+[sub_resource type="Curve2D" id="Curve2D_air"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 32, 32, 0, 0, 0, 0, 32, 96, 0, 0, 0, 0, 608, 96)
+}
+point_count = 3
+[node name="EditableMap" type="Node2D" unique_id=2047187391]
+script = ExtResource("1_8m3hf")
+level = ExtResource("2_n8xx3")
+terrain_atlas = ExtResource("3_hlsk4")
+background_texture = ExtResource("city_bg")
+perimeter_style = 1
+
+[node name="Terrain" type="TileMapLayer" parent="." unique_id=2070746491]
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAACAAAAAAABAAAAAAADAAAAAAABAAAAAAAEAAAAAAAAAAAAAAAFAAAAAAAAAAAAAAAGAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAJAAAAAAAAAAAAAAAAAAEAAAAAAAEAAAABAAEAAAAAAAEAAAACAAEAAAAAAAEAAAADAAEAAAAAAAEAAAAEAAEAAAAAAAEAAAAFAAEAAAAAAAEAAAAGAAEAAAAAAAEAAAAHAAEAAAAAAAEAAAAIAAEAAAAAAAEAAAAJAAEAAAAAAAEAAAAAAAIAAAAAAAAAAAABAAIAAAAAAAAAAAACAAIAAAAAAAAAAAADAAIAAAAAAAAAAAAEAAIAAAAAAAAAAAAFAAIAAAAAAAAAAAAGAAIAAAAAAAAAAAAHAAIAAAABAAAAAAAIAAIAAAAAAAAAAAAJAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAABAAMAAAAAAAAAAAACAAMAAAABAAAAAAADAAMAAAAAAAAAAAAEAAMAAAAAAAAAAAAFAAMAAAAAAAAAAAAGAAMAAAABAAAAAAAHAAMAAAAAAAAAAAAIAAMAAAAAAAAAAAAJAAMAAAAAAAAAAAAAAAQAAAAAAAEAAAABAAQAAAAAAAEAAAACAAQAAAAAAAEAAAADAAQAAAAAAAEAAAAEAAQAAAAAAAEAAAAFAAQAAAAAAAEAAAAGAAQAAAAAAAEAAAAHAAQAAAAAAAEAAAAIAAQAAAAAAAEAAAAJAAQAAAAAAAEAAAAAAAUAAAAAAAAAAAABAAUAAAAAAAAAAAACAAUAAAAAAAAAAAADAAUAAAAAAAAAAAAEAAUAAAAAAAAAAAAFAAUAAAADAAEAAAAGAAUAAAADAAEAAAAHAAUAAAABAAAAAAAIAAUAAAAAAAAAAAAJAAUAAAAAAAAAAAA=")
+tile_set = ExtResource("5_s5yyo")
+
+[node name="Routes" type="Node2D" parent="." unique_id=1881551327]
+
+[node name="upper" type="Path2D" parent="Routes" unique_id=1034940040]
+curve = SubResource("Curve2D_s5yyo")
+
+[node name="lower" type="Path2D" parent="Routes" unique_id=255863839]
+curve = SubResource("Curve2D_3ybtt")
+
+
+[node name="air" type="Path2D" parent="Routes"]
+curve = SubResource("Curve2D_air")
+metadata/flying = true

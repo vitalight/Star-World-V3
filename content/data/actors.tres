@@ -8,11 +8,15 @@
 [ext_resource type="Resource" path="res://content/data/skill_003.tres" id="skill_003"]
 [ext_resource type="Resource" path="res://content/data/skill_004.tres" id="skill_004"]
 [ext_resource type="Resource" path="res://content/data/skill_005.tres" id="skill_005"]
+[ext_resource type="Resource" path="res://content/data/skill_011.tres" id="skill_011"]
+[ext_resource type="Resource" path="res://content/data/skill_012.tres" id="skill_012"]
 [ext_resource type="Resource" path="res://content/data/character_011.tres" id="character_011"]
 [ext_resource type="Resource" path="res://content/data/character_012.tres" id="character_012"]
 [ext_resource type="Resource" path="res://content/data/character_013.tres" id="character_013"]
 [ext_resource type="Resource" path="res://content/data/character_014.tres" id="character_014"]
 [ext_resource type="Resource" path="res://content/data/character_015.tres" id="character_015"]
+[ext_resource type="Resource" path="res://content/data/character_016.tres" id="character_016"]
+[ext_resource type="Resource" path="res://content/data/character_017.tres" id="character_017"]
 [ext_resource type="Resource" path="res://content/data/enemy_001.tres" id="enemy_001"]
 [ext_resource type="Resource" path="res://content/data/enemy_002.tres" id="enemy_002"]
 [ext_resource type="Resource" path="res://content/data/enemy_003.tres" id="enemy_003"]
@@ -20,8 +24,17 @@
 [ext_resource type="Resource" path="res://content/data/enemy_005.tres" id="enemy_005"]
 [ext_resource type="Resource" path="res://content/data/enemy_006.tres" id="enemy_006"]
 
+[ext_resource type="Resource" path="res://content/data/enemy_011.tres" id="enemy_011"]
+[ext_resource type="Resource" path="res://content/data/enemy_012.tres" id="enemy_012"]
+[ext_resource type="Resource" path="res://content/data/enemy_013.tres" id="enemy_013"]
+[ext_resource type="Resource" path="res://content/data/enemy_014.tres" id="enemy_014"]
+[ext_resource type="Resource" path="res://content/data/enemy_015.tres" id="enemy_015"]
+[ext_resource type="Resource" path="res://content/data/enemy_016.tres" id="enemy_016"]
+[ext_resource type="Resource" path="res://content/data/enemy_017.tres" id="enemy_017"]
+[ext_resource type="Resource" path="res://content/data/enemy_018.tres" id="enemy_018"]
+
 [resource]
 script = ExtResource("script")
-skills = Array[ExtResource("skill_type")]([ExtResource("skill_001"), ExtResource("skill_002"), ExtResource("skill_003"), ExtResource("skill_004"), ExtResource("skill_005")])
-characters = Array[ExtResource("actor_type")]([ExtResource("character_011"), ExtResource("character_012"), ExtResource("character_013"), ExtResource("character_014"), ExtResource("character_015")])
-enemies = Array[ExtResource("actor_type")]([ExtResource("enemy_001"), ExtResource("enemy_002"), ExtResource("enemy_003"), ExtResource("enemy_004"), ExtResource("enemy_005"), ExtResource("enemy_006")])
+skills = Array[ExtResource("skill_type")]([ExtResource("skill_001"), ExtResource("skill_002"), ExtResource("skill_003"), ExtResource("skill_004"), ExtResource("skill_005"), ExtResource("skill_011"), ExtResource("skill_012")])
+characters = Array[ExtResource("actor_type")]([ExtResource("character_011"), ExtResource("character_012"), ExtResource("character_013"), ExtResource("character_014"), ExtResource("character_015"), ExtResource("character_016"), ExtResource("character_017")])
+enemies = Array[ExtResource("actor_type")]([ExtResource("enemy_001"), ExtResource("enemy_002"), ExtResource("enemy_003"), ExtResource("enemy_004"), ExtResource("enemy_005"), ExtResource("enemy_006"), ExtResource("enemy_011"), ExtResource("enemy_012"), ExtResource("enemy_013"), ExtResource("enemy_014"), ExtResource("enemy_015"), ExtResource("enemy_016"), ExtResource("enemy_017"), ExtResource("enemy_018")])

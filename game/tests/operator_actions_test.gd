@@ -130,8 +130,11 @@ func run() -> void:
 	check(game.battle.find_unit(deployed.id).skill_left > 0 and not actor.skill_hint.visible, "Auto-recovered skill can be activated through icon")
 	game.cancel_selection()
 	check(not game.hud.info_panel.visible and not game.hud.retreat_button.visible and not game.hud.skill_button.visible, "Cancelling selection hides both details and floating actions")
-	game.command("deploy",["tank",Vector2i(9,4),2])
-	var tank_id: int = game.last_state.units.back().id
+	var tank_deployment: Dictionary = game.command("deploy",["tank",Vector2i(3,4),2])
+	check(tank_deployment.ok, "Second operator deploys before switching selection: " + str(tank_deployment.reason))
+	if not tank_deployment.ok:
+		game.free(); quit(1); return
+	var tank_id: int = tank_deployment.id
 	await select_actor(tank_id)
 	check(game.hud.operator_portrait.texture == game.appearances.tank.portrait and game.hud.skill_description.text.contains("坚城") and game.hud.skill_button.disabled, "Switching operator updates portrait, icon and charging skill description")
 	for cell in [Vector2i(0,1), Vector2i(9,4)]:

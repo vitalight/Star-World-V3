@@ -1,0 +1,7 @@
+[gd_resource type="Resource" format=3]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="script"]
+[ext_resource type="Texture2D" path="res://game/tests/fixtures/battle/rifle.png" id="atlas"]
+[resource]
+script = ExtResource("script")
+attack_sheet = ExtResource("atlas")
+height = 1.02

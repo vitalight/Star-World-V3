@@ -200,7 +200,7 @@ func _ready() -> void:
 	deployment_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bottom = HBoxContainer.new()
 	bottom.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	bottom.offset_right = -18; bottom.offset_bottom = -14
+	bottom.offset_right = -18; bottom.offset_bottom = -7
 	bottom.alignment = BoxContainer.ALIGNMENT_END
 	bottom.add_theme_constant_override("separation", 5)
 	bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -222,7 +222,9 @@ func _ready() -> void:
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		portrait.offset_top = 27
+		portrait.offset_top = 32
+		portrait.offset_bottom = 5
+		portrait.scale = Vector2(1.2, 1.2)
 		portrait.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(portrait)
 		var strip := ColorRect.new()
@@ -443,9 +445,11 @@ func _fit() -> void:
 	end_panel.position = (size - end_panel.size) / 2
 	var compact := size.x < 1100
 	var card_size := Vector2(82, 112) if compact else Vector2(104, 136)
-	for card in cards.values(): card.button.custom_minimum_size = card_size
+	for card in cards.values():
+		card.button.custom_minimum_size = card_size
+		card.portrait.pivot_offset = Vector2(card_size.x / 2.0, (card_size.y - 27.0) / 2.0)
 	bottom.offset_left = -(card_size.x * cards.size() + 5 * (cards.size() - 1) + 18)
-	bottom.offset_top = -card_size.y - 14
+	bottom.offset_top = -card_size.y - 7
 	var economy_panel := get_node("Economy") as Control
 	economy_panel.offset_top = bottom.offset_top - 124
 	economy_panel.offset_bottom = bottom.offset_top - 8
@@ -601,8 +605,9 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		if ready: skill_button.add_theme_stylebox_override("normal", ready_skill_style)
 		else: skill_button.add_theme_stylebox_override("normal", normal_skill_style)
 		var skill_left: float = selected.get("skill_left", 0.0)
-		skill_status.visible = skill_left > 0
-		skill_status.text = "剩余 %.1fs" % skill_left if skill_left > 0 else ""
+		var max_charges: int = selected.skill.get("max_charges", 0)
+		skill_status.visible = skill_left > 0 or (deployed_selection and max_charges > 0)
+		skill_status.text = "储存 %d/%d" % [selected.get("charges", 0), max_charges] if max_charges > 0 else ("剩余 %.1fs" % skill_left if skill_left > 0 else "")
 		retreat_button.tooltip_text = "撤退"
 		_position_operator_actions()
 	end_panel.visible = finished

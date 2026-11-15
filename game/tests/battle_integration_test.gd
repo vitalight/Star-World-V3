@@ -1,6 +1,6 @@
 extends SceneTree
 const Battle = preload("res://features/battle/battle.gd")
-const Map = preload("res://content/scenes/scene_001/map.tscn")
+const Map = preload("res://game/tests/fixtures/battle/map.tscn")
 const Scene = preload("res://game/tests/sample_battle_fixture.tscn")
 const Fixture = preload("res://game/tests/defense_fixture.gd")
 var failures := 0
@@ -17,15 +17,17 @@ func check(condition: bool, message: String) -> void:
 		push_error(message)
 
 func run() -> void:
+	for path in DirAccess.get_files_at("res://game/tests/fixtures/battle"):
+		if path.ends_with(".tres") or path.ends_with(".tscn"):
+			var contents := FileAccess.get_file_as_string("res://game/tests/fixtures/battle/" + path)
+			check(not contents.contains("res://content/"), "Battle fixture has no formal content reference: " + path)
 	var map = Map.instantiate()
 	root.add_child(map)
 	check(map.errors().is_empty(), "Default map validates: " + str(map.errors()))
 	check(map.cells().size() == 60 and map.routes().size() == 3, "60 cells and three paths")
 	var tiles: TileMapLayer = map.get_node("Terrain")
-	var chapter_map = load("res://content/scenes/scene_0101B/map.tscn").instantiate()
-	check(tiles.tile_set.resource_path == "res://content/terrains/terrain_003/tileset.tres", "Test map uses marker TileSet")
-	check(map.terrain_atlas.resource_path == "res://content/terrains/terrain_003/atlas.png" and map.background_texture == chapter_map.background_texture and map.perimeter_style == chapter_map.perimeter_style, "Test map uses marker atlas and chapter setting")
-	chapter_map.free()
+	check(tiles.tile_set.resource_path == "res://game/tests/fixtures/battle/tileset.tres", "Test map uses fixture TileSet")
+	check(map.terrain_atlas.resource_path == "res://game/tests/fixtures/battle/terrain_atlas.png" and map.background_texture.resource_path == "res://game/tests/fixtures/battle/backdrop.png", "Test map uses fixture visuals")
 	var cell := Vector2i(3, 0)
 	var original_atlas: Vector2i = tiles.get_cell_atlas_coords(cell)
 	for pair in [[Vector2i(0, 1), "ground", 0.0], [Vector2i(0, 0), "high", 0.42], [Vector2i(2, 0), "high", 0.42], [Vector2i(3, 1), "none", 0.0], [Vector2i(3, 0), "none", 0.42]]:

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="1_ltwds"]
+
+[resource]
+script = ExtResource("1_ltwds")
+content_id = "character_010"
+display_name = "飞行敌人"
+max_hp = 200.0
+attack = 0.0
+defense = 4.0
+speed = 0.8
+flying = true

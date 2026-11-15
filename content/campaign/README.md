@@ -1,4 +1,4 @@
-# 第一章内容编辑
+# 章节内容编辑
 
 角色、敌人、技能使用 Godot `.tres`；关卡、波次、背景使用 UTF-8 CSV；对白使用场景目录下的 Markdown；地图使用 TileMap／Path2D。本目录是关卡与波次的唯一来源，不维护角色／敌人／技能 CSV。
 
@@ -7,8 +7,8 @@
 - `content/data/character_NNN.tres`、`enemy_NNN.tres`：stats 保存姓名与战斗数值，appearance 保存贴图、头像、显示高度与职业图标；两者均为文件内子资源。
 - `content/data/skill_NNN.tres`：技能规则与图标；角色通过 `stats.skill_spec` 引用，可复用。
 - `content/data/actors.tres`：显式注册正式角色、敌人与技能；内容加载、关联与导出都以此为准。
-- 第一章五名角色的 appearance 使用 `attack_sheet`：横向四帧依次为待机、蓄力、命中、收势，首帧也用于头像和剧情；战斗表现按攻击事件播放。当前图仅含正面方向，朝上时沿用正面。
-- 第一章敌人可同时配置横向四帧的 `attack_sheet` 和 `move_sheet`；移动帧随战斗时钟循环，攻击事件播放攻击帧。未配置时继续使用原有四姿态图集。
+- 正式角色与敌人的 `attack_sheet` 横向四帧依次为待机、蓄力、命中、收势，首帧也用于头像与静态姿态；战斗表现按攻击事件播放。当前图仅含一个方向，运行时按移动或面向镜像。
+- 怪物移动使用首帧与程序摆动；旧 `move_sheet` 不参与游戏和 Art Test 的移动表现。
 - `content_id` 使用 `type_NNN`，分配后保持稳定；不要只改文件名而保留旧 ID。
 - 新增角色／敌人时复制同类 `.tres`，修改文件名与 `content_id`，替换 appearance，再加入 `actors.tres` 对应列表。新增技能同样命名 `skill_NNN.tres`，注册后再赋给角色。
 - 保存资源后在 Game Test／Story Test 中重新加载。运行中的生命、SP、冷却由 battle 持有，不写回资源。
@@ -93,3 +93,4 @@ $env:APPDATA = Join-Path $PWD 'temp/chapter_one/user'
 - `.tres` 随资源索引导出；CSV／MD 由 `export_presets.cfg` 显式包含。编辑内容后需重新导出验证。
 
 - 城市地形图集 terrain_003：地图的 Terrain 使用 `content/terrains/terrain_003/tileset.tres`，同时将 `terrain_atlas` 指向同目录 `atlas.png`。图集和编辑器面板均由 `Human/StarterContent/terrain/terrain_markers_v3.png` 整图缩放，保留原图全部 16 格。按行依次为普通高台、普通地面、特殊高台、特殊地面；前两行各为可部署三格、不可部署一格。特殊格目前只有对应地面／高台的部署与通行规则，图案不产生战斗效果。第一章战斗地图和开发样例均使用此图集。
+- 第二章三张地图共用 `content/terrains/terrain_004/tileset.tres`、`atlas.png` 与 `backdrop.png`；每张地图独立配置地块和路线。图集保留相同 16 格含义和部署规则，图案本身不增加战斗效果。

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Texture2D" path="res://content/enemies/enemy_011/attack_v1.png" id="sheet"]
+[ext_resource type="Script" path="res://features/content_definitions/actor_definition.gd" id="actor"]
+[ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="stats"]
+[ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance"]
+
+[sub_resource type="Resource" id="Stats"]
+script = ExtResource("stats")
+content_id = "enemy_011"
+display_name = "潮蚀蟹"
+max_hp = 300
+attack = 42
+defense = 8
+interval = 1.5
+windup = 0.25
+speed = 0.55
+ranged = false
+attack_range = 0.0
+flying = false
+
+[sub_resource type="Resource" id="Appearance"]
+script = ExtResource("appearance")
+attack_sheet = ExtResource("sheet")
+height = 1.0
+
+[resource]
+script = ExtResource("actor")
+stats = SubResource("Stats")
+appearance = SubResource("Appearance")

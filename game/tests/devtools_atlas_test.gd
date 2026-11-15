@@ -22,16 +22,16 @@ func run() -> void:
   var art_actual = art.catalog[formal_id]
   check(art_actual.attack_sheet.resource_path == formal.attack_sheet.resource_path, "Art Battle uses official animation: " + formal_id)
  var entries = load("res://devtools/art_test/asset_catalog.gd").characters()
- check(entries.size() == 17, "Art previews all 9 heroes and 8 monsters")
+ check(entries.size() == 25, "Art previews all 9 heroes and 16 monsters")
  for entry in entries:
-  check(entry.attack.size() == 4 and (entry.move.is_empty() or entry.move.size() == 4), "Art has action frames: " + entry.name)
+  check(entry.attack.size() == 4 and (entry.move.size() == 1 if entry.kind == "enemy" else entry.move.is_empty()), "Art has action frames: " + entry.name)
  for index in 5:
   var appearance = load("res://content/data/character_%03d.tres" % (11 + index)).appearance
   check(appearance.attack_sheet.resource_path == "res://content/characters/character_%03d/attack_v1.png" % (11 + index) and appearance.attack_frames().size() == 4 and appearance.portrait == appearance.attack_frames()[0], "Formal actor uses its updated attack frames: " + str(11 + index))
  for index in 5:
   var appearance = load("res://content/data/enemy_%03d.tres" % (1 + index)).appearance
   var version := 2 if index == 4 else 1
-  check(appearance.attack_frames().size() == 4 and appearance.move_frames().size() == 4 and appearance.attack_sheet.resource_path == "res://content/enemies/enemy_%03d/attack_v%d.png" % [1 + index, version], "Formal enemy has updated action frames: " + str(1 + index))
+  check(appearance.attack_frames().size() == 4 and appearance.attack_sheet.resource_path == "res://content/enemies/enemy_%03d/attack_v%d.png" % [1 + index, version], "Formal enemy has updated action frames: " + str(1 + index))
  var catalog = preload("res://game/content/content_catalog.gd").new()
  catalog.reload()
  var filenames = ["chapter01_01_home_anomaly_v1.png", "chapter01_02_roadside_rescue_v2.png", "chapter01_03_oriental_pearl_node_v2.png"]

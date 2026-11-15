@@ -16,6 +16,7 @@ func _initialize() -> void:
 	skills()
 	skill_modifiers()
 	character_skill_rules()
+	chapter_two_skills()
 	boundary_contracts()
 	waves_and_determinism()
 	print("Battle rules: %d checks, %d failures" % [checks, failures])
@@ -52,6 +53,41 @@ func unit_id(b, roster: String) -> int:
 	for u in b.snapshot().units:
 		if u.roster_id == roster: return u.id
 	return -1
+
+func chapter_two_skills() -> void:
+	var c = fixture()
+	c.roster.g.merge({"max_hp": 50.0, "attack": 0.0, "windup": 0.0, "skill": {"enabled": true, "required": 1.0, "duration": 10.0, "multiplier": 1.0, "reflect_ratio": 0.3}}, true)
+	c.enemies.e.merge({"attack": 100.0, "interval": 10.0, "windup": 0.0}, true)
+	c.waves[0].time = 2.0
+	var b = Battle.new(c)
+	var id: int = b.deploy("g", Vector2i.ZERO).id
+	b.start()
+	b.advance(1.1)
+	check(b.activate_skill(id).ok, "reflect skill activates after charging")
+	b.take_events()
+	b.advance(1.1)
+	var damage_events = events(b, "damage", true)
+	check(damage_events.any(func(e): return is_equal_approx(e.amount, 15.0)), "reflection uses actual health lost even for lethal damage")
+	c = fixture()
+	c.roster.g.merge({"attack": 10.0, "windup": 0.0, "interval": 10.0, "skill": {"enabled": true, "required": 1.0, "duration": 0.0, "trigger": "automatic", "max_charges": 3, "charge_attack_bonus": 0.5, "charge_cost_gain": 2.0}}, true)
+	c.waves[0].time = 5.0
+	c.cost_cap = 41.0
+	c.initial_cost = 40.0
+	c.roster.g.cost = 0.0
+	b = Battle.new(c)
+	id = b.deploy("g", Vector2i.ZERO).id
+	b.start()
+	b.advance(4.0)
+	check(b.find_unit(id).charges == 3, "stored charges stop at three")
+	b.take_events()
+	b.advance(1.1)
+	var hits = events(b, "damage", true)
+	check(hits.any(func(e): return is_equal_approx(e.amount, 15.0)), "stored charge increases attack power")
+	check(b.find_unit(id).charges == 2, "successful attack consumes one charge")
+	near(b.snapshot().cost, 41.0, "charge cost recovery respects cap")
+	b.reset()
+	id = b.deploy("g", Vector2i.ZERO).id
+	check(b.find_unit(id).charges == 0, "reset clears stored charges")
 
 func deployment() -> void:
 	var c = fixture()

@@ -1,13 +1,15 @@
 # 角色外观登记
 
-正式原件位于 `Human/StarterContent/character/`，运行贴图整理至本目录。4×4 图集每格 256×256，四列依次为正面待机、背面待机、正面攻击、背面攻击；右向由显示模块镜像，头像默认取对应行第一列。
+正式角色的数值和外观配置位于 `content/data/character_NNN.tres`，运行贴图位于本目录。攻击素材为横向四帧：待机、准备、攻击、收势；首帧用于头像和静态姿态。
 
-| 正式 ID | 角色 | 原件 | 行（从 1 起） | 运行贴图 |
-| --- | --- | --- | --- | --- |
-| character_011 | 大星 | hero-atlas-101-v2.png | 1 | character_011/atlas.png |
-| character_012 | 小黄 | hero-atlas-101-v2.png | 2 | character_011/atlas.png |
-| character_013 | 阿五 | hero-atlas-101-v2.png | 3 | character_011/atlas.png |
-| character_014 | 胡胡 | hero-atlas-101-v2.png | 4 | character_011/atlas.png |
-| character_015 | 月月 | hero-atlas-102-v2.png | 1 | character_015/atlas.png |
+| ID | 角色 | 运行贴图 |
+| --- | --- | --- |
+| character_011 | 大星 | character_011/attack_v1.png |
+| character_012 | 小黄 | character_012/attack_v1.png |
+| character_013 | 阿五 | character_013/attack_v1.png |
+| character_014 | 胡胡 | character_014/attack_v1.png |
+| character_015 | 月月 | character_015/attack_v1.png |
+| character_016 | Tiger | character_016/attack_v1.png |
+| character_017 | Sugar | character_017/attack_v1.png |
 
-同图集角色共享贴图，不重复复制。数值与外观配置在 `content/data/character_NNN.tres`。
+`character_018` 前哥和 `character_019` 冰冰的贴图和预览外观已按正式编号存放，尚未注册为可出战干员。旧开发样例仍使用各自的编号。

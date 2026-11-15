@@ -1,0 +1,5 @@
+# enemy_001 six-frame walk
+
+Reference: `content/enemies/enemy_001/move_v1.png`. Generated with the built-in imagegen tool.
+
+> Use the supplied sprite sheet as the exact identity and style reference. Generate a transparent sprite sheet for the SAME dark charcoal dragon humanoid with white bone skull helmet, glowing amber eye, orange cracked chest core, loincloth, claws and tail. Six distinct consecutive frames of one coherent walking cycle facing LEFT, arranged in a precise 3 columns by 2 rows equal-sized grid, ordered left-to-right top-to-bottom. Alternating left and right feet: contact, passing, opposite contact, passing, return, recovery. Keep body size, features, skull, tail, camera angle and ground baseline stable across all six frames; natural compact bipedal gait, subtle weight shift, no jumping, no overlapping frames. Full body inside each cell with generous transparent margins, no cropping. No text, no ground, no effects, no borders, no extra characters. High-quality chibi tactical RPG game sprite, preserve reference visual style.

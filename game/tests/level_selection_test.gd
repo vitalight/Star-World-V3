@@ -38,7 +38,10 @@ func verify_list(unlocked_count: int, locked: bool) -> void:
 	if placeholder:
 		check(placeholder is not BaseButton and placeholder.focus_mode == Control.FOCUS_NONE and placeholder.tooltip_text.is_empty(), "Locked level cannot be selected and has no tooltip")
 	var chapter := player.find_child("LockedChapter", true, false)
-	check(chapter != null and chapter is not BaseButton and chapter.focus_mode == Control.FOCUS_NONE and chapter.tooltip_text.is_empty(), "Locked chapter is anonymous and cannot be selected")
+	if player._level_unlocked("scene_0201B"):
+		check(chapter == null and player.find_child("Chapter02", true, false) is Button, "Unlocked second chapter can be selected")
+	else:
+		check(chapter != null and chapter is not BaseButton and chapter.focus_mode == Control.FOCUS_NONE and chapter.tooltip_text.is_empty(), "Locked chapter is anonymous and cannot be selected")
 
 func run() -> void:
 	DirAccess.make_dir_recursive_absolute("res://temp/chapter_one")
@@ -90,7 +93,8 @@ func run() -> void:
 	player.progress.selected = ids.back()
 	player.show_levels()
 	await settle()
-	verify_list(ids.size(), false)
+	verify_list(3, false)
+	check(player.find_child("Level_scene_0201B", true, false) != null, "Second chapter displays its own levels")
 	var panel: Control = player.find_child("LevelDetail", true, false)
 	var detail_scroll: ScrollContainer = player.find_child("DetailScroll", true, false)
 	check(absf(panel.get_global_rect().get_center().y - detail_scroll.get_global_rect().get_center().y) < 2, "Short detail panel is vertically centered")
@@ -104,6 +108,7 @@ func run() -> void:
 	check(title.get_global_rect().end.x <= badge.get_global_rect().position.x, "Long title does not overlap type badge")
 	entry.name = old_name
 	player.developer_mode = true
+	player.progress.selected = "scene_0104C"
 	player.show_levels()
 	await settle()
 	scroll = player.find_child("LevelScroll", true, false)

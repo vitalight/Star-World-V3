@@ -65,7 +65,7 @@ func deploy(roster_id: String, cell: Vector2i, facing: int = 0) -> Dictionary:
 	unit.merge({"id": _next_id, "order": _next_id, "roster_id": roster_id,
 		"cell": cell, "position": Vector2(cell), "facing": facing, "hp": unit.max_hp,
 		"cooldown": 0.0, "action": {}, "target": -1, "blocked": [], "attack_count": 0,
-		"sp": unit.skill.initial_sp, "skill_left": 0.0}, true)
+		"sp": unit.skill.initial_sp, "skill_left": 0.0, "charges": 0}, true)
 	_state.cost -= unit.cost
 	_state.units.append(unit)
 	emit("deploy", {"source": unit.id, "roster_id": roster_id, "cell": cell, "facing": facing})

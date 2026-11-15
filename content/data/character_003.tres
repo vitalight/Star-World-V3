@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://content/data/skill_007.tres" id="skill"]
 [ext_resource type="Script" uid="uid://cg4t5d7rw7120" path="res://features/actor_view/actor_appearance.gd" id="view_2_n8f7b"]
 [ext_resource type="Texture2D" uid="uid://c6835tx8m2uw5" path="res://content/ui/class_icons/atlas.png" id="view_class_atlas"]
-[ext_resource type="Texture2D" path="res://content/characters/tiger/attack_v1.png" id="view_hero_atlas"]
+[ext_resource type="Texture2D" path="res://content/characters/character_016/attack_v1.png" id="view_hero_atlas"]
 
 [sub_resource type="AtlasTexture" id="view_ClassIcon"]
 atlas = ExtResource("view_class_atlas")

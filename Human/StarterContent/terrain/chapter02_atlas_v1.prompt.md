@@ -1,0 +1,3 @@
+Reference: content/terrains/terrain_003/atlas.png
+Tool: built-in imagegen
+Prompt: Edit this exact 4 by 4 tactical game terrain atlas to a second-chapter maritime theme. Preserve exactly the 4x4 cell geometry, original marker positions, icons and colors, and hazard stripes; keep all cells square and aligned, first row light high ground and second row dark ground, last two rows same symbols as reference. Replace concrete textures with cohesive matte weathered harbor deck stone/steel, desaturated sea blue gray, readable low detail, no perspective, text or additional symbols. Each tile self-contained and full bleed.

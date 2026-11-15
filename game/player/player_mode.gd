@@ -367,16 +367,21 @@ func show_levels(preserve_scroll := -1) -> void:
 		errors.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		return
 	var ids: Array = catalog.levels.keys()
-	var chapter := _level_panel(canvas, Rect2(48, 174, 355, 106), Color("152b48f2"), Color("ffe1a1"))
-	_level_fill(chapter, Rect2(0, 0, 6, 106), Color("ffe2a0"))
-	_text(chapter, "01", Rect2(25, 12, 100, 31), 20, Color("ffe2a0"))
-	_text(chapter, "第一章 · 上海", Rect2(25, 45, 300, 45), 27, Color("fff1d0"))
-	var locked_chapter := _level_panel(canvas, Rect2(48, 296, 355, 85), Color("12243ddd"), Color("49617f"))
-	locked_chapter.name = "LockedChapter"
-	_text(locked_chapter, "锁定", Rect2(27, 20, 260, 45), 22, Color("8399bb"))
-	_lock_icon(locked_chapter, Vector2(305, 27))
+	var second_selected: bool = progress.selected.begins_with("scene_02")
+	var chapter := _level_button(canvas, "第一章 · 上海", Rect2(48, 174, 355, 106), _select_level.bind("scene_0101A"), false)
+	chapter.name = "Chapter01"
+	chapter.add_theme_stylebox_override("normal", _level_style(Color("152b48f2"), Color("536a89") if second_selected else Color("ffe1a1")))
+	if catalog.levels.has("scene_0201B") and _level_unlocked("scene_0201B"):
+		var second := _level_button(canvas, "第二章 · 济州岛", Rect2(48, 296, 355, 85), _select_level.bind("scene_0201B"), false)
+		second.name = "Chapter02"
+		second.add_theme_stylebox_override("normal", _level_style(Color("152b48f2"), Color("ffe1a1") if second_selected else Color("536a89")))
+	else:
+		var locked_chapter := _level_panel(canvas, Rect2(48, 296, 355, 85), Color("12243ddd"), Color("49617f"))
+		locked_chapter.name = "LockedChapter"
+		_text(locked_chapter, "锁定", Rect2(27, 20, 260, 45), 22, Color("8399bb"))
+		_lock_icon(locked_chapter, Vector2(305, 27))
 	var route := _level_panel(canvas, Rect2(432, 161, 542, 730), Color("101f36e8"), Color("536a89"))
-	_text(route, "第一章 · 上海", Rect2(32, 22, 360, 45), 30, Color("f7f4ef"))
+	_text(route, "第二章 · 济州岛" if second_selected else "第一章 · 上海", Rect2(32, 22, 360, 45), 30, Color("f7f4ef"))
 	_level_fill(route, Rect2(32, 110, 478, 1), Color("52657d"))
 	var scroll := ScrollContainer.new()
 	scroll.name = "LevelScroll"
@@ -391,6 +396,7 @@ func show_levels(preserve_scroll := -1) -> void:
 	var selected_button: Control
 	var has_locked := false
 	for id in ids:
+		if str(id).begins_with("scene_02") != second_selected: continue
 		if not _level_unlocked(id):
 			has_locked = true
 			break

@@ -2,6 +2,8 @@ extends Control
 const Game = preload("res://game/battle/battle_scene.tscn")
 const DebugWindow = preload("res://devtools/game_test/debug_window.gd")
 @export var operator_roster: Resource = preload("res://content/data/game_test_roster.tres")
+@export var sample_map: PackedScene = preload("res://content/scenes/scene_001/map.tscn")
+@export var enemy_appearance_overrides: Dictionary[String, Resource] = {}
 var game: Node3D
 var debug_window: PanelContainer
 
@@ -17,6 +19,8 @@ func _ready() -> void:
 		if request is Dictionary and absf(Time.get_unix_time_from_system() - float(request.get("time", 0))) < 60.0:
 			game.campaign_level = str(request.get("level", ""))
 	game.operator_roster = operator_roster
+	game.map_source = sample_map
+	game.enemy_appearance_overrides = enemy_appearance_overrides
 	# Chapter previews use the full Game Test squad, including anti-air operators.
 	game.operator_ids.assign(operator_roster.actors.keys())
 	add_child(game)
@@ -30,6 +34,7 @@ func _ready() -> void:
 	layer.add_child(overlay)
 	debug_window = DebugWindow.new()
 	debug_window.game = game
+	debug_window.sample_map = sample_map
 	overlay.add_child(debug_window)
 	if not game.campaign_level.is_empty():
 		for index in debug_window.level_picker.item_count:

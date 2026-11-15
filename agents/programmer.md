@@ -21,6 +21,7 @@
 
 ## 测试与验证
 
+- 规则、交互和回归测试必须使用测试专属的固定关卡、角色、敌人、技能和所需素材；不得依赖正式内容的数值、地形、剧情或资源。测试夹具放在测试目录并明确注入，正式内容校验另行编写，其用途是检查当前内容本身。先断言操作成功并使用返回 ID，再验证后续状态；不要默默使用上一个单位或忽略失败原因。
 - 使用环境变量 `GODOT_PATH` 调用 Godot。规则测试用无界面模式；渲染、截图及窗口输入用真实窗口，音频听感通过实际播放检查。等待渲染帧的测试不能用 `--headless`。
 - 受限环境下 Godot 无法写入默认用户目录时，使用 `powershell -ExecutionPolicy Bypass -File scripts/run_godot_test.ps1 --headless --script res://features/battle/tests/battle_test.gd`；图形测试去掉 `--headless` 并传入对应脚本。该入口仅将测试进程的用户数据和缓存放入 `temp/godot-test/`，不读取或覆盖正式玩家存档；正式游戏仍使用默认用户目录。
 - 专属测试放在 `features/<module>/tests/`，集成测试放在 `game/tests/`；从公共接口验证可观察行为。按改动选择 [Art Test](../devtools/art_test/README.md)、[Story Test](../devtools/story_test/README.md)、[Game Test](../devtools/game_test/README.md) 或玩家流程验证，共享表现复用同一实现。

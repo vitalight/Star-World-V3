@@ -1,0 +1,4 @@
+Tool: built-in imagegen
+Reference: content/terrains/terrain_004/atlas.png, v2 before this revision.
+Prompt: Use case: precise-object-edit. Edit this exact tactical game 4x4 terrain tile atlas. Reduce color saturation noticeably across the terrain materials: change the peachy warm cream to calm neutral warm light beige limestone and the strong ocean blue to muted soft slate blue-gray. Aim for restrained natural coastal colors, low-to-medium saturation and a clean matte finish. Preserve clear light/dark contrast between high ground and road. Keep every tile and panel in the exact same position, preserve all 16 square tiles and their 4x4 layout, hazard borders, symbols and their colors and shapes; no new marks, dirt, scratches or rust. Flat orthographic view, seamless full frame.
+Processing: Scale each of the 16 generated cells into equal squares for the runtime atlas and editor palette. Tile metadata is unchanged.
