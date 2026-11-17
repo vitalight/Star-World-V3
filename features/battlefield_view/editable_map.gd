@@ -6,6 +6,8 @@ extends Node2D
 @export var tint := Color.WHITE
 @export var terrain_atlas: Texture2D
 @export var background_texture: Texture2D
+## Left corners of the painted courtyard (rear x/y, front x/y), in texture UVs.
+@export var backdrop_edges := Vector4.ZERO
 @export_enum("Ruins", "City", "Coast") var perimeter_style := 0
 @export var external_level := false
 

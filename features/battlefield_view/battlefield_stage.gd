@@ -28,7 +28,7 @@ static func setup_environment(parent: Node3D) -> void:
 	light.shadow_enabled = true
 	parent.add_child(light)
 
-static func set_background(parent: Node3D, texture: Texture2D) -> void:
+static func set_background(parent: Node3D, texture: Texture2D, edges := Vector4.ZERO) -> void:
 	var old := parent.get_node_or_null("BattleBackdrop")
 	if old: old.free()
 	var world := parent.get_node("BattleEnvironment") as WorldEnvironment
@@ -40,10 +40,18 @@ static func set_background(parent: Node3D, texture: Texture2D) -> void:
 	layer.layer = -1
 	parent.add_child(layer)
 	var image := TextureRect.new()
+	image.name = "Image"
 	image.texture = texture
 	image.modulate = Color(0.7, 0.7, 0.7, 1.0)
 	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	if edges != Vector4.ZERO:
+		var alignment := ShaderMaterial.new()
+		alignment.shader = preload("res://features/battlefield_view/backdrop_alignment.gdshader")
+		alignment.set_shader_parameter("source_edges", edges)
+		alignment.set_shader_parameter("screen_edges", edges)
+		image.material = alignment
+		image.stretch_mode = TextureRect.STRETCH_SCALE
 	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layer.add_child(image)
@@ -74,6 +82,13 @@ static func fit_camera(camera: Camera3D, bounds: Rect2i, viewport_size: Vector2)
 				for y in [0.0, 1.4]:
 					if not safe.has_point(camera.unproject_position(Vector3(x, y, z))): fits = false
 		if fits: break
+	var backdrop := camera.get_parent().get_node_or_null("BattleBackdrop/Image") as TextureRect
+	if backdrop and backdrop.material:
+		var rear := camera.unproject_position(Vector3(bounds.position.x - 1.15, 0, bounds.position.y - 1.15)) / viewport_size
+		var front := camera.unproject_position(Vector3(bounds.position.x - 1.15, 0.12, bounds.end.y + 0.12)) / viewport_size
+		rear = rear.clamp(Vector2(0.01, 0.01), Vector2(0.49, 0.98))
+		front = front.clamp(Vector2(0.01, rear.y + 0.01), Vector2(0.49, 0.99))
+		backdrop.material.set_shader_parameter("screen_edges", Vector4(rear.x, rear.y, front.x, front.y))
 
 static func route_markers(parent: Node3D, routes: Dictionary, terrain: Node3D, flying_routes := PackedStringArray(), air_texture: Texture2D = null) -> void:
 	var endpoints := {}

@@ -21,6 +21,7 @@ point_count = 4
 script = ExtResource("1_kp3ls")
 terrain_atlas = ExtResource("2_gfoea")
 background_texture = ExtResource("3_0pait")
+backdrop_edges = Vector4(0.216, 0.221, 0.087, 0.81)
 perimeter_style = 2
 external_level = true
 

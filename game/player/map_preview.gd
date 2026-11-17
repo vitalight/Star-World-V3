@@ -8,7 +8,7 @@ var terrain_bounds: Rect2i
 func _ready() -> void:
 	Stage.setup_environment(self)
 	var map = map_source.instantiate()
-	Stage.set_background(self, map.background_texture)
+	Stage.set_background(self, map.background_texture, map.backdrop_edges)
 	var field = Field.new()
 	field.atlas = map.terrain_atlas if map.terrain_atlas else preload("res://content/terrains/terrain_001/atlas.png")
 	field.tint = map.tint

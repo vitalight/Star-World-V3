@@ -94,3 +94,4 @@ $env:APPDATA = Join-Path $PWD 'temp/chapter_one/user'
 
 - 城市地形图集 terrain_003：地图的 Terrain 使用 `content/terrains/terrain_003/tileset.tres`，同时将 `terrain_atlas` 指向同目录 `atlas.png`。图集和编辑器面板均由 `Human/StarterContent/terrain/terrain_markers_v3.png` 整图缩放，保留原图全部 16 格。按行依次为普通高台、普通地面、特殊高台、特殊地面；前两行各为可部署三格、不可部署一格。特殊格目前只有对应地面／高台的部署与通行规则，图案不产生战斗效果。第一章战斗地图和开发样例均使用此图集。
 - 第二章三张地图共用 `content/terrains/terrain_004/tileset.tres`、`atlas.png` 与 `backdrop.png`；每张地图独立配置地块和路线。图集保留相同 16 格含义和部署规则，图案本身不增加战斗效果。
+- `backdrop_edges` 可将背景围边对齐战场相机。四个值依次为背景中庭院左后角、左前角的归一化坐标，右侧按中线对称。默认值沿用居中裁切。

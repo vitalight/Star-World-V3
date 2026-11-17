@@ -88,7 +88,7 @@ func reload_level() -> void:
 	map_data = ResourceLoader.load(map_source.resource_path, "", ResourceLoader.CACHE_MODE_IGNORE_DEEP).instantiate()
 	map_data.hide()
 	add_child(map_data)
-	StageView.set_background(self, map_data.background_texture)
+	StageView.set_background(self, map_data.background_texture, map_data.backdrop_edges)
 	validation_errors = catalog.map_errors(campaign_level, map_data) if catalog else map_data.errors()
 	if catalog == null:
 		if operator_roster and not operator_roster.resource_path.is_empty():
