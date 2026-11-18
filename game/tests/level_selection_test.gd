@@ -38,7 +38,7 @@ func verify_list(unlocked_count: int, locked: bool) -> void:
 	if placeholder:
 		check(placeholder is not BaseButton and placeholder.focus_mode == Control.FOCUS_NONE and placeholder.tooltip_text.is_empty(), "Locked level cannot be selected and has no tooltip")
 	var chapter := player.find_child("LockedChapter", true, false)
-	if player._level_unlocked("scene_0201B"):
+	if player._level_unlocked("scene_0201A"):
 		check(chapter == null and player.find_child("Chapter02", true, false) is Button, "Unlocked second chapter can be selected")
 	else:
 		check(chapter != null and chapter is not BaseButton and chapter.focus_mode == Control.FOCUS_NONE and chapter.tooltip_text.is_empty(), "Locked chapter is anonymous and cannot be selected")
@@ -93,8 +93,8 @@ func run() -> void:
 	player.progress.selected = ids.back()
 	player.show_levels()
 	await settle()
-	verify_list(3, false)
-	check(player.find_child("Level_scene_0201B", true, false) != null, "Second chapter displays its own levels")
+	verify_list(7, false)
+	check(player.find_child("Level_scene_0201A", true, false) != null, "Second chapter starts with its opening story")
 	var panel: Control = player.find_child("LevelDetail", true, false)
 	var detail_scroll: ScrollContainer = player.find_child("DetailScroll", true, false)
 	check(absf(panel.get_global_rect().get_center().y - detail_scroll.get_global_rect().get_center().y) < 2, "Short detail panel is vertically centered")

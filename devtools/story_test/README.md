@@ -1,6 +1,6 @@
 # Story Test
 
-从 Developer Hub 的 Story Test 进入，或运行 story_workspace.tscn。默认打开正式 1-1 剧情，下拉框只提供第一章五个独立剧情关。
+从 Developer Hub 的 Story Test 进入，或运行 story_workspace.tscn。默认打开正式 1-1 剧情，下拉框提供第一、二章的九个剧情关。
 
 背景、角色与文本统一读取正式 content，通过 game/content/content_catalog.gd 加载，复用 features/story 的 Session 和 View；不再保留开发样例或直接引用 Human 初始素材。
 

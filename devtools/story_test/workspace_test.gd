@@ -14,7 +14,7 @@ func run() -> void:
 	await process_frame
 	await process_frame
 	var workspace = current_scene
-	check(workspace.source_picker.item_count == 5 and workspace.source_picker.get_item_metadata(0) == ["scene_0101A", "story"], "Workspace contains only formal stories and defaults to 1-1")
+	check(workspace.source_picker.item_count == 9 and workspace.source_picker.get_item_metadata(0) == ["scene_0101A", "story"], "Workspace contains both chapters and defaults to 1-1")
 	check(workspace.session.snapshot().text.contains("晚上七点"), "Workspace opens formal blackout scene")
 	check(not workspace.stage.actor_views[0].visible and not workspace.stage.actor_views[1].visible, "Opening has no foreground actors")
 	check(workspace.back_button.disabled, "Back is disabled at the beginning")

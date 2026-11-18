@@ -154,10 +154,37 @@ func run() -> void:
 	check(player.progress.completed.has("scene_0104C") and player.progress.pending_after.is_empty(), "Final boss transition commits progress")
 	check(player.page == "story" and player.story_level == "scene_0105A", "Final victory opens epilogue")
 	await click("跳过剧情")
-	check(player.progress.completed.has("scene_0105A") and player.progress.unlocked("scene_0201B", player.catalog.levels.keys()), "First chapter epilogue unlocks chapter two")
+	check(player.progress.completed.has("scene_0105A") and player._level_unlocked("scene_0201A") and not player._level_unlocked("scene_0201B"), "First chapter epilogue unlocks the second chapter's opening story")
 	await capture("chapter_complete")
 	await dispose(); await spawn()
-	check(player.progress.completed.has("scene_0105A") and player.progress.unlocked("scene_0201B", player.catalog.levels.keys()), "First chapter progress survives restart")
+	check(player.progress.completed.has("scene_0105A") and player._level_unlocked("scene_0201A"), "First chapter progress survives restart")
+	player._select_level("scene_0105A")
+	await click("第二章 · 济州岛")
+	check(player.progress.selected == "scene_0201A", "Selecting chapter two opens its first story card")
+	await click("进入故事")
+	var chapter_two_route := [
+		["scene_0201A", "scene_0201B", "scene_0202A"],
+		["scene_0202A", "scene_0202B", "scene_0203A"],
+		["scene_0203A", "scene_0203B", "scene_0204A"],
+	]
+	for stage in chapter_two_route:
+		check(player.page == "story" and player.story_level == stage[0], "Chapter two story opens: " + stage[0])
+		await click("跳过剧情")
+		check(player.page == "battle" and player.battle_scene.campaign_level == stage[1], "Story opens matching battle: " + stage[1])
+		game = player.battle_scene
+		check(game.debug_victory(), "Chapter two battle accepts victory: " + stage[1])
+		await click("继续")
+		check(player.page == "story" and player.story_level == stage[2], "Victory opens following story: " + stage[2])
+	var epilogue = player.catalog.story(player.catalog.levels.scene_0204A.story)
+	for step in epilogue.nodes.size():
+		if player.page != "story": break
+		player.story_view.reveal_dialogue()
+		player.advance_story()
+	check(player.page == "levels" and player.completed, "Reading the epilogue completes chapter two and returns to levels")
+	await dispose(); await spawn()
+	check(player.completed and player.progress.completed.has("scene_0204A"), "Second chapter epilogue completion survives restart")
+	var available: Array = player.progress.available_operators()
+	check(available.has("character_016") and available.has("character_017") and not available.has("character_012"), "Both recruits persist and the injured cat remains away")
 	player._select_level("scene_0101A"); player.begin_action()
 	check(player.page == "story", "Completed story can be replayed")
 	await click("跳过剧情")

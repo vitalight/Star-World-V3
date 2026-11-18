@@ -13,7 +13,7 @@ func run() -> void:
 	var catalog = Catalog.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "Campaign sources load")
-	check(catalog.levels.size() == 10, "Ten independent chapter stages")
+	check(catalog.levels.size() == 17, "Both chapters list all story and battle stages")
 	var scripts: Array = []
 	for id in catalog.levels:
 		if catalog.levels[id].type != "story": continue
@@ -25,6 +25,8 @@ func run() -> void:
 	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("先救人"), "Tracking leads to doctor rescue")
 	check(text(scripts[3]).contains("我是医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
 	check(text(scripts[4]).contains("济州岛") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")
+	check(text(scripts[5]).contains("潮蚀蟹") and text(scripts[6]).contains("我是 Sugar"), "Harbor and sea introductions lead into their battles")
+	check(text(scripts[7]).contains("深渊缚核者") and text(scripts[8]).contains("天山雪莲"), "Rescue and epilogue set up the next chapter")
 	var portal_shakes := false
 	var cat_cry_shakes := false
 	for node in scripts[1].nodes.values():

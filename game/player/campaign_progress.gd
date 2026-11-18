@@ -59,6 +59,12 @@ func load_progress(path: String, ids: Array) -> void:
 		# their completed chapter instead of falling back to the new battle.
 		if saved.has("scene_0105A") and not saved.has("scene_0104C"):
 			saved.insert(saved.find("scene_0105A"), "scene_0104C")
+		# The battle-only chapter two saves already reached these fights.
+		for stage in ["scene_0201", "scene_0202", "scene_0203"]:
+			var story_id: String = stage + "A"
+			var battle_id: String = stage + "B"
+			if ids.has(story_id) and not saved.has(story_id) and (saved.has(battle_id) or pending == battle_id):
+				saved.append(story_id)
 		for id in ids:
 			if not saved.has(id): break
 			completed.append(id)

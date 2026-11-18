@@ -12,14 +12,18 @@ func _initialize() -> void:
 	var ids: Array = c.levels.keys()
 	var progress = Progress.new()
 	for id in ids:
-		if id == "scene_0201B": break
+		if id == "scene_0201A": break
 		progress.completed.append(id)
 	progress.configure_operators(c.starting_operators, c.recruits, c.characters.keys(), c.departures, c.returns)
-	check(progress.unlocked("scene_0201B", ids), "completed chapter one unlocks chapter two")
+	check(progress.unlocked("scene_0201A", ids), "completed chapter one unlocks chapter two")
 	check(not progress.available_operators().has("character_012"), "cat remains away")
+	progress.pending_after = "scene_0201A"
+	progress.finish_story(ids, c.recruits, c.departures, c.returns)
 	progress.pending_after = "scene_0201B"
 	progress.finish_story(ids, c.recruits, c.departures, c.returns)
 	check(progress.available_operators().has("character_016") and not progress.available_operators().has("character_017"), "Tiger joins after first battle")
+	progress.pending_after = "scene_0202A"
+	progress.finish_story(ids, c.recruits, c.departures, c.returns)
 	progress.pending_after = "scene_0202B"
 	progress.finish_story(ids, c.recruits, c.departures, c.returns)
 	check(progress.available_operators().has("character_017"), "Sugar joins after second battle")

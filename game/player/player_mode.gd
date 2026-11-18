@@ -371,8 +371,8 @@ func show_levels(preserve_scroll := -1) -> void:
 	var chapter := _level_button(canvas, "第一章 · 上海", Rect2(48, 174, 355, 106), _select_level.bind("scene_0101A"), false)
 	chapter.name = "Chapter01"
 	chapter.add_theme_stylebox_override("normal", _level_style(Color("152b48f2"), Color("536a89") if second_selected else Color("ffe1a1")))
-	if catalog.levels.has("scene_0201B") and _level_unlocked("scene_0201B"):
-		var second := _level_button(canvas, "第二章 · 济州岛", Rect2(48, 296, 355, 85), _select_level.bind("scene_0201B"), false)
+	if _level_unlocked("scene_0201A"):
+		var second := _level_button(canvas, "第二章 · 济州岛", Rect2(48, 296, 355, 85), _select_level.bind("scene_0201A"), false)
 		second.name = "Chapter02"
 		second.add_theme_stylebox_override("normal", _level_style(Color("152b48f2"), Color("ffe1a1") if second_selected else Color("536a89")))
 	else:
