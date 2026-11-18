@@ -142,6 +142,43 @@ func run() -> void:
 		await settle()
 		for button in [game.hud.retreat_button,game.hud.skill_button]:
 			check(root.get_visible_rect().encloses(button.get_global_rect()) and not game.hud.info_panel.get_global_rect().intersects(button.get_global_rect()), "Map-edge actions avoid screen edge and details")
+	await verify_charge_hint()
 	game.free(); await process_frame
 	print("OPERATOR ACTIONS: %d checks, %d failures" % [checks,failures])
 	quit(1 if failures else 0)
+
+func verify_charge_hint() -> void:
+	game.reset()
+	var config: Dictionary = game.configuration.duplicate(true)
+	config.route_warning_duration = 0.0
+	config.routes["charge_test"] = [Vector2(4, 1), Vector2(9, 1)]
+	var enemy: String = config.waves[0].enemy
+	config.enemies[enemy].merge({"speed": 0.0, "max_hp": 100000.0}, true)
+	config.waves = [{"time": 3.5, "count": 1, "interval": 1.0, "enemy": enemy, "route": "charge_test"}]
+	var guard: Dictionary = config.roster.guard
+	guard.merge({"range": [Vector2i.RIGHT], "windup": 0.0, "interval": 0.2}, true)
+	guard.skill.merge({"required": 1.0, "initial_sp": 0.0, "duration": 0.0,
+		"trigger": "automatic", "max_charges": 3}, true)
+	game.battle = Battle.new(config)
+	var deployed: Dictionary = game.command("deploy", ["guard", Vector2i(3, 1), 0])
+	check(deployed.ok, "Charge test operator deploys")
+	if not deployed.ok: return
+	game.start()
+	var actor = game.presentation.actors[deployed.id]
+	check(not actor.charge_hint.visible, "No overhead count at zero charges")
+	for count in range(1, 4):
+		game.battle.advance(1.0)
+		game.refresh(1.0)
+		check(actor.charge_hint.visible and actor.charge_hint.text == str(count), "Overhead count shows %d stored charges" % count)
+	var head: Vector2 = game.camera.unproject_position(actor.visual_position() + game.camera.global_basis.y * actor.display_height())
+	var hint: Vector2 = game.camera.unproject_position(actor.charge_hint.global_position)
+	check(root.get_visible_rect().has_point(hint) and hint.y < head.y, "Charge count sits above the operator")
+	await settle()
+	await RenderingServer.frame_post_draw
+	root.get_texture().get_image().save_png("res://temp/verification/operator_skill_charges.png")
+	game.battle.advance(0.51)
+	game.refresh(0.51)
+	check(actor.charge_hint.visible and actor.charge_hint.text == "2", "Consuming one charge decrements the overhead count")
+	game.battle.advance(0.4)
+	game.refresh(0.4)
+	check(not actor.charge_hint.visible, "Consuming the last charge hides the overhead count")

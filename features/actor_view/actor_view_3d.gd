@@ -20,6 +20,7 @@ var texture_bounds := {}
 var billboard_material: ShaderMaterial
 var last_bars := Vector3(-1,-1,-1)
 var skill_hint: Sprite3D
+var charge_hint: Label3D
 var skill_ready := false
 var readiness_phase := 0.0
 var motion_phase := 0.0
@@ -109,6 +110,18 @@ func _ready() -> void:
 	skill_hint.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	skill_hint.hide()
 	add_child(skill_hint)
+	charge_hint = Label3D.new()
+	charge_hint.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	charge_hint.no_depth_test = true
+	charge_hint.font_size = 42
+	charge_hint.pixel_size = 0.006
+	charge_hint.modulate = Color("ffe98d")
+	charge_hint.outline_modulate = Color("221807")
+	charge_hint.outline_size = 10
+	charge_hint.render_priority = 11
+	charge_hint.outline_render_priority = 10
+	charge_hint.hide()
+	add_child(charge_hint)
 	_process(0.0)
 
 func _process(_delta: float) -> void:
@@ -147,7 +160,9 @@ func update_projection() -> void:
 	shadow.position = to_local(anchor + Vector3.UP * 0.012)
 	health.position = to_local(anchor + camera.global_basis.y * (height + 0.12))
 	health_bar.position = to_local(anchor - camera.global_basis.y * 0.15)
-	skill_hint.position = to_local(anchor + camera.global_basis.y * (display_height() + 0.24 + sin(readiness_phase * 4.0) * 0.025))
+	var head_marker := display_height() + 0.24
+	skill_hint.position = to_local(anchor + camera.global_basis.y * (head_marker + sin(readiness_phase * 4.0) * 0.025))
+	charge_hint.position = to_local(anchor + camera.global_basis.y * head_marker)
 
 func display_height() -> float:
 	if not sprite or not sprite.texture: return height
@@ -177,7 +192,12 @@ func apply_state(state: Dictionary, is_enemy: bool) -> void:
 	var skill: Dictionary = state.get("skill", {})
 	var sp_ratio := clampf(float(state.get("sp", 0.0)) / maxf(0.001, float(skill.get("required", 1.0))), 0.0, 1.0)
 	var left: float = state.get("skill_left", 0.0)
-	var ready: bool = not is_enemy and state.get("skill_hint_allowed", true) and not state.get("preview", false) and skill.get("enabled", false) and skill.get("trigger", "manual") == "manual" and left <= 0 and float(state.get("sp", 0.0)) + 0.000001 >= float(skill.get("required", 1.0))
+	var show_skill_hint: bool = not is_enemy and state.get("skill_hint_allowed", true) and not state.get("preview", false) and skill.get("enabled", false)
+	var uses_charges: bool = skill.get("max_charges", 0) > 0
+	var charges: int = state.get("charges", 0)
+	charge_hint.visible = show_skill_hint and uses_charges and charges > 0
+	if charge_hint.visible: charge_hint.text = str(charges)
+	var ready: bool = show_skill_hint and not uses_charges and skill.get("trigger", "manual") == "manual" and left <= 0 and float(state.get("sp", 0.0)) + 0.000001 >= float(skill.get("required", 1.0))
 	if ready != skill_ready:
 		skill_ready = ready
 		readiness_phase = 0.0
@@ -238,6 +258,7 @@ func depart() -> void:
 	fade_left = 0.25
 	skill_ready = false
 	_update_skill_glow()
+	charge_hint.hide()
 	sprite.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
 	health.hide()
 	health_bar.hide()
