@@ -17,6 +17,7 @@ func _initialize() -> void:
 	skill_modifiers()
 	character_skill_rules()
 	chapter_two_skills()
+	area_and_global_skills()
 	boundary_contracts()
 	waves_and_determinism()
 	print("Battle rules: %d checks, %d failures" % [checks, failures])
@@ -56,7 +57,7 @@ func unit_id(b, roster: String) -> int:
 
 func chapter_two_skills() -> void:
 	var c = fixture()
-	c.roster.g.merge({"max_hp": 50.0, "attack": 0.0, "windup": 0.0, "skill": {"enabled": true, "required": 1.0, "duration": 10.0, "multiplier": 1.0, "reflect_ratio": 0.3}}, true)
+	c.roster.g.merge({"max_hp": 50.0, "attack": 0.0, "windup": 0.0, "skill": {"enabled": true, "required": 1.0, "duration": 10.0, "damage_reduction": 0.4, "reflect_ratio": 0.3}}, true)
 	c.enemies.e.merge({"attack": 100.0, "interval": 10.0, "windup": 0.0}, true)
 	c.waves[0].time = 2.0
 	var b = Battle.new(c)
@@ -66,8 +67,9 @@ func chapter_two_skills() -> void:
 	check(b.activate_skill(id).ok, "reflect skill activates after charging")
 	b.take_events()
 	b.advance(1.1)
-	var damage_events = events(b, "damage", true)
-	check(damage_events.any(func(e): return is_equal_approx(e.amount, 15.0)), "reflection uses actual health lost even for lethal damage")
+	var damage_events = events(b, "damage")
+	check(damage_events.any(func(e): return not e.friendly and is_equal_approx(e.amount, 60.0)), "Active skill reduces incoming damage")
+	check(damage_events.any(func(e): return e.friendly and is_equal_approx(e.amount, 15.0)), "Reflection uses actual health lost after mitigation, even on a lethal hit")
 	c = fixture()
 	c.roster.g.merge({"attack": 10.0, "windup": 0.0, "interval": 10.0, "skill": {"enabled": true, "required": 1.0, "duration": 0.0, "trigger": "automatic", "max_charges": 3, "charge_attack_bonus": 0.5, "charge_cost_gain": 2.0}}, true)
 	c.waves[0].time = 5.0
@@ -88,6 +90,55 @@ func chapter_two_skills() -> void:
 	b.reset()
 	id = b.deploy("g", Vector2i.ZERO).id
 	check(b.find_unit(id).charges == 0, "reset clears stored charges")
+
+func area_and_global_skills() -> void:
+	var c := fixture()
+	c.roster.g.merge({"block": 0, "windup": 0.0, "skill": {"enabled": true,
+		"required": 1.0, "initial_sp": 1.0, "targeting": "area", "attack_effect": "sweep",
+		"attack_cells": [Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1)]}}, true)
+	c.routes = {"left": [Vector2(-1, 1), Vector2(-1, 5)], "center": [Vector2(0, 1), Vector2(0, 5)],
+		"right": [Vector2(1, 1), Vector2(1, 5)], "rear": [Vector2(0, -1), Vector2(0, -5)]}
+	c.waves.clear()
+	for route in c.routes:
+		c.waves.append({"time": 0.0, "count": 1, "interval": 1.0, "enemy": "e", "route": route})
+	var b := Battle.new(c)
+	var placed := b.deploy("g", Vector2i.ZERO, 1)
+	check(placed.ok, "Area attacker deploys facing down")
+	b.start()
+	check(b.activate_skill(placed.id).ok, "Area attack activates")
+	b.advance(0.1)
+	var state := b.snapshot()
+	var attacks: Array = state.enemies.filter(func(e): return e.hp < e.max_hp)
+	check(attacks.size() == 3 and attacks.all(func(e): return e.route != "rear"), "Rotated sweep hits all three front cells and skips the rear")
+	check(b.find_unit(placed.id).attack_count == 1, "Area hit counts as one attack")
+	check(events(b, "sweep").size() == 1, "One slash visual per sweep")
+
+	c = fixture()
+	c.routes.r = [Vector2(10, 0), Vector2(20, 0)]
+	c.enemies.e.speed = 1.0
+	c.enemies.e.defense = 100.0
+	c.waves[0].count = 2
+	c.roster.s.merge({"interval": 10.0, "windup": 0.0, "skill": {"enabled": true,
+		"required": 1.0, "initial_sp": 1.0, "duration": 0.5, "targeting": "global",
+		"attack_damage_type": "arts", "attack_effect": "laser", "multiplier": 1.0,
+		"slow_ratio": 0.5, "slow_duration": 1.0}}, true)
+	c.waves[0].interval = 0.001
+	b = Battle.new(c)
+	placed = b.deploy("s", Vector2i(0, 1))
+	check(placed.ok, "Global ranged attacker deploys on high ground")
+	b.start()
+	check(b.activate_skill(placed.id).ok, "Global range activates")
+	b.advance(0.4)
+	var hits := events(b, "damage", true)
+	check(hits.size() == 1 and hits.all(func(e): return e.amount == 10 and e.damage_type == "arts" and e.effect == "laser"), "Global range hits one distant target and uses the skill damage type")
+	if hits.size() != 1: return
+	var slowed_id: int = hits[0].target
+	var other: Dictionary = b.snapshot().enemies.filter(func(e): return e.id != slowed_id)[0]
+	check(b.find_enemy(slowed_id).distance < other.distance and not other.has("slow_until"), "Only the hit target moves more slowly")
+	b.advance(1.0)
+	var before: float = b.find_enemy(slowed_id).distance
+	b.advance(0.5)
+	near(b.find_enemy(slowed_id).distance - before, 0.5, "Movement returns to normal when slow expires")
 
 func deployment() -> void:
 	var c = fixture()

@@ -25,6 +25,8 @@ static func normalize(input: Dictionary) -> Dictionary:
 		var skill = {"enabled": false, "recovery": "auto", "required": 5.0,
 			"initial_sp": 0.0, "duration": 3.0, "multiplier": 2.0, "defense_multiplier": 1.0, "interval_multiplier": 1.0, "cost_gain": 0.0,
 			"trigger": "manual", "forward_range": 0, "hit_count": 1, "heal_damage_reduction": 0.0, "heal_buff_duration": 0.0,
+			"attack_cells": [], "targeting": "single", "attack_damage_type": "", "attack_effect": "", "charge_effect": "",
+			"damage_reduction": 0.0, "slow_ratio": 0.0, "slow_duration": 0.0,
 			"reflect_ratio": 0.0, "max_charges": 0, "charge_attack_bonus": 0.0, "charge_cost_gain": 0.0}
 		skill.merge(u.get("skill", {}), true)
 		assert(skill.required > 0 and skill.duration >= 0)
@@ -32,6 +34,9 @@ static func normalize(input: Dictionary) -> Dictionary:
 		assert(skill.multiplier > 0 and skill.defense_multiplier > 0 and skill.interval_multiplier > 0)
 		assert(skill.recovery in ["auto", "attack", "hit"])
 		assert(skill.trigger in ["manual", "automatic"] and skill.forward_range >= 0 and skill.hit_count >= 1)
+		assert(skill.targeting in ["single", "area", "global"] and skill.attack_damage_type in ["", "physical", "arts", "true"])
+		assert(skill.damage_reduction >= 0 and skill.damage_reduction <= 1)
+		assert(skill.slow_ratio >= 0 and skill.slow_ratio <= 1 and is_finite(skill.slow_duration) and skill.slow_duration >= 0)
 		assert(skill.heal_damage_reduction >= 0 and skill.heal_damage_reduction <= 1 and skill.heal_buff_duration >= 0)
 		assert(skill.reflect_ratio >= 0 and skill.reflect_ratio <= 1 and skill.max_charges >= 0 and skill.charge_attack_bonus >= 0 and skill.charge_cost_gain >= 0)
 		skill.initial_sp = clampf(skill.initial_sp, 0, skill.required)

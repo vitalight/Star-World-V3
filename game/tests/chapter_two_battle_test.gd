@@ -29,8 +29,8 @@ func _initialize() -> void:
 	check(progress.available_operators().has("character_017"), "Sugar joins after second battle")
 	var plans := {
 		"scene_0201B": [["character_016", Vector2i(6, 3), 2], ["character_014", Vector2i(3, 2), 2], ["character_015", Vector2i(5, 4), 3], ["character_013", Vector2i(5, 2), 3], ["character_011", Vector2i(7, 3), 2]],
-		"scene_0202B": [["character_016", Vector2i(6, 1), 2], ["character_017", Vector2i(5, 4), 2], ["character_014", Vector2i(6, 3), 2], ["character_015", Vector2i(5, 2), 0], ["character_013", Vector2i(4, 2), 2], ["character_011", Vector2i(7, 3), 2]],
-		"scene_0203B": [["character_016", Vector2i(5, 2), 2], ["character_017", Vector2i(6, 5), 2], ["character_014", Vector2i(7, 3), 2], ["character_015", Vector2i(6, 4), 3], ["character_013", Vector2i(4, 3), 2], ["character_011", Vector2i(8, 3), 2]]}
+		"scene_0202B": [["character_016", Vector2i(6, 1), 2], ["character_017", Vector2i(6, 4), 2], ["character_014", Vector2i(6, 3), 2], ["character_015", Vector2i(5, 2), 0], ["character_013", Vector2i(4, 2), 2], ["character_011", Vector2i(7, 3), 2]],
+		"scene_0203B": [["character_016", Vector2i(5, 2), 2], ["character_017", Vector2i(3, 1), 1], ["character_014", Vector2i(7, 3), 2], ["character_015", Vector2i(6, 4), 3], ["character_013", Vector2i(4, 3), 2], ["character_011", Vector2i(8, 3), 2]]}
 	for id in plans:
 		var map = load(c.levels[id].map).instantiate()
 		check(c.map_errors(id, map).is_empty(), id + " map and waves are valid")
@@ -45,7 +45,7 @@ func _initialize() -> void:
 				var result: Dictionary = b.callv("deploy", item)
 				check(result.ok, id + " accepts planned deployment " + str(item) + " " + result.reason)
 			for unit in b.snapshot().units:
-				if unit.skill.get("trigger", "manual") == "manual" and unit.sp >= unit.skill.required and unit.skill_left <= 0: b.activate_skill(unit.id)
+				if unit.skill.trigger == "manual" and unit.sp + 0.000001 >= unit.skill.required and unit.skill_left <= 0: b.activate_skill(unit.id)
 			b.advance(1.0)
 			if b.snapshot().phase != "running": break
 		print(id, " ", b.snapshot().phase, " life=", b.snapshot().life, " killed=", b.snapshot().killed, " time=", b.snapshot().time)

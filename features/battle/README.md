@@ -52,6 +52,8 @@ battle.reset()
 
 `reflect_ratio` 在技能生效时将实际失去生命值的指定比例作为真实伤害反弹给攻击者。`max_charges` 大于零时，每 `required` 秒储存一层，满层停止充能；有效攻击消耗一层，将 `attack * charge_attack_bonus` 加入本次攻击威力，并回复 `charge_cost_gain` 费用（不超过费用上限）。叠层和充能属于部署实例，撤退或重置后清空。
 
+`attack_cells` 在技能生效时替换朝右的范围模板，`targeting=area` 在命中帧结算范围内的所有有效敌人，`targeting=global` 允许全场选取一个目标。`attack_damage_type` 可覆盖本次伤害类型。`damage_reduction` 降低技能期间受到的伤害，反伤按减伤后的实际生命损失计算。`slow_ratio` 和 `slow_duration` 控制命中附加的移动减速，同一目标再次命中时刷新。
+
 ## 状态与事件
 
 快照包含 `phase / paused / time / life / cost / wave / spawned / killed / escaped / remaining / units / enemies / redeploy / route_warnings`；`phase` 为 ready／running／victory／defeat，有防守目标时另含 `objective`。`remaining` 包含未出生敌人，`route_warnings` 无预告时为空数组。

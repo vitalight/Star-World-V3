@@ -4,10 +4,12 @@ const Navigation = preload("res://features/battle/navigation.gd")
 
 static func range_cells(unit: Dictionary) -> Array:
 	var cells: Array = []
-	var offsets: Array = unit.range.duplicate()
-	if unit.get("skill_left", 0.0) > 0 and unit.skill.forward_range > 0 and not offsets.is_empty():
+	var active: bool = unit.get("skill_left", 0.0) > 0
+	var template: Array = unit.skill.attack_cells if active and not unit.skill.attack_cells.is_empty() else unit.range
+	var offsets := template.duplicate()
+	if active and unit.skill.forward_range > 0 and not offsets.is_empty():
 		var front: int = offsets.map(func(offset): return Vector2i(offset).x).max()
-		for offset in unit.range:
+		for offset in template:
 			if Vector2i(offset).x == front:
 				for extra in range(1, unit.skill.forward_range + 1): offsets.append(Vector2i(offset) + Vector2i(extra, 0))
 	for offset in offsets:
@@ -21,6 +23,9 @@ static func in_range(unit: Dictionary, position: Vector2) -> bool:
 		var offset = position - Vector2(cell)
 		if absf(offset.x) <= 0.500001 and absf(offset.y) <= 0.500001: return true
 	return false
+
+static func targeting(unit: Dictionary) -> String:
+	return unit.skill.targeting if unit.skill_left > 0 else "single"
 
 ## A blocked enemy is on the incoming side of its blocker, even when its
 ## movement step has crossed the blocker's tile boundary by a small amount.
@@ -69,18 +74,28 @@ static func update_timers(b) -> void:
 			recover(unit, "auto", b.STEP)
 			if unit.skill.enabled and unit.skill.trigger == "automatic" and unit.sp + 0.000001 >= unit.skill.required: b._start_skill(unit)
 
-static func unit_target(b, unit: Dictionary) -> Dictionary:
-	var best: Dictionary = {}
-	var best_remaining = INF
+static func unit_targets(b, unit: Dictionary) -> Array:
+	var targets := []
+	var mode := targeting(unit)
 	for target in (b._state.units if unit.role == "healer" else b._state.enemies):
 		if target.hp <= 0: continue
+		if unit.role != "healer":
+			if target.flying and not unit.anti_air: continue
+			if target.distance >= Navigation.length_of(b._config.routes[target.route]): continue
 		var target_position: Vector2 = target.position
 		var own_blocked := false
 		if unit.role != "healer" and target.blocked_by != -1:
 			own_blocked = target.blocked_by == unit.id
 			var blocker: Dictionary = b._unit(target.blocked_by)
 			if not blocker.is_empty(): target_position = blocked_target_position(b, target, blocker)
-		if not own_blocked and not in_range(unit, target_position): continue
+		if mode != "global" and not (own_blocked and mode == "single") and not in_range(unit, target_position): continue
+		targets.append(target)
+	return targets
+
+static func unit_target(b, unit: Dictionary) -> Dictionary:
+	var best: Dictionary = {}
+	var best_remaining = INF
+	for target in unit_targets(b, unit):
 		if unit.role == "healer":
 			if target.hp >= target.max_hp: continue
 			var ratio: float = target.hp / target.max_hp
@@ -88,9 +103,7 @@ static func unit_target(b, unit: Dictionary) -> Dictionary:
 				best = target
 				best_remaining = ratio
 		else:
-			if target.flying and not unit.anti_air: continue
 			var remaining = Navigation.length_of(b._config.routes[target.route]) - target.distance
-			if remaining <= 0: continue
 			var preferred: bool = unit.role == "melee" and target.blocked_by == unit.id
 			var old_preferred: bool = not best.is_empty() and unit.role == "melee" and best.blocked_by == unit.id
 			if best.is_empty() or (preferred and not old_preferred) or (preferred == old_preferred and (remaining < best_remaining - 0.000001 or (is_equal_approx(remaining, best_remaining) and target.id < best.id))):
@@ -132,7 +145,8 @@ static func begin(b, actor: Dictionary, target: Dictionary, friendly: bool) -> v
 		actor.cooldown = maxf(actor.windup, actor.interval * actor.skill.get("interval_multiplier", 1.0))
 	actor.action = {"target": target.id, "left": actor.windup}
 	b.emit("attack_start", {"source": actor.id, "target": target.id, "from": actor.position,
-		"to": target.position, "friendly": friendly})
+		"to": target.position, "friendly": friendly,
+		"effect": actor.skill.attack_effect if friendly and actor.skill_left > 0 else ""})
 	if actor.windup <= 0: progress(b, actor, friendly)
 
 static func progress(b, actor: Dictionary, friendly: bool) -> void:
@@ -145,18 +159,24 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 	else: target = b._enemy(actor.action.target)
 	actor.action = {}
 	actor.target = -1
-	if target.is_empty() or target.hp <= 0:
+	var repeat_hit: bool = action.get("repeat_hit", false)
+	var area: bool = friendly and not healing and not repeat_hit and targeting(actor) == "area"
+	var targets: Array = unit_targets(b, actor) if area else ([target] if not target.is_empty() and target.hp > 0 else [])
+	if targets.is_empty():
 		b.emit("miss", {"source": actor.id})
 		return
 	var power: float = action.get("power", actor.attack)
 	var enhanced: bool = action.get("enhanced", false)
-	var repeat_hit: bool = action.get("repeat_hit", false)
+	var active: bool = friendly and actor.skill_left > 0
+	var effect: String = actor.skill.attack_effect if active else ""
+	var kind: String = actor.skill.attack_damage_type if active and not actor.skill.attack_damage_type.is_empty() else actor.damage_type
 	if friendly and not repeat_hit:
-		if actor.skill_left > 0: power *= actor.skill.multiplier
+		if active: power *= actor.skill.multiplier
 		if not healing:
 			if actor.skill.max_charges > 0 and actor.charges > 0:
 				actor.charges -= 1
 				power += actor.attack * actor.skill.charge_attack_bonus
+				effect = actor.skill.charge_effect
 				var gain: float = minf(actor.skill.charge_cost_gain, b._config.cost_cap - b._state.cost)
 				b._state.cost += gain
 				if gain > 0: b.emit("cost_gain", {"source": actor.id, "amount": gain})
@@ -164,22 +184,46 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 			enhanced = actor.passive and actor.attack_count % 4 == 0
 			if enhanced: power *= actor.passive_multiplier
 		recover(actor, "attack", 1.0)
+	var hit_effect := {"effect": effect, "damage_type": kind, "enhanced": enhanced}
+	if effect == "sweep":
+		var direction := Vector2.RIGHT.rotated(actor.facing * PI / 2.0)
+		b.emit("sweep", {"source": actor.id, "from": actor.position, "to": actor.position + direction})
+		hit_effect.effect = ""
+	for hit in targets:
+		apply_hit(b, actor, hit, friendly, healing, active, power, hit_effect)
+	var remaining: int = action.get("remaining_hits", 0) if repeat_hit else (actor.skill.hit_count - 1 if active and not healing and not area else 0)
+	if remaining > 0 and target.hp > 0:
+		# A follow-up launches at the first impact and lands after its own flight.
+		var flight: float = maxf(0.15, actor.windup)
+		actor.target = target.id
+		actor.action = {"target": target.id, "left": flight, "repeat_hit": true,
+			"remaining_hits": remaining - 1, "power": power, "enhanced": enhanced}
+		b.emit("attack_start", {"source": actor.id, "target": target.id, "from": actor.position,
+			"to": target.position, "friendly": true, "windup": flight})
+
+static func apply_hit(b, actor: Dictionary, target: Dictionary, friendly: bool, healing: bool,
+		active: bool, power: float, hit_effect: Dictionary) -> void:
 	var amount: float
 	var hp_before := 0.0
 	if healing:
 		amount = minf(power, target.max_hp - target.hp)
 		target.hp += amount
-		if actor.skill_left > 0 and actor.skill.heal_damage_reduction > 0:
+		if active and actor.skill.heal_damage_reduction > 0:
 			target["damage_reduction"] = actor.skill.heal_damage_reduction
 			target["damage_reduction_left"] = actor.skill.heal_buff_duration
 	else:
-		amount = damage(power, target, actor.damage_type)
+		amount = damage(power, target, hit_effect.damage_type)
 		if not friendly and target.get("damage_reduction_left", 0.0) > 0: amount *= 1.0 - target.damage_reduction
+		if not friendly and target.skill_left > 0: amount *= 1.0 - target.skill.damage_reduction
 		hp_before = target.hp
 		target.hp = maxf(0.0, target.hp - amount)
 		if not friendly: recover(target, "hit", 1.0)
+		elif active and actor.skill.slow_ratio > 0.0:
+			target["slow_until"] = b._state.time + actor.skill.slow_duration
+			target["slow_ratio"] = actor.skill.slow_ratio
 	b.emit("heal" if healing else "damage", {"source": actor.id, "target": target.id,
-		"amount": amount, "damage_type": actor.damage_type, "enhanced": enhanced,
+		"amount": amount, "damage_type": hit_effect.damage_type, "enhanced": hit_effect.enhanced,
+		"effect": hit_effect.effect,
 		"friendly": friendly, "from": actor.position, "to": target.position,
 		"attack_count": actor.get("attack_count", 0)})
 	if not healing and not friendly and target.skill_left > 0 and target.skill.reflect_ratio > 0:
@@ -189,12 +233,3 @@ static func progress(b, actor: Dictionary, friendly: bool) -> void:
 			b.emit("damage", {"source": target.id, "target": actor.id, "amount": reflected,
 				"damage_type": "true", "enhanced": false, "friendly": true,
 				"from": target.position, "to": actor.position, "attack_count": 0})
-	var remaining: int = action.get("remaining_hits", 0) if repeat_hit else (actor.skill.hit_count - 1 if friendly and not healing and actor.skill_left > 0 else 0)
-	if remaining > 0 and target.hp > 0:
-		# A follow-up launches at the first impact and lands after its own flight.
-		var flight: float = maxf(0.15, actor.windup)
-		actor.target = target.id
-		actor.action = {"target": target.id, "left": flight, "repeat_hit": true,
-			"remaining_hits": remaining - 1, "power": power, "enhanced": enhanced}
-		b.emit("attack_start", {"source": actor.id, "target": target.id, "from": actor.position,
-			"to": target.position, "friendly": true, "windup": flight})

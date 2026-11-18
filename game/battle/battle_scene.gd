@@ -520,7 +520,8 @@ func update_overlays() -> void:
 	if selected_roster.is_empty():
 		for unit in last_state.units:
 			if unit.id == selected_unit: inspected = unit
-	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, deployment_pending, dragging, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells")])
+	var global_range: bool = inspected.get("skill_left", 0.0) > 0 and inspected.skill.targeting == "global"
+	var signature := str([show_grid, show_routes, show_ranges, selected_roster, candidate, facing, deployment_pending, dragging, deployable.keys(), selected_unit, inspected.get("cell"), inspected.get("facing"), inspected.get("range_cells"), global_range])
 	if signature == overlay_signature: return
 	overlay_signature = signature
 	for child in overlays.get_children(): child.free()
@@ -559,7 +560,8 @@ func update_overlays() -> void:
 			deployment_preview.health_bar.hide()
 
 	if (show_ranges or deployment_pending) and not selected.is_empty():
-		for cell in preload("res://features/battle/combat.gd").range_cells(selected):
+		var cells: Array = map_data.cells().keys() if global_range else preload("res://features/battle/combat.gd").range_cells(selected)
+		for cell in cells:
 			if map_data.cells().has(cell): _range_overlay(cell)
 
 func _range_overlay(cell: Vector2i) -> void:

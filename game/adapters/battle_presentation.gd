@@ -22,6 +22,9 @@ const PROJECTILE = preload("res://content/effects/effect_001/projectile.tres")
 const IMPACT = preload("res://content/effects/effect_001/impact.tres")
 const HEALING = preload("res://content/effects/effect_001/healing.tres")
 const BOOST = preload("res://content/effects/effect_001/boost.tres")
+const SWEEP = preload("res://content/effects/effect_001/sweep.tres")
+const FIRE = preload("res://content/effects/effect_001/fire.tres")
+const LASER = preload("res://content/effects/effect_001/laser.tres")
 
 func _init(parent: Node3D, terrain: Node3D, catalog: Dictionary, config: Dictionary) -> void:
 	world = parent; field = terrain; appearances = catalog; configuration = config
@@ -86,6 +89,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 	for event in events:
 		if event.type == "attack_start":
 			if actors.has(event.source): actors[event.source].start_attack()
+			if event.get("effect", "") in ["sweep", "laser"]: continue
 			var source: Dictionary = combatants.get(event.source, {})
 			var healing: bool = event.friendly and source.get("role", "") == "healer"
 			if healing: continue
@@ -99,11 +103,25 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 				effect.play_projectile(from, to, event.get("windup", source.get("windup", 0.2)))
 				projectiles[event.source] = effect
 			else: effect.play_slash(from, to)
+		elif event.type == "sweep":
+			var from := event_position(event.source, event.from)
+			var to := event_position(event.source, event.to)
+			spawn_effect(SWEEP, "slash", 2.9).play_slash(from, to)
 		elif event.type in ["damage", "heal"]:
 			finish_projectile(event.source)
 			if actors.has(event.target): actors[event.target].hit(event.type == "heal")
 			var color := Color.WHITE if not event.get("enhanced", false) else Color("cbbaff")
-			pulse(event_position(event.target, event.to), color, HEALING if event.type == "heal" else IMPACT, "heal" if event.type == "heal" else "impact")
+			var to := event_position(event.target, event.to)
+			match event.get("effect", ""):
+				"laser":
+					spawn_effect(LASER, "laser", 1.0).play_beam(event_position(event.source, event.from), to)
+					color = Color("9cefff")
+				"fire":
+					pulse(to, Color.WHITE, FIRE, "fire")
+					continue
+				"slow":
+					color = Color("a6e8ff")
+			pulse(to, color, HEALING if event.type == "heal" else IMPACT, "heal" if event.type == "heal" else "impact")
 		elif event.type == "miss": finish_projectile(event.source)
 		elif event.type == "skill_start" and actors.has(event.source) and event.get("duration", 0.0) <= 0.0:
 			pulse(world.to_local(actors[event.source].visual_position()) + body_offset(), Color.WHITE, BOOST, "skill")

@@ -576,7 +576,7 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		cards[key].value.text = "%d" % roster[key].cost
 	info_panel.visible = not selected.is_empty() and not finished
 	retreat_button.visible = deployed_selection and not finished
-	skill_button.visible = deployed_selection and not finished
+	skill_button.visible = deployed_selection and not finished and selected.skill.get("trigger", "manual") == "manual"
 	if not selected.is_empty():
 		operator_name.text = selected.name
 		selection.text = "攻击 %d\n防御 %d\n法抗 %d\n阻挡 %d" % [selected.attack, selected.defense, selected.resistance, selected.block]
@@ -608,6 +608,8 @@ func update_state(state: Dictionary, chosen_roster: String, chosen_unit: int, sp
 		var max_charges: int = selected.skill.get("max_charges", 0)
 		skill_status.visible = skill_left > 0 or (deployed_selection and max_charges > 0)
 		skill_status.text = "储存 %d/%d" % [selected.get("charges", 0), max_charges] if max_charges > 0 else ("剩余 %.1fs" % skill_left if skill_left > 0 else "")
+		if skill_left > 0 and selected.skill.get("targeting") == "global":
+			skill_status.text = "全场 · %.1fs" % skill_left
 		retreat_button.tooltip_text = "撤退"
 		_position_operator_actions()
 	end_panel.visible = finished

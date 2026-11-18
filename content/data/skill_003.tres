@@ -7,9 +7,12 @@
 script = ExtResource("2_46mbf")
 icon = ExtResource("1_yrhmc")
 content_id = "skill_003"
-display_name = "精准连射"
-description = "开启技能后，12秒内每次攻击造成两次伤害。"
+display_name = "聚焦激光"
+description = "持续10秒，普通攻击切换为激光，每次对单个目标造成150%攻击力的法术伤害。"
 recovery = "attack"
-required = 12.0
-duration = 12.0
-hit_count = 2
+required = 10.0
+initial_sp = 4.0
+duration = 10.0
+multiplier = 1.5
+attack_damage_type = "arts"
+attack_effect = "laser"

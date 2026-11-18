@@ -15,6 +15,14 @@ extends Resource
 @export var cost_gain := 0.0
 @export_enum("manual", "automatic") var trigger := "manual"
 @export var forward_range := 0
+@export var attack_cells: Array[Vector2i] = []
+@export_enum("single", "area", "global") var targeting := "single"
+@export var attack_damage_type := ""
+@export var attack_effect := ""
+@export var charge_effect := ""
+@export_range(0.0, 1.0) var damage_reduction := 0.0
+@export_range(0.0, 1.0) var slow_ratio := 0.0
+@export var slow_duration := 0.0
 @export var hit_count := 1
 @export_range(0.0, 1.0) var heal_damage_reduction := 0.0
 @export var heal_buff_duration := 0.0
@@ -30,6 +38,9 @@ func configuration() -> Dictionary:
 		"defense_multiplier": defense_multiplier,
 		"interval_multiplier": interval_multiplier, "cost_gain": cost_gain,
 		"trigger": trigger, "forward_range": forward_range, "hit_count": hit_count,
+		"attack_cells": attack_cells, "targeting": targeting,
+		"attack_damage_type": attack_damage_type, "attack_effect": attack_effect, "charge_effect": charge_effect,
+		"damage_reduction": damage_reduction, "slow_ratio": slow_ratio, "slow_duration": slow_duration,
 		"heal_damage_reduction": heal_damage_reduction, "heal_buff_duration": heal_buff_duration,
 		"reflect_ratio": reflect_ratio, "max_charges": max_charges,
 		"charge_attack_bonus": charge_attack_bonus, "charge_cost_gain": charge_cost_gain}
@@ -38,12 +49,16 @@ func errors() -> PackedStringArray:
 	var result := PackedStringArray()
 	for field in ["required", "multiplier", "defense_multiplier", "interval_multiplier"]:
 		if not is_finite(get(field)) or get(field) <= 0: result.append("%s: 必须为有限正数" % field)
-	for field in ["initial_sp", "cost_gain", "duration"]:
+	for field in ["initial_sp", "cost_gain", "duration", "slow_duration"]:
 		if not is_finite(get(field)) or get(field) < 0: result.append("%s: 必须为有限非负数" % field)
 	if initial_sp > required: result.append("initial_sp: 不能大于 required")
 	if recovery not in ["auto", "attack", "hit"]: result.append("recovery: 可用值 auto/attack/hit")
 	if trigger not in ["manual", "automatic"]: result.append("trigger: 可用值 manual/automatic")
 	if forward_range < 0 or hit_count < 1: result.append("技能范围或攻击次数无效")
+	if targeting not in ["single", "area", "global"]: result.append("技能目标范围无效")
+	if attack_damage_type not in ["", "physical", "arts", "true"]: result.append("技能伤害类型无效")
+	for field in ["damage_reduction", "slow_ratio"]:
+		if not is_finite(get(field)) or get(field) < 0 or get(field) > 1: result.append("%s: 必须介于 0 和 1 之间" % field)
 	if not is_finite(heal_damage_reduction) or heal_damage_reduction < 0 or heal_damage_reduction > 1 or not is_finite(heal_buff_duration) or heal_buff_duration < 0: result.append("治疗减伤参数无效")
 	if not is_finite(reflect_ratio) or reflect_ratio < 0 or reflect_ratio > 1 or max_charges < 0 or not is_finite(charge_attack_bonus) or charge_attack_bonus < 0 or not is_finite(charge_cost_gain) or charge_cost_gain < 0: result.append("反伤或叠层参数无效")
 	return result

@@ -4,31 +4,40 @@
 [ext_resource type="Script" path="res://features/battle/unit_spec.gd" id="stats"]
 [ext_resource type="Script" path="res://features/actor_view/actor_appearance.gd" id="appearance"]
 [ext_resource type="Texture2D" path="res://content/characters/character_017/attack_v1.png" id="sheet"]
-[ext_resource type="Texture2D" path="res://content/ui/class_icons/vanguard.svg" id="icon"]
+[ext_resource type="Texture2D" path="res://content/ui/class_icons/atlas.png" id="icon"]
 [ext_resource type="Resource" path="res://content/data/skill_012.tres" id="skill"]
 
 [sub_resource type="Resource" id="Stats"]
 script = ExtResource("stats")
 content_id = "character_017"
 display_name = "Sugar"
-max_hp = 1050.0
-attack = 90.0
+max_hp = 850.0
+attack = 115.0
 defense = 30.0
 resistance = 5.0
-interval = 1.1
-cost = 12.0
+interval = 1.5
+damage_type = "arts"
+role = "ranged"
+anti_air = true
+range_cells = Array[Vector2i]([Vector2i(0, -1), Vector2i(0, 0), Vector2i(0, 1), Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 0)])
+cost = 16.0
 redeploy_time = 45.0
-block = 2
+block = 0
 skill_spec = ExtResource("skill")
+
+[sub_resource type="AtlasTexture" id="ClassIcon"]
+atlas = ExtResource("icon")
+region = Rect2(0, 627, 313.5, 313.5)
+filter_clip = true
 
 [sub_resource type="Resource" id="Appearance"]
 script = ExtResource("appearance")
 attack_sheet = ExtResource("sheet")
-class_icon = ExtResource("icon")
+class_icon = SubResource("ClassIcon")
 
 [resource]
 script = ExtResource("actor")
 stats = SubResource("Stats")
 appearance = SubResource("Appearance")
 identity = "董事长"
-profession = "先锋"
+profession = "术士"

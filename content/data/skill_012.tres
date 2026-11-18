@@ -1,18 +1,18 @@
 [gd_resource type="Resource" format=3]
 
 [ext_resource type="Script" path="res://features/content_definitions/skill_definition.gd" id="script"]
-[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_06.tres" id="icon"]
+[ext_resource type="Texture2D" path="res://content/ui/skill_icons/icon_03.tres" id="icon"]
 
 [resource]
 script = ExtResource("script")
 icon = ExtResource("icon")
 content_id = "skill_012"
-display_name = "蓄势调度"
-description = "每10秒储存一层，最多3层；攻击时消耗一层，额外造成50%攻击力伤害并回复2点部署费用。"
-required = 10.0
-duration = 0.0
-multiplier = 1.0
-trigger = "automatic"
-max_charges = 3
-charge_attack_bonus = 0.5
-charge_cost_gain = 2.0
+display_name = "凝滞航线"
+description = "持续10秒，攻击范围扩大至全场。每次攻击命中一名敌人，使其移动速度降低45%，持续2秒。"
+required = 22.0
+initial_sp = 10.0
+duration = 10.0
+targeting = "global"
+slow_ratio = 0.45
+slow_duration = 2.0
+attack_effect = "slow"

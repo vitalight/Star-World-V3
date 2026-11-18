@@ -7,8 +7,13 @@
 script = ExtResource("2_lnxra")
 icon = ExtResource("1_jcyfq")
 content_id = "skill_004"
-display_name = "紧急调度"
-description = "立即获得12点部署费用。"
-required = 16.0
+display_name = "烈焰调度"
+description = "每6秒储存一次强化攻击，最多3次。命中时消耗一次，额外附加60%攻击力并回复3点部署费用。"
+required = 6.0
+initial_sp = 6.0
 duration = 0.0
-cost_gain = 10.0
+trigger = "automatic"
+max_charges = 3
+charge_attack_bonus = 0.6
+charge_cost_gain = 3.0
+charge_effect = "fire"

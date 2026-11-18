@@ -44,6 +44,8 @@ static func move(b) -> void:
 			else: continue
 		if try_block(b, enemy) or not enemy.action.is_empty(): continue
 		var travel: float = enemy.speed * b.STEP
+		if enemy.get("slow_until", 0.0) > b._state.time:
+			travel *= 1.0 - enemy.slow_ratio
 		while travel > 0.000001:
 			var stride = minf(0.1, travel)
 			enemy.distance += stride

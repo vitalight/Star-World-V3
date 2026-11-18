@@ -66,9 +66,23 @@ func play_projectile(from: Vector3, to: Vector3, seconds: float, color := Color.
 func play_slash(from: Vector3, to: Vector3, color := Color.WHITE) -> void:
 	kind = "slash"
 	origin = from; destination = to
-	position = from + (to - from).normalized() * 0.38
+	position = from + (to - from).normalized() * width * 0.29
 	oriented = true
 	play_once(color, 0.24)
+	_orient()
+
+func play_beam(from: Vector3, to: Vector3) -> void:
+	origin = from
+	destination = to
+	position = (from + to) * 0.5
+	oriented = true
+	var camera := get_viewport().get_camera_3d()
+	var span := to - from
+	if camera: span = span.slide(camera.global_basis.z)
+	sprite.pixel_size = 1.0 / texture.get_width()
+	play_once(Color.WHITE, 0.22)
+	sprite.scale = Vector3(maxf(span.length(), 0.05), 0.18, 1.0)
+	sprite.modulate.a = 1.0
 	_orient()
 
 func _orient() -> void:
@@ -78,7 +92,7 @@ func _orient() -> void:
 	var angle := atan2(direction.dot(camera.global_basis.y), direction.dot(camera.global_basis.x))
 	if kind in ["projectile", "slash"]: angle += PI # Both supplied textures point left.
 	sprite.billboard = BaseMaterial3D.BILLBOARD_DISABLED
-	sprite.global_basis = camera.global_basis.rotated(camera.global_basis.z, angle).scaled(sprite.scale)
+	sprite.global_basis = camera.global_basis.rotated(camera.global_basis.z, angle) * Basis.from_scale(sprite.scale)
 
 func advance_visual(delta: float) -> void:
 	if looping:
@@ -92,6 +106,8 @@ func advance_visual(delta: float) -> void:
 		position = origin.lerp(destination, progress)
 		sprite.scale = Vector3.ONE
 		sprite.modulate.a = 1.0
+	elif kind == "laser":
+		sprite.modulate.a = 1.0 - progress
 	else:
 		sprite.scale = Vector3.ONE * lerpf(0.8, 1.25, progress)
 		sprite.modulate.a = sin(progress * PI)
