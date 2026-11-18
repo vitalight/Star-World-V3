@@ -95,9 +95,10 @@ func area_and_global_skills() -> void:
 	var c := fixture()
 	c.roster.g.merge({"block": 0, "windup": 0.0, "skill": {"enabled": true,
 		"required": 1.0, "initial_sp": 1.0, "targeting": "area", "attack_effect": "sweep",
-		"attack_cells": [Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1)]}}, true)
+		"attack_cells": [Vector2i(1, -1), Vector2i(1, 0), Vector2i(1, 1), Vector2i(2, 0)]}}, true)
 	c.routes = {"left": [Vector2(-1, 1), Vector2(-1, 5)], "center": [Vector2(0, 1), Vector2(0, 5)],
-		"right": [Vector2(1, 1), Vector2(1, 5)], "rear": [Vector2(0, -1), Vector2(0, -5)]}
+		"right": [Vector2(1, 1), Vector2(1, 5)], "tip": [Vector2(0, 2), Vector2(0, 5)],
+		"outside": [Vector2(1, 2), Vector2(1, 5)], "rear": [Vector2(0, -1), Vector2(0, -5)]}
 	c.waves.clear()
 	for route in c.routes:
 		c.waves.append({"time": 0.0, "count": 1, "interval": 1.0, "enemy": "e", "route": route})
@@ -109,7 +110,7 @@ func area_and_global_skills() -> void:
 	b.advance(0.1)
 	var state := b.snapshot()
 	var attacks: Array = state.enemies.filter(func(e): return e.hp < e.max_hp)
-	check(attacks.size() == 3 and attacks.all(func(e): return e.route != "rear"), "Rotated sweep hits all three front cells and skips the rear")
+	check(attacks.size() == 4 and attacks.all(func(e): return e.route in ["left", "center", "right", "tip"]), "Rotated sweep hits three front cells and the next center cell")
 	check(b.find_unit(placed.id).attack_count == 1, "Area hit counts as one attack")
 	check(events(b, "sweep").size() == 1, "One slash visual per sweep")
 

@@ -3,6 +3,7 @@ extends RefCounted
 const Actor = preload("res://features/actor_view/actor_view_3d.gd")
 const RouteGuide = preload("res://features/battlefield_view/route_guide.gd")
 const Effect = preload("res://features/effects/effect_view_3d.gd")
+const Lightning = preload("res://features/effects/lightning_view_3d.gd")
 var actors := {}
 var departing: Array = []
 var effects: Array = []
@@ -55,7 +56,8 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 	# Spawn/deploy descriptors also cover actors that enter and die within one sync.
 	for event in events:
 		if event.type == "spawn": combatants[event.source] = configuration.enemies[event.template]
-		elif event.type == "deploy": combatants[event.source] = configuration.roster[event.roster_id]
+		elif event.type == "deploy":
+			combatants[event.source] = configuration.roster[event.roster_id].merged({"roster_id": event.roster_id})
 	var present := {}
 	for unit in state.units + state.enemies:
 		combatants[unit.id] = unit
@@ -92,7 +94,7 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 			if event.get("effect", "") in ["sweep", "laser"]: continue
 			var source: Dictionary = combatants.get(event.source, {})
 			var healing: bool = event.friendly and source.get("role", "") == "healer"
-			if healing: continue
+			if healing or uses_lightning(event): continue
 			var ranged: bool = source.get("role", "") == "ranged" if event.friendly else source.get("ranged", false)
 			var from := event_position(event.source, event.from)
 			var to := event_position(event.target, event.to)
@@ -119,8 +121,12 @@ func sync(state: Dictionary, events: Array, delta: float) -> void:
 				"fire":
 					pulse(to, Color.WHITE, FIRE, "fire")
 					continue
-				"slow":
-					color = Color("a6e8ff")
+			if event.type == "damage" and uses_lightning(event):
+				var bolt := Lightning.new()
+				world.add_child(bolt)
+				effects.append(bolt)
+				bolt.strike(event_position(event.source, event.from), to)
+				color = Color("b4ceff")
 			pulse(to, color, HEALING if event.type == "heal" else IMPACT, "heal" if event.type == "heal" else "impact")
 		elif event.type == "miss": finish_projectile(event.source)
 		elif event.type == "skill_start" and actors.has(event.source) and event.get("duration", 0.0) <= 0.0:
@@ -185,6 +191,12 @@ func _sync_route_guides(state: Dictionary) -> void:
 func event_position(id: int, at: Vector2) -> Vector3:
 	var origin := position(at, combatants.get(id, {}).get("flying", false))
 	return world.to_local(Actor.projected_position(world.get_viewport().get_camera_3d(), world.to_global(origin))) + body_offset()
+
+func uses_lightning(event: Dictionary) -> bool:
+	if not event.friendly: return false
+	var unit: Dictionary = combatants.get(event.source, {})
+	var appearance = appearances.get(unit.get("content_id", unit.get("roster_id", "")))
+	return appearance != null and appearance.attack_effect == "lightning"
 
 func body_offset() -> Vector3:
 	var camera := world.get_viewport().get_camera_3d()

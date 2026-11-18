@@ -69,6 +69,7 @@ func move_frames() -> Array[Texture2D]:
 		return poses[0] if not poses.is_empty() else null
 @export var height := 1.18
 @export var class_icon: Texture2D
+@export_enum("default", "lightning") var attack_effect := "default"
 
 var _atlas_poses: Array[Texture2D] = []
 var _atlas_size := Vector2.ZERO

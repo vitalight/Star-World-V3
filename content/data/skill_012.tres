@@ -15,4 +15,3 @@ duration = 10.0
 targeting = "global"
 slow_ratio = 0.45
 slow_duration = 2.0
-attack_effect = "slow"

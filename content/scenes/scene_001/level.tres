@@ -92,6 +92,7 @@ number = 10
 [resource]
 script = ExtResource("10_vp7ah")
 life = 50
+deploy_limit = 99
 enemies = Dictionary[String, ExtResource("1_rncsy")]({
 "drone": ExtResource("4_8vhv1"),
 "rifle": ExtResource("3_lgxwh"),

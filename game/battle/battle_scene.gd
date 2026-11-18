@@ -14,6 +14,7 @@ const Catalog = preload("res://game/content/content_catalog.gd")
 @export var campaign_level := ""
 var developer_tools_enabled := false
 var developer_speed_enabled := false
+var deploy_limit_override := 0
 var replay_data: Dictionary = {}
 var replay_path := ""
 var replay_mode := false
@@ -101,6 +102,7 @@ func reload_level() -> void:
 		return
 	configuration = catalog.configuration(campaign_level, map_data, operator_ids) if catalog else map_data.configuration()
 	if catalog == null: configuration.roster = operator_roster.configuration()
+	if deploy_limit_override > 0: configuration.deploy_limit = deploy_limit_override
 	battle = Battle.new(configuration)
 	configuration = battle.configuration()
 	if replay_mode and (replay_data.get("version", 0) != 1 or replay_data.get("actions", null) is not Array):

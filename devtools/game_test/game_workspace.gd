@@ -11,6 +11,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	game = Game.instantiate()
 	game.developer_speed_enabled = true
+	game.deploy_limit_override = 99
 	# This one-shot request is produced only by the editor's Play button.
 	var request_path := "res://temp/balance_editor/play_request.json"
 	if FileAccess.file_exists(request_path):

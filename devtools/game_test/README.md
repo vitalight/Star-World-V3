@@ -2,6 +2,8 @@
 
 Game Test 是正式战斗场景的开发者工作区，用于检查资产、表现和关卡配置的集成效果。默认项目入口是 Player Mode；从 Developer Hub 进入，或在 Godot 中 F6 运行 `game/battle/battle_scene.tscn`。
 
+Game Test 工作区和开发样例的部署上限为 99。Player Mode 使用正式关卡配置。
+
 ## 调试窗
 
 F3 或左下角“F3”打开。窗口可拖动、缩放，输入不会传给战场。提供：

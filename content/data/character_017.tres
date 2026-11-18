@@ -34,6 +34,7 @@ filter_clip = true
 script = ExtResource("appearance")
 attack_sheet = ExtResource("sheet")
 class_icon = SubResource("ClassIcon")
+attack_effect = "lightning"
 
 [resource]
 script = ExtResource("actor")
