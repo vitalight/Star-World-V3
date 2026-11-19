@@ -1,11 +1,11 @@
 # 2-4 无人的海岸
 
 ---
-background: background_008
+background: background_011
 > 风暴逐渐远去，一座海岛出现在众人眼前。
 
 ---
-background: background_008
+background: background_011
 actors: character_017|character_014
 speaker: character_017
 > 陆地！我们到了！
