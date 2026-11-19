@@ -51,7 +51,9 @@ background: background_008
 
 ---
 background: background_008
-> ？？？：喂！那边船上的朋友，还好吗？
+actors: character_017
+speaker: character_017
+> 喂！那边船上的朋友，还好吗？
 
 ---
 background: background_008
@@ -66,7 +68,8 @@ background: background_008
 ---
 background: background_008
 actors: character_017
-> ？？？：抓住绳索！一个一个过来！
+speaker: character_017
+> 抓住绳索！一个一个过来！
 
 ---
 background: background_008
