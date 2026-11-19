@@ -20,13 +20,8 @@ if not exist "%PROJECT_ROOT%\temp\devtools\user" (
 rem Scope the user-data override to this BAT and its Godot child processes.
 set "APPDATA=%PROJECT_ROOT%\temp\devtools\user"
 echo [Godot] "%GODOT_PATH%"
-echo [Import] temp/devtools/import.log
-"%GODOT_PATH%" --headless --path "%PROJECT_ROOT%" --editor --import --quit > "%PROJECT_ROOT%\temp\devtools\import.log" 2>&1
-if errorlevel 1 (
-    type "%PROJECT_ROOT%\temp\devtools\import.log"
-    echo [ERROR] Resource import failed. Check the Godot output and GODOT_PATH.
-    exit /b 1
-)
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0prepare_devtools.ps1"
+if errorlevel 1 exit /b 1
 echo [Run] Developer Hub
 "%GODOT_PATH%" --path "%PROJECT_ROOT%" res://devtools/hub/developer_hub.tscn %*
 set "RUN_RESULT=%ERRORLEVEL%"
