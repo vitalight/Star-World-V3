@@ -42,7 +42,9 @@ speaker: character_011
 
 ---
 background: background_007
-> ？？？：你们要去哪儿？
+actors: character_011|character_016
+speaker: character_016
+> 你们要去哪儿？
 
 ---
 background: background_007
@@ -58,7 +60,8 @@ speaker: character_013
 ---
 background: background_007
 actors: character_013|character_016
-> ？？？：巧了，我也正准备去那儿。我有几名船员在岛上失联了，正打算去找他们。
+speaker: character_016
+> 巧了，我也正准备去那儿。我有几名船员在岛上失联了，正打算去找他们。
 
 ---
 background: background_007
