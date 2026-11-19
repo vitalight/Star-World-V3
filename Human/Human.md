@@ -36,14 +36,6 @@ Star World is a tower-defense game. It uses Godot. It is inspired by Arknights�
 
 ## 战斗
 
-- 强度调整
-
-- 关卡调整：先优化最终关卡的数值
-第三关优化：增强盾牌怪物
-第四关：增强怪物伤害
-第五关：增多怪物数量
-
-
 ## 剧情
 
 ## 关卡
