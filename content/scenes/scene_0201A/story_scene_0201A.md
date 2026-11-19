@@ -2,93 +2,114 @@
 
 ---
 background: background_007
-> 远处的船鸣声戛然而止，码头的警示灯开始闪烁。
+> 码头的扩音器里，传来一声猫叫。隔了两秒，又是同一声。
 
 ---
 background: background_007
-actors: character_011|character_014
+actors: character_011
 speaker: character_011
-> 济州岛这么远……
-> 我们真的要坐船过去？
-
----
-background: background_007
-actors: character_011|character_014
-speaker: character_014
-> 你要是会飞，也可以先走一步。
-
----
-background: background_007
-actors: character_011|character_014
-speaker: character_011
-> 那还是坐船吧。
-
----
-background: background_007
-actors: character_013
-> 阿五低头看了看检测仪。
+> 小黄？我在这儿！
 
 ---
 background: background_007
 actors: character_011|character_013
 speaker: character_013
-> 信号还在。方向没有变。
+> 等一下。济州岛的读数还在。这边怎么也有一个？
+
+---
+background: background_007
+actors: character_011
+> 大星翻过栏杆。下方的浮台空无一人，潮水正一寸寸漫过踏板。
+
+---
+background: background_007
+actors: character_011|character_016
+speaker: character_016
+> 手给我。
+
+---
+background: background_007
+actors: character_011|character_016
+speaker: character_011
+> 你放开我！它就在下面！
+
+---
+background: background_007
+actors: character_011|character_016
+speaker: character_016
+> 看脚底。再下一步，你就得等别人捞。
+
+---
+background: background_007
+anim_screen_shake: true
+> Tiger 把大星拽回码头。浮台沉进水里，缆绳一下绷直。
+
+---
+background: background_007
+actors: character_011|character_013
+speaker: character_013
+> 两处信号的波形完全一样。港口这个是回声。济州外海还有源头。
 
 ---
 background: background_007
 actors: character_011|character_013
 speaker: character_011
-> 小黄，等着我。
+> 可那就是它的声音。它每次听见我开门，都是这么叫的。
 
 ---
 background: background_007
-anim_screen_shake: true
-> 码头传来一声金属碰撞的巨响。
+actors: character_011|character_013
+speaker: character_013
+> 有源头就有路。我去查。
 
 ---
 background: background_007
-actors: character_016|enemy_011
+> 港灯齐刷刷灭了。还没上船的人堵在舷梯口，有人摔倒。
+
+---
+background: background_007
+actors: character_015|character_016
 speaker: character_016
-> 岸上的人，往后退！
+> 医生，先带走摔倒的。能走的扶着走。
 
 ---
 background: background_007
-actors: character_016|enemy_011
-anim_screen_shake: true
-> Tiger 抬起船锚纹重盾，挡住冲上码头的怪物。
-
----
-background: background_007
-actors: character_013|character_015
+actors: character_015|character_016
 speaker: character_015
-> 那边还有人！
+> 听我的声音，别挤。手给我，一步一步来。
 
 ---
 background: background_007
-actors: character_013|character_015
-speaker: character_013
-> 异常体从海里上来了。
-
----
-background: background_007
-actors: character_011|character_016
-speaker: character_011
-> 我们来帮忙！
+actors: character_016|enemy_011
+anim_screen_shake: true
+> 一只潮蚀蟹攀上舷梯。Tiger 把盾砸进栏杆之间，堵住了缺口。
 
 ---
 background: background_007
 actors: character_011|character_016
 speaker: character_016
-> 好！船就在后面，别让它们靠近。
+> 还能握剑吗？
 
 ---
 background: background_007
-actors: character_014|character_016
+actors: character_011|character_016
+speaker: character_011
+> 能。你要我去哪儿？
+
+---
+background: background_007
+actors: character_011|character_016
+speaker: character_016
+> 守舷梯。最后一个人上船以前，脚别离开这块板。
+
+---
+background: background_007
+actors: character_011|character_014
 speaker: character_014
-> 前面有船长顶着。
-> 后面的交给我们。
+> 海里的先交给我们。你只管看住这条路。
 
 ---
 background: background_007
-actors: enemy_011
-> 潮蚀蟹群沿码头接连涌来。
+actors: character_011|character_016
+speaker: character_011
+> 我守这儿。你数人。

@@ -25,8 +25,10 @@ func run() -> void:
 	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("先救人"), "Tracking leads to doctor rescue")
 	check(text(scripts[3]).contains("我是医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
 	check(text(scripts[4]).contains("济州岛") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")
-	check(text(scripts[5]).contains("潮蚀蟹") and text(scripts[6]).contains("我是 Sugar"), "Harbor and sea introductions lead into their battles")
-	check(text(scripts[7]).contains("深渊缚核者") and text(scripts[8]).contains("天山雪莲"), "Rescue and epilogue set up the next chapter")
+	check(text(scripts[5]).contains("回声") and text(scripts[6]).contains("小黄？我在这儿！"), "The false signal at the harbor pays off at sea")
+	check(text(scripts[6]).contains("全员弃船") and text(scripts[7]).contains("是我放行的"), "Sugar saves the crew and takes responsibility for the route")
+	check(text(scripts[7]).contains("断电桥也会掉") and text(scripts[8]).contains("主节点重启"), "The rescue requires restoring the ocean node without dropping the bridge")
+	check(text(scripts[8]).contains("把它抱上桥") and text(scripts[8]).contains("天山雪莲"), "The chapter rescues the cat and sets up the next goal")
 	var portal_shakes := false
 	var cat_cry_shakes := false
 	for node in scripts[1].nodes.values():
@@ -67,11 +69,8 @@ func run() -> void:
 				if node.type == "end": continue
 				valid_backgrounds = valid_backgrounds and view.background.texture != null
 				if node.speaker_actor.is_empty(): valid_cast = valid_cast and not view.speaker.visible
-				if node.actors.size() == 2 and node.speaker_actor.is_empty():
-					valid_cast = valid_cast and node.actors.any(func(id): return catalog.enemies.has(id))
 				for index in node.actors.size():
-					if catalog.enemies.has(node.actors[index]):
-						valid_cast = valid_cast and view.actor_views[index].visible and view.actor_views[index].texture == textures.actors[node.actors[index]]
+					valid_cast = valid_cast and view.actor_views[index].visible and view.actor_views[index].texture == textures.actors[node.actors[index]]
 			check(valid_backgrounds, "Every beat has a background: " + script.title)
 			check(valid_cast, "Narration label and dialogue cast: " + script.title)
 		view.show_snapshot(scripts[0].nodes.line_0)

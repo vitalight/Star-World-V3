@@ -3,19 +3,57 @@
 ---
 background: background_009
 actors: enemy_018
-anim_actor_exit_left: enemy_018
-> 深渊缚核者倒下，异常光幕逐渐消散。
+> 深渊缚核者倒在桥口。检修桥晃了两下，桥底传来一阵抓挠。
 
 ---
 background: background_009
-actors: character_011
+actors: character_013|character_017
+speaker: character_017
+> 桥已切到备用电，锁还扣着。你现在可以断主电。
+
+---
+background: background_009
+actors: character_013|character_017
+speaker: character_013
+> 故障段隔离。主节点重启。
+
+---
+background: background_009
+> 平台上的广播安静下来。信号灯从绿转红，电台里传来值守站的应答。
+
+---
+background: background_009
+actors: character_016|character_017
+speaker: character_017
+> 主节点恢复。航道暂时封闭。我会留在频道上，等每条船回报。
+
+---
+background: background_009
+actors: character_011|character_016
+speaker: character_016
+> 桥稳了。走。
+
+---
+background: background_009
+actors: character_011|character_012
+> 大星趴在桥边，把胳膊伸下去。小黄的爪子还紧紧抠着横梁。
+
+---
+background: background_009
+actors: character_011|character_012
 speaker: character_011
-> 小黄！
+> 上次你扑过来，我都没来得及接你。
 
 ---
 background: background_009
-actors: character_012
-> 大星跑到小黄身边。小黄费力地抬起头。
+actors: character_011|character_012
+speaker: character_011
+> 这次我抓着呢。你松手。
+
+---
+background: background_009
+actors: character_011|character_012
+> 小黄松开横梁，勾住大星的袖口。大星把它抱上桥。
 
 ---
 background: background_009
@@ -27,91 +65,47 @@ speaker: character_012
 background: background_009
 actors: character_011|character_012
 speaker: character_011
-> 我找到你了。
-> 这次不会再把你弄丢了。
+> 听见了。就你这一声。
 
 ---
 background: background_009
-actors: character_015
-> 月月蹲下来检查小黄的伤势。
-
----
-background: background_009
-actors: character_012|character_015
+actors: character_011|character_015
 speaker: character_015
-> 它还活着，但伤得很重。
+> 让我托住它的背。对，手放松一点。它喘不上来。
+
+---
+background: background_009
+> 大星松开一点手。小黄靠进月月的外套里，还勾着大星的袖子。
+
+---
+background: background_009
+actors: character_011|character_015
+speaker: character_015
+> 呼吸稳住了。伤口里的异常还在。我知道一个可能有用的办法，天山雪莲。得先查清楚在哪儿。
 
 ---
 background: background_009
 actors: character_011|character_015
 speaker: character_011
-> 你能治好它吗？
+> 你告诉我怎么抱它。我们回船上查。
 
 ---
 background: background_009
-actors: character_011|character_015
-speaker: character_015
-> 我能先稳住它的情况。
-> 可是这种异常留下的伤，我没有把握。
-
----
-background: background_009
-actors: character_013
-> 检测仪上的异常信号仍在小黄身边闪烁。
-
----
-background: background_009
-actors: character_013|character_015
-speaker: character_013
-> 节点能量还没有消退。
-
----
-background: background_009
-actors: character_011|character_015
-speaker: character_015
-> 我听说过一种天山雪莲。
-
----
-background: background_009
-actors: character_011|character_015
-speaker: character_015
-> 传说它能帮助受异常侵蚀的人恢复，但我没有亲眼见过。
-
----
-background: background_009
-actors: character_011|character_014
-speaker: character_011
-> 只要有机会，我就去找。
-
----
-background: background_009
-actors: character_011|character_014
+actors: character_014|character_016
 speaker: character_014
-> 那就先查清楚线索。大家一起去。
+> 我去找干毯子。船长，回去的路这次能信吗？
 
 ---
 background: background_009
-actors: character_016|character_017
+actors: character_014|character_016
 speaker: character_016
-> 船和补给交给我。
+> 看海。再听我的。
 
 ---
 background: background_009
 actors: character_016|character_017
 speaker: character_017
-> 需要的物资，我也来想办法。
-
----
-background: background_009
-actors: character_012
-> 大星轻轻抱起小黄。小黄的尾巴微微动了一下。
-
----
-background: background_009
-actors: character_011|character_012
-speaker: character_011
-> 再坚持一下。
-> 我们带你回家。
+> 最后一条船报平安了。接下来要查的地方，给我一张地图。
 
 ---
 background: background_009

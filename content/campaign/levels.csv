@@ -10,9 +10,9 @@ scene_0104B,1-4B 明珠失辉,击败根节点核心，修复失控的根节点�
 scene_0104C,1-4C 灯火将熄,击退根节点最后的反扑，守住上海的灯火。,battle,,res://content/scenes/scene_0104B/map.tscn,5,10,99,0.75,4,0,fixed,character_011|character_013|character_014|character_015,
 scene_0105A,1-5A 万家灯火,第一章尾声,story,res://content/scenes/scene_0105A/story_scene_0105A.md,,,,,,,,,,music_calm
 scene_0201A,2-1A 潮声将至,剧情,story,res://content/scenes/scene_0201A/story_scene_0201A.md,,,,,,,,,,music_tension
-scene_0201B,2-1 潮声将至,守住港口通道，击退连续来袭的敌人。,battle,,res://content/scenes/scene_0201B/map.tscn,5,15,99,1,5,0,fixed,character_011|character_013|character_014|character_015|character_016,
+scene_0201B,2-1 潮声将至,守住通往舷梯的通道，掩护码头人员撤离。,battle,,res://content/scenes/scene_0201B/map.tscn,5,15,99,1,5,0,fixed,character_011|character_013|character_014|character_015|character_016,
 scene_0202A,2-2A 风浪之间,剧情,story,res://content/scenes/scene_0202A/story_scene_0202A.md,,,,,,,,,,music_tension
-scene_0202B,2-2 风浪之间,留意不同入口，及时调整防线。,battle,,res://content/scenes/scene_0202B/map.tscn,5,18,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
+scene_0202B,2-2 风浪之间,守住两船之间的防线，掩护游艇船员转移。,battle,,res://content/scenes/scene_0202B/map.tscn,5,18,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
 scene_0203A,2-3A 彼岸微光,剧情,story,res://content/scenes/scene_0203A/story_scene_0203A.md,,,,,,,,,,music_tension
-scene_0203B,2-3 彼岸微光,守住节点的两条路线，击退强敌。,battle,,res://content/scenes/scene_0203B/map.tscn,5,20,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
+scene_0203B,2-3 彼岸微光,守住通往切换箱和检修桥的两条路，掩护主节点修复和救援。,battle,,res://content/scenes/scene_0203B/map.tscn,5,20,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
 scene_0204A,2-4A 第二章尾声,剧情,story,res://content/scenes/scene_0204A/story_scene_0204A.md,,,,,,,,,,music_calm

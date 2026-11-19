@@ -159,7 +159,7 @@ func run() -> void:
 	await dispose(); await spawn()
 	check(player.progress.completed.has("scene_0105A") and player._level_unlocked("scene_0201A"), "First chapter progress survives restart")
 	player._select_level("scene_0105A")
-	await click("第二章 · 济州岛")
+	await click("第二章 · 海洋")
 	check(player.progress.selected == "scene_0201A", "Selecting chapter two opens its first story card")
 	await click("进入故事")
 	var chapter_two_route := [
