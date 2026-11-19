@@ -122,6 +122,14 @@ func _ready() -> void:
 	charge_hint.outline_render_priority = 10
 	charge_hint.hide()
 	add_child(charge_hint)
+	var charge_ring := Sprite3D.new()
+	charge_ring.texture = preload("res://features/actor_view/skill_charge_ring.svg")
+	charge_ring.pixel_size = 0.0055
+	charge_ring.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	charge_ring.no_depth_test = true
+	charge_ring.render_priority = 9
+	charge_ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	charge_hint.add_child(charge_ring)
 	_process(0.0)
 
 func _process(_delta: float) -> void:
