@@ -93,7 +93,7 @@ func run() -> void:
 	player.progress.selected = ids.back()
 	player.show_levels()
 	await settle()
-	verify_list(7, false)
+	verify_list(11, false)
 	check(player.find_child("Level_scene_0201A", true, false) != null, "Second chapter starts with its opening story")
 	var panel: Control = player.find_child("LevelDetail", true, false)
 	var detail_scroll: ScrollContainer = player.find_child("DetailScroll", true, false)

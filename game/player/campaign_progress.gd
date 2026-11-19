@@ -1,5 +1,6 @@
 extends RefCounted
 ## Versioned chapter progress. Existing legacy sections survive writes.
+const SAVE_VERSION := 4
 var selected := "scene_0101A"
 var completed: Array[String] = []
 var pending_after := ""
@@ -16,10 +17,11 @@ func load_progress(path: String, ids: Array) -> void:
 	operators.clear()
 	away_operators.clear(); _has_roster_state = false
 	if _file.load(path) != OK: return
-	if _file.get_value("campaign", "version", 0) not in [1, 2, 3]: return
+	var version = _file.get_value("campaign", "version", 0)
+	if version not in [1, 2, 3, SAVE_VERSION]: return
 	var saved_operators = _file.get_value("player", "operators", [])
 	if saved_operators is Array:
-		_has_roster_state = _file.get_value("campaign", "version", 0) >= 2 and not saved_operators.is_empty()
+		_has_roster_state = version >= 2 and not saved_operators.is_empty()
 		for id in saved_operators:
 			if id is String and not operators.has(id): operators.append(id)
 	var saved_away = _file.get_value("player", "away", [])
@@ -29,7 +31,7 @@ func load_progress(path: String, ids: Array) -> void:
 	var saved = _file.get_value("campaign", "completed", [])
 	var selection = _file.get_value("campaign", "selected", selected)
 	var pending = _file.get_value("campaign", "pending_after", "")
-	if _file.get_value("campaign", "version", 0) < 3 and ids.has("scene_0101A"):
+	if version < 3 and ids.has("scene_0101A"):
 		var old_ids := ["scene_002", "scene_005", "scene_003", "scene_004"]
 		if saved is not Array: saved = []
 		else: saved = saved.duplicate()
@@ -65,6 +67,12 @@ func load_progress(path: String, ids: Array) -> void:
 			var battle_id: String = stage + "B"
 			if ids.has(story_id) and not saved.has(story_id) and (saved.has(battle_id) or pending == battle_id):
 				saved.append(story_id)
+		if version < 4:
+			# Preserve the furthest old checkpoint when a new pair precedes it.
+			if ids.has("scene_0205B") and (saved.has("scene_0202A") or saved.has("scene_0203A")):
+				saved.append_array(["scene_0205A", "scene_0205B"])
+			if ids.has("scene_0206B") and saved.has("scene_0203A"):
+				saved.append_array(["scene_0206A", "scene_0206B"])
 		for id in ids:
 			if not saved.has(id): break
 			completed.append(id)
@@ -108,7 +116,7 @@ func unlocked(id: String, ids: Array) -> bool:
 	return index >= 0 and (index == 0 or completed.has(ids[index - 1]))
 
 func save(path: String) -> Error:
-	_file.set_value("campaign", "version", 3)
+	_file.set_value("campaign", "version", SAVE_VERSION)
 	_file.set_value("player", "operators", operators)
 	_file.set_value("player", "away", away_operators)
 	_file.set_value("campaign", "selected", selected)

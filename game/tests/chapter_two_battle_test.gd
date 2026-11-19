@@ -22,14 +22,18 @@ func _initialize() -> void:
 	progress.pending_after = "scene_0201B"
 	progress.finish_story(ids, c.recruits, c.departures, c.returns)
 	check(progress.available_operators().has("character_016") and not progress.available_operators().has("character_017"), "Tiger joins after first battle")
-	progress.pending_after = "scene_0202A"
-	progress.finish_story(ids, c.recruits, c.departures, c.returns)
+	for id in ["scene_0205A", "scene_0205B", "scene_0202A"]:
+		progress.pending_after = id
+		progress.finish_story(ids, c.recruits, c.departures, c.returns)
+	check(not progress.available_operators().has("character_017"), "Sugar has not joined before the storm battle")
 	progress.pending_after = "scene_0202B"
 	progress.finish_story(ids, c.recruits, c.departures, c.returns)
-	check(progress.available_operators().has("character_017"), "Sugar joins after second battle")
+	check(progress.available_operators().has("character_017"), "Sugar joins after the storm battle")
 	var plans := {
 		"scene_0201B": [["character_016", Vector2i(6, 3), 2], ["character_014", Vector2i(3, 2), 2], ["character_015", Vector2i(5, 4), 3], ["character_013", Vector2i(5, 2), 3], ["character_011", Vector2i(7, 3), 2]],
-		"scene_0202B": [["character_016", Vector2i(6, 1), 2], ["character_017", Vector2i(6, 4), 2], ["character_014", Vector2i(6, 3), 2], ["character_015", Vector2i(5, 2), 0], ["character_013", Vector2i(4, 2), 2], ["character_011", Vector2i(7, 3), 2]],
+		"scene_0205B": [["character_016", Vector2i(7, 3), 2], ["character_014", Vector2i(4, 3), 2], ["character_013", Vector2i(6, 2), 3], ["character_015", Vector2i(6, 4), 3], ["character_011", Vector2i(8, 3), 2]],
+		"scene_0202B": [["character_016", Vector2i(6, 1), 2], ["character_014", Vector2i(6, 3), 2], ["character_011", Vector2i(5, 4), 2], ["character_013", Vector2i(4, 2), 2], ["character_015", Vector2i(5, 2), 0]],
+		"scene_0206B": [["character_016", Vector2i(6, 2), 2], ["character_014", Vector2i(4, 4), 2], ["character_011", Vector2i(7, 1), 3], ["character_015", Vector2i(5, 1), 0], ["character_013", Vector2i(6, 1), 3], ["character_017", Vector2i(6, 3), 3]],
 		"scene_0203B": [["character_016", Vector2i(5, 2), 2], ["character_017", Vector2i(3, 1), 1], ["character_014", Vector2i(7, 3), 2], ["character_015", Vector2i(6, 4), 3], ["character_013", Vector2i(4, 3), 2], ["character_011", Vector2i(8, 3), 2]]}
 	for id in plans:
 		var map = load(c.levels[id].map).instantiate()

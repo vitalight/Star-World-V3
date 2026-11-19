@@ -55,3 +55,13 @@ wave_057,scene_0203B,85,5,5,enemy_016,flank,4
 wave_058,scene_0202B,48,3,8,enemy_013,air,2
 wave_059,scene_0203B,45,2,12,enemy_017,main,2
 wave_060,scene_0203B,100,2,12,enemy_014,flank,4
+wave_061,scene_0205B,5,5,5,enemy_011,deck,1
+wave_062,scene_0205B,28,3,8,enemy_013,air,2
+wave_063,scene_0205B,41,4,5,enemy_012,deck,2
+wave_064,scene_0205B,68,5,4,enemy_011,deck,3
+wave_065,scene_0205B,72,2,8,enemy_013,air,3
+wave_066,scene_0206B,5,5,5,enemy_011,promenade,1
+wave_067,scene_0206B,25,4,6,enemy_012,shore,2
+wave_068,scene_0206B,44,2,12,enemy_015,promenade,2
+wave_069,scene_0206B,62,5,5,enemy_016,shore,3
+wave_070,scene_0206B,76,2,12,enemy_017,promenade,3

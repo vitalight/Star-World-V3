@@ -63,7 +63,7 @@ func run() -> void:
 	workspace.queue_free(); await settle()
 	workspace = load("res://devtools/story_test/story_workspace.tscn").instantiate()
 	root.add_child(workspace); await settle()
-	check(workspace.source_picker.item_count == 9, "Story Test offers both chapters' introductions and epilogues")
+	check(workspace.source_picker.item_count == 11, "Story Test offers both chapters' introductions and epilogues")
 	for index in workspace.source_picker.item_count:
 		workspace.source_picker.select(index)
 		workspace._load_source(index)

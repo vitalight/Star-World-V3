@@ -1,154 +1,92 @@
-# 2-2 风浪之间
-
----
-background: background_007
-> 最后一个撤离的人踏上甲板。Tiger 把名单点完，等岸上接应的人一一应声。
-
----
-background: background_007
-actors: character_013|character_016
-speaker: character_016
-> 港灯和外海航标一起熄的。你说的源头，在什么位置？
-
----
-background: background_007
-actors: character_013|character_016
-speaker: character_013
-> 济州外海。海洋主节点失联前，最后一组读数和小黄的信号重合。
-
----
-background: background_007
-actors: character_011|character_016
-speaker: character_016
-> 等潮退，港口还能开船。主节点一直坏着，外面那些船就只能等。走吧。
-
----
-background: background_007
-actors: character_011|character_016
-speaker: character_011
-> 船长……刚才谢谢你拉我。
-
----
-background: background_007
-actors: character_011|character_016
-speaker: character_016
-> 叫 Tiger。上船先把救生衣扣好。谢我等回来再谢。
-
----
-background: background_008
-> 海面上，一艘亮着绿灯的游艇横在浪里。它第三次从同一块礁石旁漂过。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 我是 Sugar。请报船名、拖带能力，还有你们的报价。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_016
-> 先报人数。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 七个。两个受伤。我的船还能走，航标一直给绿灯。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_016
-> 那块礁石你已经过了三回。熄火，放梯。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 绿灯用的是我公司的设备。这条航线也是我签字放行的。
-
----
-background: background_008
-> 游艇电台咔哒一响，传出大星的声音：「小黄？我在这儿！」
-
----
-background: background_008
-actors: character_011|character_013
-speaker: character_011
-> 我在码头喊的……它怎么会在这儿？
-
----
-background: background_008
-actors: character_011|character_013
-speaker: character_013
-> 它把港口的声音送到了海上。回电喊你的人，未必就在那条船上。
+# 2-3 风暴的来客
 
 ---
 background: background_008
 anim_screen_shake: true
-> 游艇底下传来一阵刮擦。带着绿光的航标应答器每亮一下，甲板就抖一次。
-
----
-background: background_008
-actors: character_017|enemy_012
-> 一只潜潮猎手攀上游艇。后面的怪物朝同一盏绿灯涌来。
-
----
-background: background_008
-actors: character_013|character_017
-speaker: character_013
-> 把应答器关掉。它在跟主节点互相呼叫，怪物顺着这道信号来的。
-
----
-background: background_008
-actors: character_013|character_017
-speaker: character_017
-> 开关没用了。备用电池在底舱。现在下去，水先到。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_016
-> 人过来，把缆绳解掉。让它们跟那艘船走。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 试航记录还在船上。没了它，谁信我一路收到的都是绿灯？
-
----
-background: background_008
-actors: character_015|character_017
-speaker: character_015
-> 先让伤员过来。她在等你说可以走。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 全员弃船。记录别拿。驾驶台的那位，回来，我看得见你。
-
----
-background: background_008
-anim_screen_shake: true
-> 两条船在浪里撞到一起。胡胡把跳板压住。
-
----
-background: background_008
-actors: character_014|character_017
-speaker: character_014
-> 正面一拨，跳板下面还有一拨。谁会解缆？
-
----
-background: background_008
-actors: character_014|character_017
-speaker: character_017
-> 我来。你喊过了几个。我最后走。
+> 怪物被赶下船。紧接着一记巨浪拍过来，船尾一震，引擎声断了。
 
 ---
 background: background_008
 actors: character_014|character_016
 speaker: character_016
-> 守住甲板和跳板。人齐了才解缆。
+> 舵没坏，动力没了。胡胡，替我发求救。报位置，报人数。
+
+---
+background: background_008
+actors: character_014|character_016
+speaker: character_014
+> 报完了。要不再报一次？
+
+---
+background: background_008
+actors: character_014|character_016
+speaker: character_016
+> 报。浪没把电台打坏之前，一直报。
+
+---
+background: background_008
+> 风雨里亮起两盏探照灯。一艘探险船迎着浪头转了过来。
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_017
+> 这里是 Sugar，探险家。你们船上的灯怎么只亮一半？
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_016
+> 撞坏了两盏。我的船过不去，你有办法靠过来吗？
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_017
+> 我来贴你们背风的一侧。先过人。等我数到三再迈。
+
+---
+background: background_008
+actors: character_011|character_015
+speaker: character_015
+> 大星，手给我。踏板一稳就走，别往下看。
+
+---
+background: background_008
+anim_screen_shake: true
+> 最后一人跳上探险船。Tiger 回身松开缆绳，身后的船被浪推开。
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_016
+> 人齐了。谢了，你怎么敢往风眼里开？
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_017
+> 我本来在风暴边上测潮。听见有人把人数报了三遍，就折回来了。
+
+---
+background: background_008
+actors: character_013|character_014
+speaker: character_013
+> 怪物也围过来了。两边都是，头顶还有。
+
+---
+background: background_008
+actors: enemy_012
+> 一只潜潮猎手从船尾的栏杆间挤上来。探照灯掠过海面，更多背鳍正在靠拢。
+
+---
+background: background_008
+actors: character_016|character_017
+speaker: character_017
+> 我来开船。这边的浪有一道缺口，过了就能看到岛。
+
+---
+background: background_008
+actors: character_011|character_016
+speaker: character_016
+> 他管航向。咱们守住甲板，让船过得去。

@@ -163,8 +163,10 @@ func run() -> void:
 	check(player.progress.selected == "scene_0201A", "Selecting chapter two opens its first story card")
 	await click("进入故事")
 	var chapter_two_route := [
-		["scene_0201A", "scene_0201B", "scene_0202A"],
-		["scene_0202A", "scene_0202B", "scene_0203A"],
+		["scene_0201A", "scene_0201B", "scene_0205A"],
+		["scene_0205A", "scene_0205B", "scene_0202A"],
+		["scene_0202A", "scene_0202B", "scene_0206A"],
+		["scene_0206A", "scene_0206B", "scene_0203A"],
 		["scene_0203A", "scene_0203B", "scene_0204A"],
 	]
 	for stage in chapter_two_route:

@@ -1,0 +1,5 @@
+# chapter02_02_blue_horizon_v1
+
+Generated with the built-in ImageGen tool. The prompt refers to the existing Chapter 2 storm deck as a visual direction.
+
+Wide 16:9 environment-only story background for a polished 2D tactical science fiction RPG, 1600x900 composition. View from the working aft deck of a modest steel search vessel at sea on a clear breezy morning. A strip of low rail and matte blue-gray deck in the foreground, a simple reel of rope and one orange life ring at the sides, open sapphire and turquoise sea with a long straight horizon and a few soft cumulus clouds, soft late morning sunlight. Calm and spacious, cinematic digital painting with credible perspective, crisp broad forms, restrained textures and painterly realism, similar to the existing Star World storm deck in the conversation but a new daylight composition. This is an empty environment plate for separately composited anime characters. Keep midground and lower middle visually quiet, clear large tonal areas, no people, no animals, no other boats, no text, no UI, no logos, no watermarks.

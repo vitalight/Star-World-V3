@@ -1,0 +1,5 @@
+# chapter02_04_empty_coast_v1
+
+Generated with the built-in ImageGen tool. The prompt refers to the existing Chapter 2 storm deck as a visual direction.
+
+Wide 16:9 environment-only story background for a polished 2D tactical science fiction RPG, 1600x900 composition. An empty formerly busy coastal holiday promenade on an East Asian volcanic island, seen at human eye level just after a storm. A modest closed rental kiosk with blank fascia, stacked cream umbrellas off to the side, a strip of sand and black basalt rocks with quiet gray-blue sea, a broad stone footpath bending inland between low walls. Cool overcast daylight with a little warm light breaking through. Uneasy stillness, exquisite hand-painted narrative environment, large clean forms, credible perspective, atmospheric distance, details clustered at sides. Match the painterly realist material treatment of Star World ocean chapter art shown in the conversation, with the lower middle kept quiet for separately overlaid characters and dialogue. Empty scene with no people, no animals, no monsters, no text, no badges, no logos, no watermarks.
