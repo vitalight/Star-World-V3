@@ -28,13 +28,8 @@ if not exist "%PROJECT_ROOT%\temp\game" (
     echo [ERROR] Cannot create temp/game.
     exit /b 1
 )
-echo [Import] temp/game/import.log
-"%GODOT_PATH%" --headless --path "%PROJECT_ROOT%" --editor --import --quit > "%PROJECT_ROOT%\temp\game\import.log" 2>&1
-if errorlevel 1 (
-    type "%PROJECT_ROOT%\temp\game\import.log"
-    echo [ERROR] Resource import failed.
-    exit /b 1
-)
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0prepare_project_import.ps1" -Launcher game
+if errorlevel 1 exit /b 1
 echo [Run] Player Mode
 "%GODOT_PATH%" --path "%PROJECT_ROOT%" %GAME_ARGS%
 set "RUN_RESULT=%ERRORLEVEL%"

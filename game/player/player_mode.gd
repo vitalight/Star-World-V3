@@ -1,21 +1,16 @@
 extends Control
 ## Product flow owns navigation and progress; the shared battle owns gameplay.
-const BattleScene = preload("res://game/battle/battle_scene.tscn")
-const Background = preload("res://content/ui/player/background.png")
-const Atlas = preload("res://content/ui/player/atlas.png")
 const MainBackground = preload("res://content/ui/player/main_background_v2.png")
-const LevelsBackground = preload("res://content/ui/player/levels_background_v1.png")
 const MainEmblem = preload("res://content/ui/player/main_emblem_v2.png")
 const MainButtonLight = preload("res://content/ui/player/main_button_light_v2.png")
 const MainButtonDark = preload("res://content/ui/player/main_button_dark_v2.png")
 const MainSettings = preload("res://content/ui/player/main_settings_v2.png")
-const FirstBattleHintImage = preload("res://content/ui/tutorial/scene_0101B_battle.png")
 const BATTLE_HINTS := {
-	"scene_0101B": [FirstBattleHintImage, "欢迎来到星世界。\n- 你的目标，是部署干员，击退来袭的敌人。\n- 敌人突破防线，会消耗基地生命值。\n- 当基地生命值降至 0 时，游戏失败。"],
-	"scene_0102B": [preload("res://content/scenes/scene_0102B/level_preview.png"), "警戒！出现了飞行敌人。\n- 飞行会从高台出发，不受干员阻挡，是极大的威胁。\n- 阿五拥有远程攻击能力，是制裁他们的办法。"],
-	"scene_0103B": [preload("res://content/scenes/scene_0103B/level_preview.png"), "部署干员需要消耗 DP。\n- DP 会随时间自动恢复。\n- 先锋干员【胡胡】的技能，可以帮助你更快获得 DP。\n- 合理安排部署顺序，尽快建立防线。"],
-	"scene_0104B": [preload("res://content/scenes/scene_0104B/level_preview.png"), "怪物的攻势愈发猛烈，需要紧急救援。\n- 干员生命值为0时，就会退场。\n- 月月拥有治疗能力，会自动治疗范围内生命值最低的盟友。"],
-	"scene_0104C": [preload("res://content/scenes/scene_0104C/level_preview.png"), "大量敌人来袭！\n- 受节点紊乱影响，本关DP恢复变慢。\n- 请合理安排干员位置，确保最大化输出。"],
+	"scene_0101B": ["res://content/ui/tutorial/scene_0101B_battle.png", "欢迎来到星世界。\n- 你的目标，是部署干员，击退来袭的敌人。\n- 敌人突破防线，会消耗基地生命值。\n- 当基地生命值降至 0 时，游戏失败。"],
+	"scene_0102B": ["res://content/scenes/scene_0102B/level_preview.png", "警戒！出现了飞行敌人。\n- 飞行会从高台出发，不受干员阻挡，是极大的威胁。\n- 阿五拥有远程攻击能力，是制裁他们的办法。"],
+	"scene_0103B": ["res://content/scenes/scene_0103B/level_preview.png", "部署干员需要消耗 DP。\n- DP 会随时间自动恢复。\n- 先锋干员【胡胡】的技能，可以帮助你更快获得 DP。\n- 合理安排部署顺序，尽快建立防线。"],
+	"scene_0104B": ["res://content/scenes/scene_0104B/level_preview.png", "怪物的攻势愈发猛烈，需要紧急救援。\n- 干员生命值为0时，就会退场。\n- 月月拥有治疗能力，会自动治疗范围内生命值最低的盟友。"],
+	"scene_0104C": ["res://content/scenes/scene_0104C/level_preview.png", "大量敌人来袭！\n- 受节点紊乱影响，本关DP恢复变慢。\n- 请合理安排干员位置，确保最大化输出。"],
 }
 const Catalog = preload("res://game/content/content_catalog.gd")
 const Progress = preload("res://game/player/campaign_progress.gd")
@@ -34,11 +29,25 @@ var page := ""
 var menu: Control
 var canvas: Control
 var battle_scene: Node3D
-var has_progress := false
-var completed := false
+var has_progress := false:
+	get:
+		_ensure_campaign()
+		return has_progress
+var completed := false:
+	get:
+		_ensure_campaign()
+		return completed
 var save_notice := ""
-var catalog = Catalog.new()
-var progress = Progress.new()
+var catalog = Catalog.new():
+	get:
+		_ensure_campaign()
+		return catalog
+var progress = Progress.new():
+	get:
+		_ensure_campaign()
+		return progress
+var _campaign_initialized := false
+var _battle_scene_source: PackedScene
 var audio: Node
 var audio_settings
 var session = Session.new()
@@ -56,8 +65,6 @@ var slot_notice := ""
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	developer_mode = developer_mode or "--developer-mode" in OS.get_cmdline_user_args()
-	catalog.reload()
-	_load_progress()
 	_setup_audio()
 	resized.connect(_fit_menu)
 	show_main()
@@ -76,6 +83,12 @@ func _play_music(id: String) -> void:
 func _play_ui(id: String) -> void:
 	if audio: audio.play_sfx(id)
 
+func _ensure_campaign() -> void:
+	if _campaign_initialized: return
+	_campaign_initialized = true
+	catalog.reload()
+	_load_progress()
+
 func _load_progress() -> void:
 	progress = Progress.new()
 	if not developer_mode:
@@ -93,11 +106,13 @@ func _save_progress() -> void:
 	completed = progress.completed.size() == catalog.levels.size() and not catalog.levels.is_empty()
 
 func resume_game() -> void:
-	if not developer_mode: _load_progress()
+	if not _campaign_initialized: _ensure_campaign()
+	elif not developer_mode: _load_progress()
 	if not progress.pending_after.is_empty(): _continue_campaign()
 	else: show_levels()
 
 func new_game() -> void:
+	_ensure_campaign()
 	progress = Progress.new()
 	selected_squad.clear(); squad_level = ""
 	if not catalog.levels.is_empty(): progress.selected = str(catalog.levels.keys()[0])
@@ -130,7 +145,10 @@ func _menu_page(kind: String, shade: float) -> void:
 	menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(menu)
 	var background := TextureRect.new()
-	background.texture = MainBackground if kind == "main" else (LevelsBackground if kind in ["levels", "saves"] else Background)
+	match kind:
+		"main": background.texture = MainBackground
+		"levels", "saves": background.texture = load("res://content/ui/player/levels_background_v1.png")
+		_: background.texture = load("res://content/ui/player/background.png")
 	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -165,7 +183,7 @@ func show_main() -> void:
 	title.add_theme_constant_override("shadow_outline_size", 3)
 	_main_button("开始游戏", Rect2(641, 514, 390, 69), new_game if developer_mode else show_save_slots)
 	var resume := _main_button("读取存档", Rect2(641, 601, 390, 69), resume_game if developer_mode else show_save_slots)
-	resume.disabled = not has_progress if developer_mode else not _any_save_exists()
+	resume.disabled = not (_campaign_initialized and has_progress) if developer_mode else not _any_save_exists()
 	if developer_mode: _text(canvas, "开发者模式", Rect2(48, 42, 250, 35), 19, Color("ffe2a0"))
 	_main_button("退出游戏", Rect2(641, 688, 390, 69), func(): get_tree().quit())
 	var settings := _level_button(canvas, "设置", Rect2(1538, 42, 64, 64), show_settings, false)
@@ -725,7 +743,9 @@ func _start_battle(play_replay: bool) -> void:
 	page = "battle"
 	_play_music("music_battle")
 	result_recorded = false
-	battle_scene = BattleScene.instantiate()
+	if _battle_scene_source == null:
+		_battle_scene_source = load("res://game/battle/battle_scene.tscn")
+	battle_scene = _battle_scene_source.instantiate()
 	battle_scene.developer_tools_enabled = developer_mode
 	battle_scene.developer_speed_enabled = developer_mode
 	battle_scene.replay_mode = play_replay
@@ -783,7 +803,7 @@ func _show_tutorial(hint: Array) -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(title)
 	var screenshot := TextureRect.new()
-	screenshot.texture = hint[0]
+	screenshot.texture = load(hint[0])
 	screenshot.custom_minimum_size = Vector2(564, 250)
 	screenshot.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	screenshot.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -848,7 +868,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _region(rect: Rect2) -> AtlasTexture:
 	var texture := AtlasTexture.new()
-	texture.atlas = Atlas; texture.region = rect
+	texture.atlas = load("res://content/ui/player/atlas.png"); texture.region = rect
 	return texture
 
 func _image(parent: Node, rect: Rect2, texture: Texture2D) -> TextureRect:

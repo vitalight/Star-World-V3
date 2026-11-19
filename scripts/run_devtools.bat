@@ -20,7 +20,7 @@ if not exist "%PROJECT_ROOT%\temp\devtools\user" (
 rem Scope the user-data override to this BAT and its Godot child processes.
 set "APPDATA=%PROJECT_ROOT%\temp\devtools\user"
 echo [Godot] "%GODOT_PATH%"
-powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0prepare_devtools.ps1"
+powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "%~dp0prepare_project_import.ps1" -Launcher devtools
 if errorlevel 1 exit /b 1
 echo [Run] Developer Hub
 "%GODOT_PATH%" --path "%PROJECT_ROOT%" res://devtools/hub/developer_hub.tscn %*

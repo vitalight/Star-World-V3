@@ -1,9 +1,15 @@
+param(
+    [Parameter(Mandatory)]
+    [ValidateSet('game', 'devtools')]
+    [string] $Launcher
+)
+
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $godotCache = Join-Path $projectRoot '.godot'
-$devtoolsTemp = Join-Path $projectRoot 'temp/devtools'
-$snapshotPath = Join-Path $devtoolsTemp 'import-state.txt'
-$logPath = Join-Path $devtoolsTemp 'import.log'
+$snapshotPath = Join-Path $projectRoot 'temp/project-import-state.txt'
+$relativeLogPath = "temp/$Launcher/import.log"
+$logPath = Join-Path $projectRoot $relativeLogPath
 
 function Get-FileState([IO.FileInfo] $File) {
     '{0}|{1}|{2}' -f $File.FullName, $File.Length, $File.LastWriteTimeUtc.Ticks
@@ -61,7 +67,7 @@ function Get-ImportState {
 $hash = [Security.Cryptography.SHA256]::Create()
 $projectKey = [Convert]::ToBase64String($hash.ComputeHash([Text.Encoding]::UTF8.GetBytes($projectRoot.ToUpperInvariant())))
 $hash.Dispose()
-$mutex = [Threading.Mutex]::new($false, 'StarWorldDevtoolsImport-' + $projectKey.Replace('/', '_'))
+$mutex = [Threading.Mutex]::new($false, 'StarWorldProjectImport-' + $projectKey.Replace('/', '_'))
 try {
     try { $null = $mutex.WaitOne() } catch [Threading.AbandonedMutexException] {}
     try {
@@ -70,7 +76,7 @@ try {
             [IO.File]::ReadAllText($snapshotPath) -ceq $before.Snapshot) { exit 0 }
 
         [IO.File]::Delete($snapshotPath)
-        Write-Host '[Import] temp/devtools/import.log'
+        Write-Host "[Import] $relativeLogPath"
         & {
             $ErrorActionPreference = 'Continue'
             & $env:GODOT_PATH --headless --path $projectRoot --editor --import --quit 2>&1 |
