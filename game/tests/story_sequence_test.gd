@@ -25,10 +25,10 @@ func run() -> void:
 	check(text(scripts[2]).contains("信号全乱了") and text(scripts[2]).contains("先救人"), "Tracking leads to doctor rescue")
 	check(text(scripts[3]).contains("我是医生") and text(scripts[3]).contains("东方明珠"), "Doctor joins before root node battle")
 	check(text(scripts[4]).contains("济州岛") and not text(scripts[4]).contains("铃铛"), "Ocean hook uses revised script")
-	check(text(scripts[5]).contains("所有客运航线停运") and text(scripts[6]).contains("鱼竿"), "Harbor closures lead into the voyage with Tiger")
-	check(text(scripts[7]).contains("动力没了") and text(scripts[7]).contains("Sugar，探险家"), "Sugar rescues the group when the ship loses power")
-	check(text(scripts[8]).contains("爪印") and text(scripts[9]).contains("生命信号"), "Tracks on the coast lead to the ocean node")
-	check(text(scripts[10]).contains("海洋主节点恢复正常") and text(scripts[10]).contains("天山雪莲"), "The epilogue restores the node and sets up the mountain journey")
+	check(text(scripts[5]).contains("所有的客运航班都取消了") and text(scripts[6]).contains("鱼竿"), "Harbor closures lead into the voyage with Tiger")
+	check(text(scripts[7]).contains("损坏了动力系统") and text(scripts[7]).contains("我叫 Sugar"), "Sugar rescues the group when the ship loses power")
+	check(text(scripts[8]).contains("脚印") and text(scripts[9]).contains("生命信号"), "Tracks on the coast lead to the ocean node")
+	check(text(scripts[10]).contains("根节点已经恢复正常") and text(scripts[10]).contains("天山雪莲"), "The epilogue restores the node and sets up the mountain journey")
 	var portal_shakes := false
 	var cat_cry_shakes := false
 	for node in scripts[1].nodes.values():

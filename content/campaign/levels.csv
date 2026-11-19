@@ -19,4 +19,4 @@ scene_0206A,2-4A 无人的海岸,剧情,story,res://content/scenes/scene_0206A/s
 scene_0206B,2-4B 海岛突围,压住海滨步道和沿岸小路的敌人，打通进岛路线。,battle,,res://content/scenes/scene_0206B/map.tscn,5,20,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
 scene_0203A,2-5A 深蓝之下,剧情,story,res://content/scenes/scene_0203A/story_scene_0203A.md,,,,,,,,,,music_tension
 scene_0203B,2-5B 海洋主节点,击败深渊缚核者，为节点修复和小黄救援打通道路。,battle,,res://content/scenes/scene_0203B/map.tscn,5,20,99,1,6,0,fixed,character_011|character_013|character_014|character_015|character_016|character_017,
-scene_0204A,尾声 潮声渐息,剧情,story,res://content/scenes/scene_0204A/story_scene_0204A.md,,,,,,,,,,music_calm
+scene_0204A,2-6 潮声渐息,剧情,story,res://content/scenes/scene_0204A/story_scene_0204A.md,,,,,,,,,,music_calm

@@ -2,70 +2,93 @@
 
 ---
 background: background_009
-> 沿步道翻过一道矮坡，众人看见了海洋主节点。冷紫色的异常能量顺着支架爬，海水一下下撞在检修台底。
+> 巨大的异常裂口悬浮在海面上空，周围的海水违背常理地向天空涌去。
 
 ---
 background: background_009
-actors: character_011|character_013
-speaker: character_013
-> 停。探测仪刷新了。里面有小黄的生命信号，很弱，但还在。
-
----
-background: background_009
-actors: character_011|character_013
-speaker: character_011
-> 你再说一遍。
-
----
-background: background_009
-actors: character_011|character_013
-speaker: character_013
-> 它还活着。信号在节点背面的检修区。
-
----
-background: background_009
-actors: character_016|character_017
-speaker: character_016
-> 我船员最后报的位置也在这一带。能走到背面吗？
-
----
-background: background_009
-actors: character_016|character_017
+actors: character_017|character_013
 speaker: character_017
-> 护栏后面有道检修门。先看那条路。
+> 我去过那么多地方，还是第一次见到这样的景象。
 
 ---
 background: background_009
-actors: enemy_018
-anim_screen_shake: true
-> 深渊缚核者从检修门前站起。它拖着重臂向前一砸，钢板传来闷响。
-
----
-background: background_009
-actors: character_011|character_016
-speaker: character_011
-> 它后面就是小黄。船长，这次我能过去了吗？
-
----
-background: background_009
-actors: character_011|character_016
-speaker: character_016
-> 先跟着我的盾。你去得了，还得带它回来。
-
----
-background: background_009
-actors: character_013|character_017
+actors: character_017|character_013
 speaker: character_013
-> 它压着检修台，我进不去。打通主路以后，我进去切断异常供能，再重启节点。
+> 这就是这个地区的根节点。异常的风暴也是它引起的。
 
 ---
 background: background_009
-actors: character_011|character_015
-speaker: character_015
-> 等你把它带出来，直接交给我。
+actors: character_014|character_013
+speaker: character_014
+> 队长，检测到生命信号了！
 
 ---
 background: background_009
-actors: character_011|character_016
+actors: character_011|character_014
 speaker: character_011
-> 好。船长，我们一起过去。
+> 是小黄吗？
+
+---
+background: background_009
+actors: character_011|character_014
+speaker: character_014
+> 没错！就在前面！
+
+---
+background: background_009
+actors: character_011|enemy_018
+anim_screen_shake: true
+> 大星朝节点方向跑去，一只巨大的海洋怪物突然从海中升起。
+
+---
+background: background_009
+actors: character_016|character_011
+speaker: character_016
+> 小心！
+
+---
+background: background_009
+actors: character_016|character_011
+> Tiger挡在大星身前。
+
+---
+background: background_009
+actors: character_013|enemy_018
+speaker: character_013
+> 这家伙正在吸收根节点的能量。必须先消灭它，才能修复节点。
+
+---
+background: background_009
+actors: character_014|character_013
+speaker: character_014
+> 队长，节点的能量还在不断上升！
+
+---
+background: background_009
+actors: character_015|character_011
+speaker: character_015
+> 我们得抓紧时间，小黄可能撑不了太久了。
+
+---
+background: background_009
+actors: character_017|enemy_018
+speaker: character_017
+> 看来这就是本次探险的最后一道难关了。
+
+---
+background: background_009
+actors: character_016|enemy_018
+speaker: character_016
+> 大家尽管进攻，前面交给我！
+
+---
+background: background_009
+actors: character_011
+speaker: character_011
+> 小黄，再坚持一下。
+
+---
+background: background_009
+actors: character_011
+speaker: character_011
+> 我来接你回家了！

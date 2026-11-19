@@ -2,91 +2,144 @@
 
 ---
 background: background_008
-anim_screen_shake: true
-> 怪物被赶下船。紧接着一记巨浪拍过来，船尾一震，引擎声断了。
+> 乌云遮蔽天空，海浪不断拍打船身。
 
 ---
 background: background_008
-actors: character_014|character_016
+actors: character_016|character_013
 speaker: character_016
-> 舵没坏，动力没了。胡胡，替我发求救。报位置，报人数。
+> 糟了，刚才的战斗损坏了动力系统！
+
+---
+background: background_008
+actors: character_016|character_013
+speaker: character_013
+> 附近出现了强烈的异常能量反应，这场风暴恐怕也和节点有关。
+
+---
+background: background_008
+actors: character_015|character_014
+speaker: character_015
+> 船进水了！
 
 ---
 background: background_008
 actors: character_014|character_016
 speaker: character_014
-> 报完了。要不再报一次？
+> 船长，我们现在怎么办？
 
 ---
 background: background_008
 actors: character_014|character_016
 speaker: character_016
-> 报。浪没把电台打坏之前，一直报。
-
----
-background: background_008
-> 风雨里亮起两盏探照灯。一艘探险船迎着浪头转了过来。
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 这里是 Sugar，探险家。你们船上的灯怎么只亮一半？
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_016
-> 撞坏了两盏。我的船过不去，你有办法靠过来吗？
-
----
-background: background_008
-actors: character_016|character_017
-speaker: character_017
-> 我来贴你们背风的一侧。先过人。等我数到三再迈。
-
----
-background: background_008
-actors: character_011|character_015
-speaker: character_015
-> 大星，手给我。踏板一稳就走，别往下看。
+> 所有人穿好救生衣！我去想办法恢复动力！
 
 ---
 background: background_008
 anim_screen_shake: true
-> 最后一人跳上探险船。Tiger 回身松开缆绳，身后的船被浪推开。
+> 风浪越来越大，船身剧烈摇晃。
+
+---
+background: background_008
+actors: character_011
+speaker: character_011
+> 小黄还在等我……可不能在这里倒下啊！
+
+---
+background: background_008
+> 突然，远处传来一阵汽笛声。一束明亮的探照灯穿透雨幕。
+
+---
+background: background_008
+> ？？？：喂！那边船上的朋友，还好吗？
+
+---
+background: background_008
+actors: character_014
+speaker: character_014
+> 有船！有人来救我们了！
+
+---
+background: background_008
+> 一艘大型探险船缓缓靠近。
+
+---
+background: background_008
+actors: character_017
+> ？？？：抓住绳索！一个一个过来！
+
+---
+background: background_008
+actors: character_016|character_017
+> 众人陆续转移到探险船上。
 
 ---
 background: background_008
 actors: character_016|character_017
 speaker: character_016
-> 人齐了。谢了，你怎么敢往风眼里开？
+> 多谢！这种天气还敢出海，你也是够大胆的。
 
 ---
 background: background_008
 actors: character_016|character_017
 speaker: character_017
-> 我本来在风暴边上测潮。听见有人把人数报了三遍，就折回来了。
+> 哈哈哈，没点胆量，怎么当探险家？
 
 ---
 background: background_008
-actors: character_013|character_014
+actors: character_016|character_017
+speaker: character_017
+> 我叫 Sugar，专门去一些别人不敢去的地方。
+
+---
+background: background_008
+actors: character_014|character_017
+speaker: character_014
+> 比如这种随时可能翻船的地方？
+
+---
+background: background_008
+actors: character_014|character_017
+speaker: character_017
+> 没错！刺激吧？
+
+---
+background: background_008
+actors: character_014|character_017
+speaker: character_014
+> ……太刺激了。
+
+---
+background: background_008
+anim_screen_shake: true
+> 船上的警报突然响起。
+
+---
+background: background_008
+actors: character_017|character_013
+speaker: character_017
+> 看来那些家伙还不打算放过我们。
+
+---
+background: background_008
+actors: character_013|enemy_012
 speaker: character_013
-> 怪物也围过来了。两边都是，头顶还有。
+> 大量异常怪物正在接近！
 
 ---
 background: background_008
-actors: enemy_012
-> 一只潜潮猎手从船尾的栏杆间挤上来。探照灯掠过海面，更多背鳍正在靠拢。
-
----
-background: background_008
-actors: character_016|character_017
+actors: character_017|character_011
 speaker: character_017
-> 我来开船。这边的浪有一道缺口，过了就能看到岛。
+> 各位，有没有兴趣陪我穿越风暴？
 
 ---
 background: background_008
-actors: character_011|character_016
-speaker: character_016
-> 他管航向。咱们守住甲板，让船过得去。
+actors: character_017|character_011
+speaker: character_011
+> 只要能到那座海岛，什么风暴我都不怕！
+
+---
+background: background_008
+actors: character_017|character_011
+speaker: character_017
+> 好！我就喜欢这样的冒险伙伴！
